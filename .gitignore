@@ -1,0 +1,41 @@
+# CMake build files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+DartConfiguration.tcl
+Makefile
+
+# Compiled object files
+*.o
+*.o.d
+
+# Executables
+pba_sta
+sample_parser
+
+# Auto-generated files (Flex/Bison)
+verilog_parser.tab.cc
+verilog_parser.tab.hh
+verilog_lexer.yy.cc
+location.hh
+position.hh
+stack.hh
+
+# IDE files
+.vscode/
+.idea/
+*.code-workspace
+
+# Temporary files
+*.swp
+*.swo
+*~
+.DS_Store
+*.tmp
+*.bak
+*.log
+
+# Debug files
+*.dSYM/
+*.pdb
