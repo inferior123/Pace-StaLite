@@ -1,73 +1,9 @@
-#include <cstdlib>
-#include <iostream>
+#include "sta/sta_data_structures.hpp"
+#include "parser-verilog/verilog_data.hpp"
 #include <set>
-#include <vector>
 
-#include "sta_data_structures.hpp"
-#include "verilog_driver.hpp"
+#include "sta/debug.h"
 
-sta::STAWorker worker;
-
-// Define your own parser by inheriting the ParserVerilogInterface
-struct MyVerilogParser : public verilog::ParserVerilogInterface {
-
-  virtual ~MyVerilogParser(){}
-
-  // Function that will be called when encountering the top module name.
-  void add_module(std::string&& name){
-    worker.top_moudle = name;
-  }
-
-  // Function that will be called when encountering a port.
-  void add_port(verilog::Port&& port) {
-    worker.collect_port(port);
-  }  
-
-  // Function that will be called when encountering a net.
-  void add_net(verilog::Net&& net) {
-    worker.collect_net(net);    
-  }  
-
-  // Function that will be called when encountering a assignment statement.
-  void add_assignment(verilog::Assignment&& ast) {
-    worker.collect_assign(ast);
-  }  
-
-  // Function that will be called when encountering a module instance.
-  void add_instance(verilog::Instance&& inst) {
-    worker.collect_instance(inst);
-  }
-};
-
-struct SampleParser : public verilog::ParserVerilogInterface {
-
-  virtual ~SampleParser(){}
-
-  // Function that will be called when encountering the top module name.
-  void add_module(std::string&& name){
-    std::cout << "Module: " << name << '\n';
-  }
-
-  // Function that will be called when encountering a port.
-  void add_port(verilog::Port&& port) {
-    std::cout << "Port: " << port << '\n';
-  }  
-
-  // Function that will be called when encountering a net.
-  void add_net(verilog::Net&& net) {
-    std::cout << "Net: " << net << '\n';
-  }  
-
-  // Function that will be called when encountering a assignment statement.
-  void add_assignment(verilog::Assignment&& ast) {
-    std::cout << "Assignment: " << ast << '\n';
-  }  
-
-  // Function that will be called when encountering a module instance.
-  void add_instance(verilog::Instance&& inst) {
-    std::cout << "Instance: " << inst << '\n';
-  }
-};
 
 void fanout_debuger(sta::STAWorker& worker) {
   std::cout << "\n╔══════════════════════════════════════════════════════════╗\n";
@@ -106,7 +42,12 @@ void fanout_debuger(sta::STAWorker& worker) {
   std::cout << "  INPUT ports:\n";
   for (const auto& bit : input_ports) {
     std::cout << "    " << bit.wire_name;
-    if (bit.bit_offset != 0 || signal_registry.at(bit.wire_name).size() > 1) {
+    // 检查是否需要显示索引：如果bit_offset不为0，或者signal_registry中存在且size>1
+    bool need_index = (bit.bit_offset != 0);
+    if (!need_index && signal_registry.count(bit.wire_name)) {
+      need_index = (signal_registry.at(bit.wire_name).size() > 1);
+    }
+    if (need_index) {
       std::cout << "[" << bit.bit_offset << "]";
     }
     std::cout << "\n";
@@ -120,7 +61,12 @@ void fanout_debuger(sta::STAWorker& worker) {
       continue;
     }
     std::cout << "    " << bit.wire_name;
-    if (bit.bit_offset != 0 || signal_registry.at(bit.wire_name).size() > 1) {
+    // 检查是否需要显示索引：如果bit_offset不为0，或者signal_registry中存在且size>1
+    bool need_index = (bit.bit_offset != 0);
+    if (!need_index && signal_registry.count(bit.wire_name)) {
+      need_index = (signal_registry.at(bit.wire_name).size() > 1);
+    }
+    if (need_index) {
       std::cout << "[" << bit.bit_offset << "]";
     }
     std::cout << "\n";
@@ -197,13 +143,83 @@ void fanout_debuger(sta::STAWorker& worker) {
   std::cout << "╚══════════════════════════════════════════════════════════╝\n\n";
 }
 
-
-int main(){
-  MyVerilogParser parser;
-  parser.read("./Testing/reg.v");
-  worker.build_fanouts();
-
-  fanout_debuger(worker);
-
-  return EXIT_SUCCESS;
+void run_debuger(sta::STAWorker& worker, bool verbose) {
+  std::cout << "\n╔══════════════════════════════════════════════════════════╗\n";
+  std::cout << "║              Timing Propagation Trace                    ║\n";
+  std::cout << "╚══════════════════════════════════════════════════════════╝\n\n";
+  
+  // 显示初始状态
+  const auto& timing_queue = worker.get_timing_queue();
+  const auto& arrival_time = worker.get_arrival_time();
+  const auto& endpoints = worker.get_endpoints();
+  
+  std::cout << "Initial State:\n";
+  std::cout << "----------------------------------------\n";
+  std::cout << "Queue size: " << timing_queue.size() << "\n";
+  if (timing_queue.size() > 0) {
+    std::cout << "Signals in queue:\n";
+    for (const auto& bit : timing_queue) {
+      sta::SignalBit canonical = worker.get_canonical_signal(bit);
+      std::cout << "  - " << canonical.wire_name << "[" << canonical.bit_offset << "]";
+      if (arrival_time.count(canonical)) {
+        std::cout << " (arrival: " << arrival_time.at(canonical) << "ps)";
+      }
+      std::cout << "\n";
+    }
+  }
+  std::cout << "\n";
+  
+  // 执行时序传播（调用实际的 run() 函数）
+  std::cout << "Executing timing propagation...\n";
+  std::cout << "----------------------------------------\n";
+  worker.run();
+  std::cout << "✓ Timing propagation completed\n\n";
+  
+  // 显示最终结果
+  const auto& final_arrival_time = worker.get_arrival_time();
+  int max_arrival = worker.get_max_arrival_time();
+  sta::SignalBit critical_sig = worker.get_critical_signal();
+  
+  std::cout << "----------------------------------------\n";
+  std::cout << "Final Results:\n";
+  std::cout << "----------------------------------------\n";
+  std::cout << "Max arrival time: " << max_arrival << "ps\n";
+  if (critical_sig.wire_name != "") {
+    std::cout << "Critical signal: " << critical_sig.wire_name 
+              << "[" << critical_sig.bit_offset << "]\n";
+    
+    // 显示关键路径信息
+    if (final_arrival_time.count(critical_sig)) {
+      int critical_arrival = final_arrival_time.at(critical_sig);
+      std::cout << "Critical signal arrival time: " << critical_arrival << "ps\n";
+      if (endpoints.count(critical_sig)) {
+        int required = endpoints.at(critical_sig).required_time;
+        std::cout << "Required time: " << required << "ps\n";
+        std::cout << "Total time: " << (critical_arrival + required) << "ps\n";
+      }
+    }
+  }
+  
+  if (verbose) {
+    std::cout << "\nAll arrival times:\n";
+    std::cout << "----------------------------------------\n";
+    for (const auto& [bit, time] : final_arrival_time) {
+      if (time >= 0) {
+        std::cout << "  " << bit.wire_name << "[" << bit.bit_offset << "]: " 
+                  << time << "ps";
+        
+        // 显示是否是 endpoint
+        if (endpoints.count(bit)) {
+          int required = endpoints.at(bit).required_time;
+          std::cout << " [endpoint, required: " << required << "ps, total: " 
+                    << (time + required) << "ps]";
+        }
+        std::cout << "\n";
+      }
+    }
+  }
+  
+  std::cout << "\n╔══════════════════════════════════════════════════════════╗\n";
+  std::cout << "║              End of Timing Propagation Trace              ║\n";
+  std::cout << "╚══════════════════════════════════════════════════════════╝\n\n";
 }

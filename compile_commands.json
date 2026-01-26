@@ -1,0 +1,92 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/ysyx/project/pba-sta-base/proj/include",
+      "-I/home/ysyx/project/pba-sta-base/proj",
+      "-I/home/ysyx/project/pba-sta-base/proj/parser-verilog",
+      "-Wall",
+      "-O2",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/pba_sta.dir/src/main.cpp.o",
+      "/home/ysyx/project/pba-sta-base/proj/src/main.cpp"
+    ],
+    "directory": "/home/ysyx/project/pba-sta-base/proj",
+    "file": "/home/ysyx/project/pba-sta-base/proj/src/main.cpp",
+    "output": "/home/ysyx/project/pba-sta-base/proj/CMakeFiles/pba_sta.dir/src/main.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/ysyx/project/pba-sta-base/proj/include",
+      "-I/home/ysyx/project/pba-sta-base/proj",
+      "-I/home/ysyx/project/pba-sta-base/proj/parser-verilog",
+      "-Wall",
+      "-O2",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/pba_sta.dir/src/sta.cpp.o",
+      "/home/ysyx/project/pba-sta-base/proj/src/sta.cpp"
+    ],
+    "directory": "/home/ysyx/project/pba-sta-base/proj",
+    "file": "/home/ysyx/project/pba-sta-base/proj/src/sta.cpp",
+    "output": "/home/ysyx/project/pba-sta-base/proj/CMakeFiles/pba_sta.dir/src/sta.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/ysyx/project/pba-sta-base/proj/include",
+      "-I/home/ysyx/project/pba-sta-base/proj",
+      "-I/home/ysyx/project/pba-sta-base/proj/parser-verilog",
+      "-Wall",
+      "-O2",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/pba_sta.dir/src/trace_debug.cpp.o",
+      "/home/ysyx/project/pba-sta-base/proj/src/trace_debug.cpp"
+    ],
+    "directory": "/home/ysyx/project/pba-sta-base/proj",
+    "file": "/home/ysyx/project/pba-sta-base/proj/src/trace_debug.cpp",
+    "output": "/home/ysyx/project/pba-sta-base/proj/CMakeFiles/pba_sta.dir/src/trace_debug.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/ysyx/project/pba-sta-base/proj/include",
+      "-I/home/ysyx/project/pba-sta-base/proj",
+      "-I/home/ysyx/project/pba-sta-base/proj/parser-verilog",
+      "-Wall",
+      "-O2",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/pba_sta.dir/verilog_lexer.yy.cc.o",
+      "/home/ysyx/project/pba-sta-base/proj/verilog_lexer.yy.cc"
+    ],
+    "directory": "/home/ysyx/project/pba-sta-base/proj",
+    "file": "/home/ysyx/project/pba-sta-base/proj/verilog_lexer.yy.cc",
+    "output": "/home/ysyx/project/pba-sta-base/proj/CMakeFiles/pba_sta.dir/verilog_lexer.yy.cc.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/ysyx/project/pba-sta-base/proj/include",
+      "-I/home/ysyx/project/pba-sta-base/proj",
+      "-I/home/ysyx/project/pba-sta-base/proj/parser-verilog",
+      "-Wall",
+      "-O2",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/pba_sta.dir/verilog_parser.tab.cc.o",
+      "/home/ysyx/project/pba-sta-base/proj/verilog_parser.tab.cc"
+    ],
+    "directory": "/home/ysyx/project/pba-sta-base/proj",
+    "file": "/home/ysyx/project/pba-sta-base/proj/verilog_parser.tab.cc",
+    "output": "/home/ysyx/project/pba-sta-base/proj/CMakeFiles/pba_sta.dir/verilog_parser.tab.cc.o"
+  }
+]

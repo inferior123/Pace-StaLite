@@ -11,9 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
 
 # add the binary tree to the search path for include files
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(parser-verilog)
+include_directories(${PROJECT_SOURCE_DIR}/parser-verilog)  # For Flex/Bison generated files
 
 
 # -----------------------------------------------------------------------------
@@ -39,11 +39,11 @@ ADD_FLEX_BISON_DEPENDENCY(verilog_lexer verilog_parser)
 # Set the output folder to example
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-# A sample parser
+# Main executable
 add_executable(pba_sta
-  ${PROJECT_SOURCE_DIR}/main.cpp
-  ${PROJECT_SOURCE_DIR}/sta.cpp
-  ${PROJECT_SOURCE_DIR}/trace_debug.cpp
+  ${PROJECT_SOURCE_DIR}/src/main.cpp
+  ${PROJECT_SOURCE_DIR}/src/sta.cpp
+  ${PROJECT_SOURCE_DIR}/src/trace_debug.cpp
   ${FLEX_verilog_lexer_OUTPUTS}
   ${BISON_verilog_parser_OUTPUTS}
 )

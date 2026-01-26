@@ -1,8 +1,8 @@
 #ifndef STA_DATA_STRUCTURES_HPP
 #define STA_DATA_STRUCTURES_HPP
 
-#include "./parser-verilog/verilog_data.hpp"
-#include "./parser-verilog/verilog_driver.hpp"
+#include "../parser-verilog/verilog_data.hpp"
+#include "../parser-verilog/verilog_driver.hpp"
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -285,6 +285,9 @@ public:
     void collect_instance(verilog::Instance &inst);
     
     void build_fanouts();
+    void run();
+    void sta_check(int clock_period);
+    void report(int clock_period = 0);  // 详细的时序报告，参考 yosys
 
     SignalSpec get_signal_bits(const std::string &signame) const;
 
@@ -303,11 +306,17 @@ public:
     const std::unordered_set<SignalBit, SignalBitHash>& get_driven_signals() const { return driven_signals; }
     const std::deque<SignalBit>& get_timing_queue() const { return timing_queue; }
     SignalBit get_canonical_signal(const SignalBit& bit)  { return sigmap.find(bit); }
+    
+    // 用于调试的访问器
+    const std::unordered_map<SignalBit, int, SignalBitHash>& get_arrival_time() const { return arrival_time; }
+    int get_max_arrival_time() const { return max_arrival_time; }
+    SignalBit get_critical_signal() const { return critical_signal; }
 
 private:
     // 内部辅助函数
     void propagate_timing(const SignalBit& bit);
     void trace_critical_path();
+    void trace_path(const SignalBit& endpoint_bit);  // 回溯并打印路径
     SignalBit create_signal_bit(const std::string& name, int offset);
 };
 
