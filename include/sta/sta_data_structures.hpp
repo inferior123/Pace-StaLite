@@ -67,9 +67,9 @@ using SignalSpec = std::vector<SignalBit>;
  */
 class SignalMap {
 private:
-    std::unordered_map<SignalBit, SignalBit, SignalBitHash> parent;
+    mutable std::unordered_map<SignalBit, SignalBit, SignalBitHash> parent;
     
-    SignalBit find_root(const SignalBit& bit) {
+    SignalBit find_root(const SignalBit& bit) const {
         auto it = parent.find(bit);
         if (it == parent.end() || it->second == bit) {
             return bit;
@@ -99,7 +99,7 @@ public:
     }
     
     // 查找信号的规范代表
-    SignalBit find(const SignalBit& bit) {
+    SignalBit find(const SignalBit& bit) const {
         if (parent.find(bit) == parent.end()) {
             return bit;  // 未映射的信号返回自身
         }
@@ -276,14 +276,25 @@ private:
     // 单元实例管理
     std::vector<std::unique_ptr<Instance>> instances;
     
+    // 时序配置
+    struct sta_config {
+        int clk_period = 0;
+        int clock_uncertain = 0;
+        int clock_transit_raise = 0;
+        int clock_transit_fall = 0;
+    };
+    sta_config cfg;
+    
 public:
     STAWorker() : max_arrival_time(0) {}
     
+    // 和verilog parser相耦合的函数
     void collect_net(verilog::Net &net); 
     void collect_port(verilog::Port &port);
     void collect_assign(verilog::Assignment &assign);
     void collect_instance(verilog::Instance &inst);
     
+    // 核心工作函数
     void build_fanouts();
     void run();
     void sta_check(int clock_period);
@@ -296,16 +307,53 @@ public:
 
     // top module name
     std::string top_moudle;
+    
+    // 配置访问器
+    const sta_config& get_config() const { return cfg; }
+    sta_config& get_config() { return cfg; }
+    
+    /**
+     * 计算考虑所有时序参数后的有效时钟周期（用于 setup 检查）
+     * 考虑的因素：
+     * - clock_uncertain: setup uncertainty（减少可用时间）
+     * - clock_transit_raise/fall: 时钟转换时间（未来可能使用）
+     * 
+     * @return 有效时钟周期（ps），已减去所有减少可用时间的因素
+     */
+    int get_effective_clock_period() const {
+        int effective_period = cfg.clk_period;
+        
+        // 减去 setup uncertainty（减少可用时间）
+        if (cfg.clock_uncertain > 0) {
+            effective_period -= cfg.clock_uncertain;
+        }
+        
+        // 未来可以在这里添加其他减少可用时间的因素
+        // 例如：clock_transit_raise, clock_transit_fall 等
+        
+        return effective_period;
+    }
+    
+    /**
+     * 计算考虑所有时序参数后的 data required time
+     * @param setup_time 库中定义的 setup time
+     * @return 考虑所有时序参数后的 data required time
+     */
+    int calculate_data_required_time(int setup_time) const {
+        int effective_period = get_effective_clock_period();
+        return effective_period - setup_time;
+    }
 
     bool is_reg(std::string name);
 
+    // 用于外部访问的接口
     const std::vector<std::unique_ptr<Instance>>& get_instances() const { return instances; }
     const std::unordered_map<std::string, std::vector<SignalBit>>& get_signal_registry() const { return signal_registry; }
     const std::unordered_map<SignalBit, SignalTimingData, SignalBitHash>& get_timing_data() const { return timing_data; }
     const std::unordered_map<SignalBit, TimingEndpoint, SignalBitHash>& get_endpoints() const { return endpoints; }
     const std::unordered_set<SignalBit, SignalBitHash>& get_driven_signals() const { return driven_signals; }
     const std::deque<SignalBit>& get_timing_queue() const { return timing_queue; }
-    SignalBit get_canonical_signal(const SignalBit& bit)  { return sigmap.find(bit); }
+    SignalBit get_canonical_signal(const SignalBit& bit) const { return sigmap.find(bit); }
     
     // 用于调试的访问器
     const std::unordered_map<SignalBit, int, SignalBitHash>& get_arrival_time() const { return arrival_time; }

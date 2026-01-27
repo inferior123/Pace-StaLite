@@ -1,5 +1,4 @@
 #include "sta/sta_data_structures.hpp"
-#include "parser-verilog/verilog_data.hpp"
 #include <set>
 
 #include "sta/debug.h"

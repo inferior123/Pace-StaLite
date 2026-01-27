@@ -481,20 +481,36 @@ namespace sta {
     }
 
     void STAWorker::sta_check(int clock_period) {
-        // 如果最大的路径时序长度小于时钟周期，那么直接返回没有时序违规
-        if (max_arrival_time <= clock_period) {
+        // 更新配置中的时钟周期（如果传入）
+        if (clock_period > 0) {
+            cfg.clk_period = clock_period;
+        }
+        
+        // 计算有效时钟周期（考虑 uncertainty 等时序参数）
+        int effective_period = get_effective_clock_period();
+        
+        // 如果最大的路径时序长度小于有效时钟周期，那么直接返回没有时序违规
+        if (max_arrival_time <= effective_period) {
             std::cout << "\n✓ No timing violations found.\n";
             std::cout << "  Max arrival time: " << max_arrival_time << "ps\n";
-            std::cout << "  Clock period: " << clock_period << "ps\n";
-            std::cout << "  Slack: " << (clock_period - max_arrival_time) << "ps\n";
+            std::cout << "  Clock period: " << cfg.clk_period << "ps";
+            if (cfg.clock_uncertain > 0) {
+                std::cout << " (effective: " << effective_period << "ps after uncertainty)";
+            }
+            std::cout << "\n";
+            std::cout << "  Slack: " << (effective_period - max_arrival_time) << "ps\n";
             return;
         }
         
-        // 否则找到所有大于时钟周期的路径（时序违规）
+        // 否则找到所有大于有效时钟周期的路径（时序违规）
         std::cout << "\n⚠ Timing violations detected!\n";
-        std::cout << "  Clock period: " << clock_period << "ps\n";
+        std::cout << "  Clock period: " << cfg.clk_period << "ps";
+        if (cfg.clock_uncertain > 0) {
+            std::cout << " (effective: " << effective_period << "ps after uncertainty)";
+        }
+        std::cout << "\n";
         std::cout << "  Max arrival time: " << max_arrival_time << "ps\n";
-        std::cout << "  Worst slack: " << (clock_period - max_arrival_time) << "ps\n\n";
+        std::cout << "  Worst slack: " << (effective_period - max_arrival_time) << "ps\n\n";
         
         std::cout << "Violating paths:\n";
         std::cout << "----------------------------------------\n";
@@ -509,19 +525,25 @@ namespace sta {
             }
             
             int arrival = arrival_time.at(canonical);
-            int required = endpoint.required_time;
-            int total_time = arrival + required;
+            int setup_time = endpoint.required_time;
+            // 计算考虑所有时序参数后的 data required time
+            int data_required_time = calculate_data_required_time(setup_time);
             
-            // 检查是否超过时钟周期
-            if (total_time > clock_period) {
+            // 检查是否超过有效时钟周期（使用 data_required_time 进行比较）
+            if (arrival > data_required_time) {
                 violation_count++;
-                int slack = clock_period - total_time;
+                int slack = data_required_time - arrival;
                 
                 std::cout << "\n[" << violation_count << "] Violation at: " 
                           << canonical.wire_name << "[" << canonical.bit_offset << "]\n";
                 std::cout << "  Arrival time: " << arrival << "ps\n";
-                std::cout << "  Required time: " << required << "ps\n";
-                std::cout << "  Total time: " << total_time << "ps\n";
+                std::cout << "  Setup time: " << setup_time << "ps\n";
+                std::cout << "  Data required time: " << data_required_time << "ps";
+                if (cfg.clock_uncertain > 0) {
+                    std::cout << " (clock period " << cfg.clk_period << "ps - setup " << setup_time 
+                              << "ps - uncertainty " << cfg.clock_uncertain << "ps)";
+                }
+                std::cout << "\n";
                 std::cout << "  Slack: " << slack << "ps (violation: " << (-slack) << "ps)\n";
                 
                 // 显示 endpoint 信息
