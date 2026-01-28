@@ -573,7 +573,7 @@ namespace sta {
         // 从 endpoint 回溯到输入端口
         std::vector<std::pair<SignalBit, int>> path;  // (signal, arrival_time)
         SignalBit current = endpoint_bit;
-        std::unordered_set<SignalBit, SignalBitHash> visited;  // 防止循环
+        std::unordered_set<SignalBit, SignalBitHash> visited; 
         
         while (true) {
             SignalBit canonical = sigmap.find(current);

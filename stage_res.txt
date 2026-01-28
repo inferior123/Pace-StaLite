@@ -1,0 +1,137 @@
+no verilog file specific, use "/home/ysyx/project/pba-sta-base/proj/Testing/reg.v "
+
+
+╔══════════════════════════════════════════════════════════╗
+║              Timing Propagation Trace                    ║
+╚══════════════════════════════════════════════════════════╝
+
+Initial State:
+----------------------------------------
+Queue size: 3
+Signals in queue:
+  - a[0] (arrival: 0ps)
+  - b[0] (arrival: 0ps)
+  - __clk__[0] (arrival: 0ps)
+
+Executing timing propagation...
+----------------------------------------
+✓ Timing propagation completed
+
+----------------------------------------
+Final Results:
+----------------------------------------
+Max arrival time: 130ps
+Critical signal: c1[0]
+Critical signal arrival time: 120ps
+Required time: 10ps
+Total time: 130ps
+
+All arrival times:
+----------------------------------------
+  c1[0]: 120ps [endpoint, required: 10ps, total: 130ps]
+  reg_reg2_q[0]: 20ps
+  reg_reg3_q[0]: 20ps [endpoint, required: 0ps, total: 20ps]
+  reg_reg1_q[0]: 20ps
+  __clk__[0]: 0ps
+  b[0]: 0ps [endpoint, required: 10ps, total: 10ps]
+  a[0]: 0ps [endpoint, required: 10ps, total: 10ps]
+
+╔══════════════════════════════════════════════════════════╗
+║              End of Timing Propagation Trace              ║
+╚══════════════════════════════════════════════════════════╝
+
+no clk period specific, use 10
+
+⚠ Timing violations detected!
+  Clock period: 100ps
+  Max arrival time: 130ps
+  Worst slack: -30ps
+
+Violating paths:
+----------------------------------------
+
+[1] Violation at: c1[0]
+  Arrival time: 120ps
+  Setup time: 10ps
+  Data required time: 90ps
+  Slack: -30ps (violation: 30ps)
+  Endpoint: reg_reg3 (REG.d)
+
+  Path trace (from input to endpoint):
+    [0] __clk__[0] (arrival: 0ps) [Virtual Clock]
+    [1] reg_reg1_q[0] (arrival: 20ps)
+        → reg_reg1 (REG) via port clk
+
+    [2] c1[0] (arrival: 120ps)
+        → g1 (AND2_X1) via port a
+ [Endpoint]
+
+----------------------------------------
+Total violations: 1
+
+╔══════════════════════════════════════════════════════════╗
+║              Static Timing Analysis Report               ║
+╚══════════════════════════════════════════════════════════╝
+
+Module: and
+Clock Period: 100ps (0.10ns)
+===========================================================
+
+Critical Path Report:
+
+Startpoint: Virtual Clock (rising edge-triggered flip-flop clocked by __clk__)
+Endpoint: g1 (rising edge-triggered flip-flop clocked by __clk__)
+Path Group: __clk__
+Path Type: max
+Point                                    Incr       Path
+---------------------------------------------------------------
+clock __clk__ (rise edge)                     0.00      0.00
+reg_reg1/clk/q (REG) r                        0.02      0.02
+g1/a/o (AND2_X1) r                            0.10      0.12
+data arrival time                                       0.12
+
+clock __clk__ (rise edge)                     0.10      0.10
+clock network delay (ideal)                   0.00      0.10
+library setup time                           -0.01      0.09
+data required time                                      0.09
+---------------------------------------------------------------
+data required time                                      0.09
+data arrival time                                       0.12
+---------------------------------------------------------------
+slack                                   (VIOLATED)     -0.03
+
+
+╔══════════════════════════════════════════════════════════╗
+║              Timing Violations Summary                   ║
+╚══════════════════════════════════════════════════════════╝
+
+Total Violations: 1
+
+Violation #1:
+
+Startpoint: Virtual Clock (rising edge-triggered flip-flop clocked by __clk__)
+Endpoint: g1 (rising edge-triggered flip-flop clocked by __clk__)
+Path Group: __clk__
+Path Type: max
+Point                                    Incr       Path
+---------------------------------------------------------------
+clock __clk__ (rise edge)                     0.00      0.00
+reg_reg1/clk/q (REG) r                        0.02      0.02
+g1/a/o (AND2_X1) r                            0.10      0.12
+data arrival time                                       0.12
+
+clock __clk__ (rise edge)                     0.10      0.10
+clock network delay (ideal)                   0.00      0.10
+library setup time                           -0.01      0.09
+data required time                                      0.09
+---------------------------------------------------------------
+data required time                                      0.09
+data arrival time                                       0.12
+---------------------------------------------------------------
+slack                                   (VIOLATED)     -0.03
+
+
+╔══════════════════════════════════════════════════════════╗
+║              End of Report                               ║
+╚══════════════════════════════════════════════════════════╝
+
