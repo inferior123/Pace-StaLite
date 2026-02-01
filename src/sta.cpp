@@ -1,6 +1,7 @@
 #include "cell/cell_data_structure.hpp"
 #include "sta/sta_data_structures.hpp"
 #include "parser-verilog/verilog_data.hpp"
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <memory>
@@ -10,6 +11,8 @@
 #include <variant>
 #include <vector>
 #include <unordered_set>
+#include <stack>
+#include <queue>
 #include <cmath>
 
 using namespace verilog;
@@ -171,9 +174,10 @@ namespace sta {
                     // OUTPUT
                     assert(port.dir == PortDirection::OUTPUT && "invalid port dir");
                     SignalBit output_canonical = sigmap.find(bit);
-                    endpoints[output_canonical] = TimingEndpoint{nullptr, sig_name};  // 标记为top_module的output
-                    endpoints[output_canonical].Setup_req = 0;
-                    endpoints[output_canonical].Hold_req = 0;
+                    TimingEndpoint ep{nullptr, sig_name};
+                    ep.Setup_req = 0;
+                    ep.Hold_req = 0;
+                    endpoints[output_canonical].push_back(std::move(ep));
                 }
             }
             signal_registry[sig_name] = std::move(bits);
@@ -408,10 +412,22 @@ namespace sta {
                         
                         // 将寄存器的D端（数据输入端）注册为endpoint；若该 net 已是顶层输出（sigmap 合并），保留 primary output 端口名
                         TimingEndpoint ep(instance.get(), input_pin_name);
-                        if (endpoints.count(input_connect) && endpoints[input_connect].sink == nullptr) {
-                            ep.primary_output_port = endpoints[input_connect].port;
+                        if (endpoints.count(input_connect)) {
+                            for (const auto& existing : endpoints[input_connect]) {
+                                if (existing.sink == nullptr) {
+                                    ep.primary_output_port = existing.port;
+                                    break;
+                                }
+                            }
                         }
-                        endpoints[input_connect] = std::move(ep);
+                        // 避免重复：同一 (sink, port) 只添加一次
+                        auto& eps = endpoints[input_connect];
+                        bool is_dup = std::any_of(eps.begin(), eps.end(), [&ep](const TimingEndpoint& e) {
+                            return e.sink == ep.sink && e.port == ep.port;
+                        });
+                        if (!is_dup) {
+                            eps.push_back(std::move(ep));
+                        }
                     }
                 }
             } else {
@@ -781,9 +797,8 @@ namespace sta {
                             }
                            
                             // FIXME 这里存在一个设计逻辑上的bug
-                            // 由于当前计算延迟如果大于等于最大路径，当更新转换时间的时候
-                            // 如果时序路径本身也是违例的，那么这个条路径本也应该被记录
-                            // 但是这样就会使报告存在一个问题，预计在0.0.3版本之中进行修复
+                            // 这个问题通过使用 dfs_run 解决了，但是依靠纯的拓扑排序始终没办法解决这个问题
+                            // 本质原因是当我丢弃一个节点的时候就必然会丢弃其信息
 
                             // 查找所有输入路径到该输出的最大延迟
                             double max_delay_for_output = 0.0;
@@ -837,6 +852,62 @@ namespace sta {
                 } 
             }
         }
+    }
+
+    int STAWorker::process_endpoint_timing(TimingEndpoint& ep, const SignalBit& dst_canonical) {
+        if (ep.sink == nullptr) return 0;
+        const auto* cell = cell_library_->get_cell(ep.sink->module_name);
+        if (!cell) return 0;
+        const auto* pin = cell->get_pin(ep.port);
+        if (!pin) return 0;
+
+        double data_trans_rise = 0.0, data_trans_fall = 0.0;
+        if (timing_data.count(dst_canonical)) {
+            const auto& dt = timing_data.at(dst_canonical);
+            if (dt.rise_transition_time.has_value()) data_trans_rise = dt.rise_transition_time.value();
+            if (dt.fall_transition_time.has_value()) data_trans_fall = dt.fall_transition_time.value();
+        }
+        double data_trans = std::max(data_trans_rise, data_trans_fall);
+        double clk_trans = std::max(static_cast<double>(cfg.clock_transit_raise),
+                                    static_cast<double>(cfg.clock_transit_fall));
+
+        for (const auto& arc : pin->timing_arcs) {
+            if (arc.timing_type == celllib::TimingType::SETUP_RISING ||
+                arc.timing_type == celllib::TimingType::SETUP_FALLING) {
+                double setup_rise = 0.0, setup_fall = 0.0;
+                if (arc.rise_constraint.has_value() && arc.rise_constraint->template_name.has_value()) {
+                    const auto* t = cell_library_->get_table_template(arc.rise_constraint->template_name.value());
+                    if (t && t->variable_1.has_value() && t->variable_2.has_value())
+                        setup_rise = cell_library_->caculate_lookuptable(arc.rise_constraint.value(),
+                            data_trans, clk_trans, t->variable_1.value(), t->variable_2.value());
+                }
+                if (arc.fall_constraint.has_value() && arc.fall_constraint->template_name.has_value()) {
+                    const auto* t = cell_library_->get_table_template(arc.fall_constraint->template_name.value());
+                    if (t && t->variable_1.has_value() && t->variable_2.has_value())
+                        setup_fall = cell_library_->caculate_lookuptable(arc.fall_constraint.value(),
+                            data_trans, clk_trans, t->variable_1.value(), t->variable_2.value());
+                }
+                ep.Setup_req = static_cast<int>(std::max(setup_rise, setup_fall));
+            }
+            if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
+                arc.timing_type == celllib::TimingType::HOLD_FALLING) {
+                double hold_rise = 0.0, hold_fall = 0.0;
+                if (arc.rise_constraint.has_value() && arc.rise_constraint->template_name.has_value()) {
+                    const auto* t = cell_library_->get_table_template(arc.rise_constraint->template_name.value());
+                    if (t && t->variable_1.has_value() && t->variable_2.has_value())
+                        hold_rise = cell_library_->caculate_lookuptable(arc.rise_constraint.value(),
+                            data_trans, clk_trans, t->variable_1.value(), t->variable_2.value());
+                }
+                if (arc.fall_constraint.has_value() && arc.fall_constraint->template_name.has_value()) {
+                    const auto* t = cell_library_->get_table_template(arc.fall_constraint->template_name.value());
+                    if (t && t->variable_1.has_value() && t->variable_2.has_value())
+                        hold_fall = cell_library_->caculate_lookuptable(arc.fall_constraint.value(),
+                            data_trans, clk_trans, t->variable_1.value(), t->variable_2.value());
+                }
+                ep.Hold_req = static_cast<int>(std::max(hold_rise, hold_fall));
+            }
+        }
+        return ep.Setup_req.value_or(0);
     }
 
     void STAWorker::run() {
@@ -899,174 +970,214 @@ namespace sta {
                     
                     // 检查是否是endpoint（endpoint中的key也应该是规范代表）
                     if (endpoints.count(dst_canonical)) {
-                        std::cout << "[DEBUG] start the endpoint caculate" << std::endl;
-                        int required_time;
-                        if(endpoints[dst_canonical].sink ==nullptr) {
-                            required_time = 0;
-                        } else {
-                            std::cout << "[DEBUG] start the setup/holdon caculate" << std::endl;
-                            // flip-flop d port, caculate the setup time by lookuptable
-                            // 获取sink的module_name和端口名
-                            std::string module_name = endpoints[dst_canonical].sink->module_name;
-                            std::string port_name = endpoints[dst_canonical].port;
-                            
-                            std::cout << "\n[DEBUG] Setup/Hold Calculation for endpoint:\n";
-                            std::cout << "  Signal: " << dst_canonical.wire_name << "[" << dst_canonical.bit_offset << "]\n";
-                            std::cout << "  Cell: " << module_name << ", Port: " << port_name << "\n";
-                            
-                            // 从cell library获取对应的cell
-                            const auto* cell = cell_library_->get_cell(module_name);
-                            if (cell) {
-                                const auto* pin = cell->get_pin(port_name);
-                                if (pin) {
-                                    // 获取data信号的transition time (constrained_pin_transition)
-                                    double data_trans_rise = 0.0;
-                                    double data_trans_fall = 0.0;
-                                    if (timing_data.count(dst_canonical)) {
-                                        const auto& data_timing = timing_data[dst_canonical];
-                                        if (data_timing.rise_transition_time.has_value()) {
-                                            data_trans_rise = data_timing.rise_transition_time.value();
-                                        }
-                                        if (data_timing.fall_transition_time.has_value()) {
-                                            data_trans_fall = data_timing.fall_transition_time.value();
-                                        }
-                                    }
-                                    
-                                    // 获取clock的transition time (related_pin_transition)
-                                    double clk_trans_rise = static_cast<double>(cfg.clock_transit_raise);
-                                    double clk_trans_fall = static_cast<double>(cfg.clock_transit_fall);
-                                    
-                                    // 取rise和fall的最大值作为lookup参数
-                                    double data_trans = std::max(data_trans_rise, data_trans_fall);
-                                    double clk_trans = std::max(clk_trans_rise, clk_trans_fall);
-                                    
-                                    std::cout << "  Data transition: rise=" << data_trans_rise << "ps, fall=" << data_trans_fall << "ps, max=" << data_trans << "ps\n";
-                                    std::cout << "  Clock transition: rise=" << clk_trans_rise << "ps, fall=" << clk_trans_fall << "ps, max=" << clk_trans << "ps\n";
-                                    
-                                    // 遍历timing arcs查找setup/hold约束
-                                    for (const auto& arc : pin->timing_arcs) {
-                                        // Setup约束计算
-                                        if (arc.timing_type == celllib::TimingType::SETUP_RISING || 
-                                            arc.timing_type == celllib::TimingType::SETUP_FALLING) {
-                                            double setup_rise = 0.0;
-                                            double setup_fall = 0.0;
-                                            
-                                            std::cout << "  [SETUP] Found setup timing arc (related_pin: " << arc.related_pin << ")\n";
-                                            
-                                            // 计算rise_constraint (data rising edge)
-                                            if (arc.rise_constraint.has_value() && arc.rise_constraint->template_name.has_value()) {
-                                                std::string template_name = arc.rise_constraint->template_name.value();
-                                                const auto* templ = cell_library_->get_table_template(template_name);
-                                                if (templ && templ->variable_1.has_value() && templ->variable_2.has_value()) {
-                                                    std::string var1 = templ->variable_1.value();
-                                                    std::string var2 = templ->variable_2.value();
-                                                    setup_rise = cell_library_->caculate_lookuptable(
-                                                        arc.rise_constraint.value(), data_trans, clk_trans, var1, var2);
-                                                    std::cout << "    rise_constraint: template=" << template_name 
-                                                              << ", var1=" << var1 << ", var2=" << var2 
-                                                              << " => setup_rise=" << setup_rise << "ps\n";
-                                                }
-                                            } else {
-                                                std::cout << "    rise_constraint: NOT AVAILABLE\n";
-                                            }
-                                            
-                                            // 计算fall_constraint (data falling edge)
-                                            if (arc.fall_constraint.has_value() && arc.fall_constraint->template_name.has_value()) {
-                                                std::string template_name = arc.fall_constraint->template_name.value();
-                                                const auto* templ = cell_library_->get_table_template(template_name);
-                                                if (templ && templ->variable_1.has_value() && templ->variable_2.has_value()) {
-                                                    std::string var1 = templ->variable_1.value();
-                                                    std::string var2 = templ->variable_2.value();
-                                                    setup_fall = cell_library_->caculate_lookuptable(
-                                                        arc.fall_constraint.value(), data_trans, clk_trans, var1, var2);
-                                                    std::cout << "    fall_constraint: template=" << template_name 
-                                                              << ", var1=" << var1 << ", var2=" << var2 
-                                                              << " => setup_fall=" << setup_fall << "ps\n";
-                                                }
-                                            } else {
-                                                std::cout << "    fall_constraint: NOT AVAILABLE\n";
-                                            }
-                                            
-                                            // 取最大值作为setup time
-                                            int setup_time = static_cast<int>(std::max(setup_rise, setup_fall));
-                                            endpoints[dst_canonical].Setup_req = setup_time;
-                                            std::cout << "    => Final Setup Time: " << setup_time << "ps (max of rise=" << setup_rise << ", fall=" << setup_fall << ")\n";
-                                        }
-                                        
-                                        // Hold约束计算
-                                        if (arc.timing_type == celllib::TimingType::HOLD_RISING || 
-                                            arc.timing_type == celllib::TimingType::HOLD_FALLING) {
-                                            double hold_rise = 0.0;
-                                            double hold_fall = 0.0;
-                                            
-                                            std::cout << "  [HOLD] Found hold timing arc (related_pin: " << arc.related_pin << ")\n";
-                                            
-                                            // 计算rise_constraint (data rising edge)
-                                            if (arc.rise_constraint.has_value() && arc.rise_constraint->template_name.has_value()) {
-                                                std::string template_name = arc.rise_constraint->template_name.value();
-                                                const auto* templ = cell_library_->get_table_template(template_name);
-                                                if (templ && templ->variable_1.has_value() && templ->variable_2.has_value()) {
-                                                    std::string var1 = templ->variable_1.value();
-                                                    std::string var2 = templ->variable_2.value();
-                                                    hold_rise = cell_library_->caculate_lookuptable(
-                                                        arc.rise_constraint.value(), data_trans, clk_trans, var1, var2);
-                                                    std::cout << "    rise_constraint: template=" << template_name 
-                                                              << ", var1=" << var1 << ", var2=" << var2 
-                                                              << " => hold_rise=" << hold_rise << "ps\n";
-                                                }
-                                            } else {
-                                                std::cout << "    rise_constraint: NOT AVAILABLE\n";
-                                            }
-                                            
-                                            // 计算fall_constraint (data falling edge)
-                                            if (arc.fall_constraint.has_value() && arc.fall_constraint->template_name.has_value()) {
-                                                std::string template_name = arc.fall_constraint->template_name.value();
-                                                const auto* templ = cell_library_->get_table_template(template_name);
-                                                if (templ && templ->variable_1.has_value() && templ->variable_2.has_value()) {
-                                                    std::string var1 = templ->variable_1.value();
-                                                    std::string var2 = templ->variable_2.value();
-                                                    hold_fall = cell_library_->caculate_lookuptable(
-                                                        arc.fall_constraint.value(), data_trans, clk_trans, var1, var2);
-                                                    std::cout << "    fall_constraint: template=" << template_name 
-                                                              << ", var1=" << var1 << ", var2=" << var2 
-                                                              << " => hold_fall=" << hold_fall << "ps\n";
-                                                }
-                                            } else {
-                                                std::cout << "    fall_constraint: NOT AVAILABLE\n";
-                                            }
-                                            
-                                            // 取最大值作为hold time (注意hold可能为负数)
-                                            int hold_time = static_cast<int>(std::max(hold_rise, hold_fall));
-                                            endpoints[dst_canonical].Hold_req = hold_time;
-                                            std::cout << "    => Final Hold Time: " << hold_time << "ps (max of rise=" << hold_rise << ", fall=" << hold_fall << ")\n";
-                                        }
-                                    }
-                                    
-                                    // 使用setup_time作为required_time
-                                    if (endpoints[dst_canonical].Setup_req.has_value()) {
-                                        required_time = endpoints[dst_canonical].Setup_req.value();
-                                        std::cout << "  => Required Time (Setup): " << required_time << "ps\n";
-                                    } else {
-                                        required_time = 0;
-                                        std::cout << "  => Required Time: 0ps (no setup constraint found)\n";
-                                    }
-                                } else {
-                                    required_time = 0;
-                                }
-                            } else {
-                                required_time = 0;
+                        for (auto& ep : endpoints[dst_canonical]) {
+                            int required_time = (ep.sink == nullptr) ? 0 : process_endpoint_timing(ep, dst_canonical);
+                            int total_time = new_arrival + required_time;
+                            // 只有源信号被驱动时才更新max_arrival_time
+                            if (total_time > max_arrival_time && driven_signals.count(canonical_bit)) {
+                                max_arrival_time = total_time;
+                                critical_signal = dst_canonical;
                             }
-                        }
-                        int total_time = new_arrival + required_time;
-                        // 只有源信号被驱动时才更新max_arrival_time
-                        if (total_time > max_arrival_time && driven_signals.count(canonical_bit)) {
-                            max_arrival_time = total_time;
-                            critical_signal = dst_canonical;
                         }
                     }
                 }
             }
         }
+    }
+
+    void STAWorker::run_dfs() {
+        max_arrival_time = 0;
+        critical_signal = SignalBit();
+
+        // 重置 arrival_time：仅保留 startpoint (driven_signals 且 arrival=0)，其余置 -1
+        for (auto& [bit, t] : arrival_time) {
+            if (!(driven_signals.count(bit) && t == 0))
+                t = -1;
+        }
+
+        // 使用 stack 模拟 DFS：从 input 端口出发，沿 fanout 深度优先遍历
+        // 栈中存储待处理的 SignalBit，处理顺序为 LIFO（深度优先）
+        std::stack<SignalBit> dfs_stack;
+
+        for (const auto& bit : timing_queue) {
+            SignalBit canonical = sigmap.find(bit);
+            if (arrival_time.count(canonical) && arrival_time[canonical] == 0)
+                dfs_stack.push(canonical);
+        }
+
+        while (!dfs_stack.empty()) {
+            SignalBit canonical_bit = dfs_stack.top();
+            dfs_stack.pop();
+
+            if (!arrival_time.count(canonical_bit) || arrival_time[canonical_bit] < 0)
+                continue;
+            int src_arrival = arrival_time[canonical_bit];
+
+            if (!timing_data.count(canonical_bit))
+                continue;
+            auto& timing = timing_data[canonical_bit];
+
+            for (const auto& fanout : timing.fanouts) {
+                SignalBit dst_canonical = sigmap.find(fanout.target_bit);
+                int delay = static_cast<int>(fanout.delay);
+                int new_arrival = src_arrival + delay;
+
+                if (!arrival_time.count(dst_canonical))
+                    arrival_time[dst_canonical] = -1;
+
+                if (new_arrival > arrival_time[dst_canonical]) {
+                    arrival_time[dst_canonical] = new_arrival;
+                    if (!timing_data.count(dst_canonical))
+                        timing_data[dst_canonical] = SignalTimingData();
+                    timing_data[dst_canonical].backtrack = canonical_bit;
+                    timing_data[dst_canonical].source_port = fanout.port_name;
+                    timing_data[dst_canonical].driver = fanout.cell;
+
+                    dfs_stack.push(dst_canonical);
+
+                    if (endpoints.count(dst_canonical)) {
+                        for (auto& ep : endpoints[dst_canonical]) {
+                            int required_time = (ep.sink == nullptr) ? 0 : process_endpoint_timing(ep, dst_canonical);
+                            int total_time = new_arrival + required_time;
+                            if (total_time > max_arrival_time && driven_signals.count(canonical_bit)) {
+                                max_arrival_time = total_time;
+                                critical_signal = dst_canonical;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (max_arrival_time == 0 && critical_signal.wire_name.empty()) {
+            for (const auto& [bit, eps] : endpoints) {
+                SignalBit canonical = sigmap.find(bit);
+                if (!arrival_time.count(canonical)) continue;
+                int arr = arrival_time.at(canonical);
+                for (const auto& ep : eps) {
+                    int req = ep.Setup_req.value_or(0);
+                    int total = arr + req;
+                    if (total > max_arrival_time) {
+                        max_arrival_time = total;
+                        critical_signal = canonical;
+                    }
+                }
+            }
+        }
+    
+
+        // Fallback: 若 max_arrival_time 仍为 0 但存在 arrival > 0 的 endpoint
+        // （例如纯组合电路、顶层输出路径因 driven_signals 检查未通过），则重新计算
+        if (max_arrival_time == 0 && critical_signal.wire_name.empty()) {
+            for (const auto& [bit, eps] : endpoints) {
+                SignalBit canonical = sigmap.find(bit);
+                if (!arrival_time.count(canonical)) continue;
+                int arr = arrival_time.at(canonical);
+                for (const auto& ep : eps) {
+                    int req = ep.Setup_req.value_or(0);
+                    int total = arr + req;
+                    if (total > max_arrival_time) {
+                        max_arrival_time = total;
+                        critical_signal = canonical;
+                    }
+                }
+            }
+        }
+    }
+
+    void STAWorker::print_all_timing_paths_dfs() {
+        struct PathNodeInfo {
+            SignalBit signal;
+            int arrival;
+            Instance* driver;
+            std::string port;
+        };
+        std::vector<PathNodeInfo> path;
+        struct StackFrame { SignalBit signal; int path_arrival; size_t fanout_idx; };
+        std::stack<StackFrame> stk;
+        int path_count = 0;
+        std::unordered_set<std::string> path_printed;  // 已打印路径的指纹，用于去重
+
+        std::unordered_set<SignalBit, SignalBitHash> startpoints;
+        for (const auto& bit : timing_queue) {
+            SignalBit canonical = sigmap.find(bit);
+            if (!driven_signals.count(canonical)) continue;
+            if (arrival_time.count(canonical) && arrival_time.at(canonical) != 0) continue;
+            startpoints.insert(canonical);
+        }
+
+        for (const SignalBit& canonical : startpoints) {
+            stk.push({canonical, 0, 0});
+
+            while (!stk.empty()) {
+                StackFrame f = stk.top();
+                SignalBit cur = sigmap.find(f.signal);
+                int arr = f.path_arrival;
+
+                if (f.fanout_idx == 0) {
+                    path.push_back({cur, arr, nullptr, ""});
+                    if (timing_data.count(cur)) {
+                        path.back().driver = timing_data.at(cur).driver;
+                        path.back().port = timing_data.at(cur).source_port;
+                    }
+                }
+
+                if (endpoints.count(cur)) {
+                    std::string fingerprint;
+                    for (const auto& n : path) {
+                        fingerprint += n.signal.wire_name + "[" + std::to_string(n.signal.bit_offset) + "]:" +
+                                       std::to_string(n.arrival) + "->";
+                    }
+                    if (path_printed.insert(fingerprint).second) {
+                        path_count++;
+                        std::cout << "\n--- Path #" << path_count << " (arrival: " << arr << "ps) ---\n";
+                        for (size_t i = 0; i < path.size(); ++i) {
+                            const auto& n = path[i];
+                            std::cout << "  [" << i << "] " << n.signal.wire_name << "[" << n.signal.bit_offset << "]";
+                            std::cout << " (arrival: " << n.arrival << "ps)";
+                            if (driven_signals.count(n.signal) && n.arrival == 0)
+                                std::cout << (n.signal.wire_name == "__clk__" ? " [Clock]" : " [Primary Input]");
+                            if (n.driver) {
+                                std::cout << " -> " << n.driver->instance_name << "(" << n.driver->module_name << ")";
+                                if (!n.port.empty()) std::cout << "/" << n.port;
+                            }
+                            if (i == path.size() - 1) std::cout << " [Endpoint]";
+                            std::cout << "\n";
+                        }
+                    }
+                }
+
+                if (!timing_data.count(cur)) {
+                    path.pop_back();
+                    stk.pop();
+                    continue;
+                }
+                const auto& timing = timing_data.at(cur);
+                if (f.fanout_idx >= timing.fanouts.size()) {
+                    path.pop_back();
+                    stk.pop();
+                    continue;
+                }
+
+                const auto& fanout = timing.fanouts[f.fanout_idx];
+                SignalBit dst = sigmap.find(fanout.target_bit);
+                // 跳过重复：若同一节点有多个 fanout 指向同一 dst（不同 port），避免重复枚举同一条路径
+                bool dup = false;
+                for (size_t j = 0; j < f.fanout_idx; ++j) {
+                    if (sigmap.find(timing.fanouts[j].target_bit) == dst) {
+                        dup = true;
+                        break;
+                    }
+                }
+                stk.pop();
+                stk.push({f.signal, f.path_arrival, f.fanout_idx + 1});
+                if (!dup) {
+                    int delay = static_cast<int>(fanout.delay);
+                    stk.push({dst, arr + delay, 0});
+                }
+            }
+        }
+        std::cout << "\nTotal paths found: " << path_count << "\n";
     }
 
     void STAWorker::sta_check(int clock_period) {
@@ -1105,7 +1216,7 @@ namespace sta {
         std::cout << "----------------------------------------\n";
         
         int violation_count = 0;
-        for (const auto& [bit, endpoint] : endpoints) {
+        for (const auto& [bit, eps] : endpoints) {
             SignalBit canonical = sigmap.find(bit);
             
             // 只检查有 arrival time 的 endpoint
@@ -1114,38 +1225,40 @@ namespace sta {
             }
             
             int arrival = arrival_time.at(canonical);
-            int setup_time = endpoint.Setup_req.value();
-            // 计算考虑所有时序参数后的 data required time
-            int data_required_time = calculate_data_required_time(setup_time);
-            
-            // 检查是否超过有效时钟周期（使用 data_required_time 进行比较）
-            if (arrival > data_required_time) {
-                violation_count++;
-                int slack = data_required_time - arrival;
+            for (const auto& endpoint : eps) {
+                int setup_time = endpoint.Setup_req.value();
+                // 计算考虑所有时序参数后的 data required time
+                int data_required_time = calculate_data_required_time(setup_time);
                 
-                std::cout << "\n[" << violation_count << "] Violation at: " 
-                          << canonical.wire_name << "[" << canonical.bit_offset << "]\n";
-                std::cout << "  Arrival time: " << arrival << "ps\n";
-                std::cout << "  Setup time: " << setup_time << "ps\n";
-                std::cout << "  Data required time: " << data_required_time << "ps";
-                if (cfg.clock_uncertain > 0) {
-                    std::cout << " (clock period " << cfg.clk_period << "ps - setup " << setup_time 
-                              << "ps - uncertainty " << cfg.clock_uncertain << "ps)";
+                // 检查是否超过有效时钟周期（使用 data_required_time 进行比较）
+                if (arrival > data_required_time) {
+                    violation_count++;
+                    int slack = data_required_time - arrival;
+                    
+                    std::cout << "\n[" << violation_count << "] Violation at: " 
+                              << canonical.wire_name << "[" << canonical.bit_offset << "]\n";
+                    std::cout << "  Arrival time: " << arrival << "ps\n";
+                    std::cout << "  Setup time: " << setup_time << "ps\n";
+                    std::cout << "  Data required time: " << data_required_time << "ps";
+                    if (cfg.clock_uncertain > 0) {
+                        std::cout << " (clock period " << cfg.clk_period << "ps - setup " << setup_time 
+                                  << "ps - uncertainty " << cfg.clock_uncertain << "ps)";
+                    }
+                    std::cout << "\n";
+                    std::cout << "  Slack: " << slack << "ps (violation: " << (-slack) << "ps)\n";
+                    
+                    // 显示 endpoint 信息
+                    if (endpoint.sink) {
+                        std::cout << "  Endpoint: " << endpoint.sink->instance_name 
+                                  << " (" << endpoint.sink->module_name << "." << endpoint.port << ")\n";
+                    } else {
+                        std::cout << "  Endpoint: Top module output (" << endpoint.port << ")\n";
+                    }
+                    
+                    // 回溯并打印完整路径
+                    std::cout << "\n  Path trace (from input to endpoint):\n";
+                    trace_path(canonical);
                 }
-                std::cout << "\n";
-                std::cout << "  Slack: " << slack << "ps (violation: " << (-slack) << "ps)\n";
-                
-                // 显示 endpoint 信息
-                if (endpoint.sink) {
-                    std::cout << "  Endpoint: " << endpoint.sink->instance_name 
-                              << " (" << endpoint.sink->module_name << "." << endpoint.port << ")\n";
-                } else {
-                    std::cout << "  Endpoint: Top module output (" << endpoint.port << ")\n";
-                }
-                
-                // 回溯并打印完整路径
-                std::cout << "\n  Path trace (from input to endpoint):\n";
-                trace_path(canonical);
             }
         }
         

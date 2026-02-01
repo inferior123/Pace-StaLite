@@ -1,5 +1,6 @@
 #include "sta/sta_report.hpp"
 #include "sta/sta_data_structures.hpp"
+#include <algorithm>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -51,7 +52,8 @@ std::string STAReportGenerator::get_cell_type(Instance* inst) {
 TimingPath STAReportGenerator::build_timing_path(
     const STAWorker& worker,
     const SignalBit& endpoint_bit,
-    const std::string& clock_name
+    const std::string& clock_name,
+    const TimingEndpoint* endpoint_override
 ) {
     TimingPath path;
     path.endpoint = endpoint_bit;
@@ -65,12 +67,17 @@ TimingPath STAReportGenerator::build_timing_path(
     SignalBit canonical_endpoint = worker.get_canonical_signal(endpoint_bit);
     
     // 获取 endpoint 信息
-    if (endpoints.count(canonical_endpoint)) {
-        const auto& endpoint = endpoints.at(canonical_endpoint);
+    const TimingEndpoint* ep = endpoint_override;
+    if (!ep && endpoints.count(canonical_endpoint) && !endpoints.at(canonical_endpoint).empty()) {
+        ep = &endpoints.at(canonical_endpoint).front();
+    }
+    if (ep) {
         path.data_arrival_time = arrival_time.count(canonical_endpoint) ? 
                                  arrival_time.at(canonical_endpoint) : 0;
-        // 使用 worker 的方法计算考虑所有时序参数后的 data required time
-        int setup_time = endpoint.Setup_req.value();
+        int setup_time = ep->Setup_req.value_or(0);
+        path.setup_time = setup_time;
+        path.endpoint_sink = ep->sink;
+        path.endpoint_port = ep->port;
         path.data_required_time = worker.calculate_data_required_time(setup_time);
         path.slack = path.data_required_time - path.data_arrival_time;
         path.met = path.slack >= 0;
@@ -168,14 +175,22 @@ void STAReportGenerator::print_path_header(const TimingPath& path) {
     
     std::cout << "Endpoint: ";
     
-    // 显示终点信息
-    const auto& endpoint_node = path.path_nodes.back();
-    if (endpoint_node.driver) {
-        std::cout << endpoint_node.driver->instance_name 
+    // 显示终点信息：优先使用 endpoint_sink（寄存器 D 端或顶层输出）
+    if (path.endpoint_sink) {
+        std::cout << path.endpoint_sink->instance_name 
                   << " (rising edge-triggered flip-flop clocked by " 
                   << path.path_group << ")\n";
-    } else {
+    } else if (!path.endpoint_port.empty()) {
         std::cout << get_signal_name(path.endpoint) << " (primary output)\n";
+    } else {
+        const auto& endpoint_node = path.path_nodes.back();
+        if (endpoint_node.driver) {
+            std::cout << endpoint_node.driver->instance_name 
+                      << " (rising edge-triggered flip-flop clocked by " 
+                      << path.path_group << ")\n";
+        } else {
+            std::cout << get_signal_name(path.endpoint) << " (primary output)\n";
+        }
     }
     
     std::cout << "Path Group: " << path.path_group << "\n";
@@ -255,16 +270,11 @@ void STAReportGenerator::print_data_required(const TimingPath& path, const STAWo
         std::cout << std::right << std::setw(10) << format_time(clock_period - cfg.clock_uncertain) << "\n";
     }
     
-    // 如果有 setup time，显示（从 endpoint 中获取）
-    const auto& endpoints = worker.get_endpoints();
-    SignalBit canonical_endpoint = worker.get_canonical_signal(path.endpoint);
-    if (endpoints.count(canonical_endpoint)) {
-        int setup_time = endpoints.at(canonical_endpoint).Setup_req.value();
-        if (setup_time > 0) {
-            std::cout << std::left << std::setw(40) << "library setup time";
-            std::cout << std::right << std::setw(10) << format_time(-setup_time);
-            std::cout << std::right << std::setw(10) << format_time(path.data_required_time) << "\n";
-        }
+    // 如果有 setup time，显示（从 path 中获取）
+    if (path.setup_time > 0) {
+        std::cout << std::left << std::setw(40) << "library setup time";
+        std::cout << std::right << std::setw(10) << format_time(-path.setup_time);
+        std::cout << std::right << std::setw(10) << format_time(path.data_required_time) << "\n";
     }
     
     std::cout << std::left << std::setw(40) << "data required time";
@@ -288,9 +298,10 @@ void STAReportGenerator::print_slack_summary(const TimingPath& path) {
 void STAReportGenerator::generate_path_report(
     const STAWorker& worker,
     const SignalBit& endpoint_bit,
-    const std::string& clock_name
+    const std::string& clock_name,
+    const TimingEndpoint* endpoint_override
 ) {
-    TimingPath path = build_timing_path(worker, endpoint_bit, clock_name);
+    TimingPath path = build_timing_path(worker, endpoint_bit, clock_name, endpoint_override);
     
     print_path_header(path);
     print_data_arrival(path);
@@ -314,40 +325,68 @@ void STAReportGenerator::generate_report(
     std::cout << "Clock Period: " << clock_period << "ps (" << format_time(clock_period) << "ns)\n";
     std::cout << "===========================================================\n\n";
     
-    // 获取关键路径
-    SignalBit critical = worker.get_critical_signal();
-    if (critical.wire_name == "") {
+    // 收集所有 endpoint 路径，按 total_time (arrival + setup_req) 降序排序，取最长的前 3 条
+    const auto& endpoints = worker.get_endpoints();
+    const auto& arrival_time_map = worker.get_arrival_time();
+    
+    struct PathCandidate {
+        SignalBit bit;
+        TimingEndpoint endpoint;
+        int total_time;
+    };
+    std::vector<PathCandidate> all_paths;
+    
+    for (const auto& [bit, eps] : endpoints) {
+        SignalBit canonical = worker.get_canonical_signal(bit);
+        if (!arrival_time_map.count(canonical)) continue;
+        int arrival = arrival_time_map.at(canonical);
+        for (const auto& ep : eps) {
+            int setup = ep.Setup_req.value_or(0);
+            int total = arrival + setup;
+            all_paths.push_back({canonical, ep, total});
+        }
+    }
+    
+    std::sort(all_paths.begin(), all_paths.end(),
+              [](const PathCandidate& a, const PathCandidate& b) {
+                  return a.total_time > b.total_time;
+              });
+    
+    const int top_n = 3;
+    int paths_to_show = std::min(top_n, static_cast<int>(all_paths.size()));
+    
+    if (paths_to_show == 0) {
         std::cout << "No timing paths found.\n";
         return;
     }
     
-    // 生成关键路径报告
-    std::cout << "Critical Path Report:\n";
-    generate_path_report(worker, critical, clock_name);
+    // 默认打印最长的前 3 条路径
+    std::cout << "Top " << paths_to_show << " Longest Path(s):\n";
+    for (int i = 0; i < paths_to_show; ++i) {
+        std::cout << "\n--- Path #" << (i + 1) << " (total time: " << all_paths[i].total_time << "ps) ---\n";
+        generate_path_report(worker, all_paths[i].bit, clock_name, &all_paths[i].endpoint);
+    }
     
-    // 统计所有违规路径
-    const auto& endpoints = worker.get_endpoints();
-    const auto& arrival_time = worker.get_arrival_time();
-    
+    // 统计所有违规路径（每个 (bit, endpoint) 单独计数）
     int violation_count = 0;
-    std::vector<SignalBit> violations;
+    std::vector<std::pair<SignalBit, TimingEndpoint>> violations;
     
-    for (const auto& [bit, endpoint] : endpoints) {
+    for (const auto& [bit, eps] : endpoints) {
         SignalBit canonical = worker.get_canonical_signal(bit);
         
-        if (!arrival_time.count(canonical)) {
+        if (!arrival_time_map.count(canonical)) {
             continue;
         }
         
-        int arrival = arrival_time.at(canonical);
-        int setup_time = endpoint.Setup_req.value();
-        // 使用 worker 的方法计算考虑所有时序参数后的 data required time
-        int data_required_time = worker.calculate_data_required_time(setup_time);
-        
-        // 检查是否违反时序（arrival time > data required time）
-        if (arrival > data_required_time) {
-            violation_count++;
-            violations.push_back(canonical);
+        int arrival = arrival_time_map.at(canonical);
+        for (const auto& endpoint : eps) {
+            int setup_time = endpoint.Setup_req.value_or(0);
+            int data_required_time = worker.calculate_data_required_time(setup_time);
+            
+            if (arrival > data_required_time) {
+                violation_count++;
+                violations.push_back({canonical, endpoint});
+            }
         }
     }
     
@@ -360,13 +399,13 @@ void STAReportGenerator::generate_report(
         
         // 显示前几个违规路径
         int max_violations_to_show = 5;
-        for (size_t i = 0; i < violations.size() && i < max_violations_to_show; ++i) {
+        for (size_t i = 0; i < violations.size() && i < static_cast<size_t>(max_violations_to_show); ++i) {
             std::cout << "Violation #" << (i + 1) << ":\n";
-            generate_path_report(worker, violations[i], clock_name);
+            generate_path_report(worker, violations[i].first, clock_name, &violations[i].second);
             std::cout << "\n";
         }
         
-        if (violations.size() > max_violations_to_show) {
+        if (static_cast<int>(violations.size()) > max_violations_to_show) {
             std::cout << "... and " << (violations.size() - max_violations_to_show) 
                       << " more violations.\n";
         }

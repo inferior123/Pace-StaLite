@@ -31,6 +31,10 @@ struct TimingPath {
     int data_required_time;
     int slack;
     bool met;  // 是否满足时序要求
+    int setup_time = 0;  // 库中 setup time，用于报告显示
+    // 用于报告显示：endpoint 的 sink 和 port（nullptr = 顶层输出）
+    Instance* endpoint_sink = nullptr;
+    std::string endpoint_port;
 };
 
 /**
@@ -54,21 +58,25 @@ public:
      * @param worker STAWorker 实例的引用（从 worker.cfg 获取时钟周期等参数）
      * @param endpoint_bit 终点信号
      * @param clock_name 时钟名称
+     * @param endpoint_override 可选，指定使用哪个 endpoint（当同一 signal 有多个 endpoint 时）
      */
     static void generate_path_report(
         const STAWorker& worker,
         const SignalBit& endpoint_bit,
-        const std::string& clock_name = "__clk__"
+        const std::string& clock_name = "__clk__",
+        const TimingEndpoint* endpoint_override = nullptr
     );
 
 private:
     /**
      * 构建路径节点列表
+     * @param endpoint_override 可选，指定使用哪个 endpoint 的 Setup_req（当同一 signal 有多个 endpoint 时）
      */
     static TimingPath build_timing_path(
         const STAWorker& worker,
         const SignalBit& endpoint_bit,
-        const std::string& clock_name
+        const std::string& clock_name,
+        const TimingEndpoint* endpoint_override = nullptr
     );
 
     /**

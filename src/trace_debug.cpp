@@ -5,6 +5,7 @@
 #include "interface.hpp"
 #include "parser-verilog/verilog_data.hpp"
 #include <set>
+#include <iostream>
 
 #include "sta/debug.h"
 
@@ -34,7 +35,7 @@ void fanout_debuger(sta::STAWorker& worker) {
   
   // 收集输出端口：遍历 endpoints，使用规范代表去重
   std::set<sta::SignalBit> output_ports_set;
-  for (const auto& [bit, endpoint] : endpoints) {
+  for (const auto& [bit, eps] : endpoints) {
     sta::SignalBit canonical = worker.get_canonical_signal(bit);
     output_ports_set.insert(canonical);
   }
@@ -58,12 +59,16 @@ void fanout_debuger(sta::STAWorker& worker) {
   }
   
   std::cout << "  OUTPUT ports:\n";
-  for (const auto& endpoint : endpoints) {
-    const auto &bit = endpoint.first;
-    const auto &info = endpoint.second;
-    if(info.sink != nullptr) {
-      continue;
+  for (const auto& [bit, eps] : endpoints) {
+    // 只显示顶层输出（sink == nullptr 的 endpoint）
+    bool has_output = false;
+    for (const auto& ep : eps) {
+      if (ep.sink == nullptr) {
+        has_output = true;
+        break;
+      }
     }
+    if (!has_output) continue;
     std::cout << "    " << bit.wire_name;
     // 检查是否需要显示索引：如果bit_offset不为0，或者signal_registry中存在且size>1
     bool need_index = (bit.bit_offset != 0);
@@ -79,8 +84,12 @@ void fanout_debuger(sta::STAWorker& worker) {
   std::cout << "\n----------------------------------------\n";
   std::cout << "Endpoints:\n";
   std::cout << "----------------------------------------\n";
-  for (const auto &endpoint : endpoints) {
-    std::cout << "    " << endpoint.first.wire_name << std::endl;
+  for (const auto& [bit, eps] : endpoints) {
+    for (const auto& ep : eps) {
+      std::cout << "    " << bit.wire_name;
+      if (ep.sink) std::cout << " -> " << ep.sink->instance_name << "." << ep.port;
+      std::cout << std::endl;
+    }
   }
   std::cout << '\n';
 
@@ -196,8 +205,8 @@ void run_debuger(sta::STAWorker& worker, bool verbose) {
     if (final_arrival_time.count(critical_sig)) {
       int critical_arrival = final_arrival_time.at(critical_sig);
       std::cout << "Critical signal arrival time: " << critical_arrival << "ps\n";
-      if (endpoints.count(critical_sig)) {
-        int setup_required = endpoints.at(critical_sig).Setup_req.value();
+      if (endpoints.count(critical_sig) && !endpoints.at(critical_sig).empty()) {
+        int setup_required = endpoints.at(critical_sig).front().Setup_req.value_or(0);
         std::cout << "Library Setup time: " << setup_required << "ps\n";
         std::cout << "Total time: " << (critical_arrival + setup_required) << "ps\n";
       }
@@ -213,8 +222,8 @@ void run_debuger(sta::STAWorker& worker, bool verbose) {
                   << time << "ps";
         
         // 显示是否是 endpoint
-        if (endpoints.count(bit)) {
-          int setup_required = endpoints.at(bit).Setup_req.value();
+        if (endpoints.count(bit) && !endpoints.at(bit).empty()) {
+          int setup_required = endpoints.at(bit).front().Setup_req.value_or(0);
           std::cout << " [endpoint, library setup required: " << setup_required << "ps, total: " 
                     << (time + setup_required) << "ps]";
         }

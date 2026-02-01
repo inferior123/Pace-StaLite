@@ -291,7 +291,7 @@ private:
     // 核心数据结构
     SignalMap sigmap;
     std::unordered_map<SignalBit, SignalTimingData, SignalBitHash> timing_data;
-    std::unordered_map<SignalBit, TimingEndpoint, SignalBitHash> endpoints;
+    std::unordered_map<SignalBit, std::vector<TimingEndpoint>, SignalBitHash> endpoints;
     std::deque<SignalBit> timing_queue;
     std::unordered_set<SignalBit, SignalBitHash> driven_signals;
     
@@ -358,6 +358,9 @@ public:
     void calculate_load_capacitance();
     void calculate_timing_arcs();
     void run();
+    void run_dfs();  // DFS 版本：从 input 端口出发，使用 stack 模拟递归寻找时序路径
+    void print_all_timing_paths_dfs();  // DFS 枚举并打印每一条时序路径
+    void print_all_timing_paths_bfs();  // BFS/拓扑序：用队列按层枚举并打印每一条时序路径（不依赖 timing_queue）
     void sta_check(int clock_period);
 
     SignalSpec get_signal_bits(const std::string &signame) const;
@@ -428,7 +431,7 @@ public:
     const std::vector<std::unique_ptr<Instance>>& get_instances() const { return instances; }
     const std::unordered_map<std::string, std::vector<SignalBit>>& get_signal_registry() const { return signal_registry; }
     const std::unordered_map<SignalBit, SignalTimingData, SignalBitHash>& get_timing_data() const { return timing_data; }
-    const std::unordered_map<SignalBit, TimingEndpoint, SignalBitHash>& get_endpoints() const { return endpoints; }
+    const std::unordered_map<SignalBit, std::vector<TimingEndpoint>, SignalBitHash>& get_endpoints() const { return endpoints; }
     const std::unordered_set<SignalBit, SignalBitHash>& get_driven_signals() const { return driven_signals; }
     const std::deque<SignalBit>& get_timing_queue() const { return timing_queue; }
     SignalBit get_canonical_signal(const SignalBit& bit) const { return sigmap.find(bit); }
@@ -442,6 +445,8 @@ private:
     // 内部辅助函数
     void propagate_timing(const SignalBit& bit);
     void trace_critical_path();
+    // 处理单个 endpoint 的 setup/hold 计算，返回 required_time
+    int process_endpoint_timing(TimingEndpoint& ep, const SignalBit& dst_canonical);
     void trace_path(const SignalBit& endpoint_bit);  // 回溯并打印路径
     SignalBit create_signal_bit(const std::string& name, int offset);
 };

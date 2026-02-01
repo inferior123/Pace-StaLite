@@ -56,9 +56,13 @@ int sta_main(int argc, char *argv[]) {
 
   // fanout_debuger(worker);
 
-  run_debuger(worker, true);
-  // worker.run();
-  
+  // run_debuger(worker, true);
+  worker.run();
+  worker.print_all_timing_paths_bfs();
+  // worker.run_dfs();
+  // std::cout << "\n=== DFS 枚举所有时序路径 ===\n";
+  // worker.print_all_timing_paths_dfs();
+
   // 设置时钟配置
   if(worker.get_config().clk_period == 0) {
     std::cout << "no clk period specific, use 10" << std::endl;
