@@ -1,0 +1,222 @@
+/********************************************/
+/*                                          */
+/* Simple Standard Cell Library             */
+/* For Static Timing Analysis              */
+/*                                          */
+/* This is a simplified Liberty format      */
+/* library file for basic STA testing       */
+/*                                          */
+/********************************************/
+
+library(simple_cells) {
+  technology (cmos);
+  revision : 1.0;
+  
+  /* Units Attributes */
+  time_unit                     : "1ps";
+  capacitive_load_unit          (1,ff);
+  voltage_unit                  : "1V";
+  current_unit                  : "1uA";
+  pulling_resistance_unit       : "1kohm";
+  
+  /* Default Pin Attributes */
+  default_inout_pin_cap         : 1.0;
+  default_input_pin_cap         : 1.0;
+  default_output_pin_cap        : 0.0;
+  default_fanout_load           : 1.0;
+  
+  /* Operating Conditions */
+  nom_process                   : 1.0;
+  nom_temperature               : 25.0;
+  nom_voltage                   : 1.2;
+  
+  delay_model                   : generic_cmos;
+  
+  /******************************************************************************
+   * AND2_X1: 2-input AND gate
+   * Delay: 100ps from any input to output
+   ******************************************************************************/
+  cell (AND2_X1) {
+    area : 1.0;
+    
+    pin (a) {
+      direction : input;
+      capacitance : 0.9;  /* Input capacitance in ff */
+    }
+    
+    pin (b) {
+      direction : input;
+      capacitance : 0.9;  /* Input capacitance in ff */
+    }
+    
+    pin (o) {
+      direction : output;
+      function : "(a & b)";
+      
+      timing () {
+        related_pin : "a";
+        timing_sense : positive_unate;
+        intrinsic_rise : 100;  /* Delay in ps */
+        intrinsic_fall : 100;
+      }
+      
+      timing () {
+        related_pin : "b";
+        timing_sense : positive_unate;
+        intrinsic_rise : 100;  /* Delay in ps */
+        intrinsic_fall : 100;
+      }
+    }
+  }
+  
+  /******************************************************************************
+   * OR2_X1: 2-input OR gate
+   * Delay: 120ps from any input to output
+   ******************************************************************************/
+  cell (OR2_X1) {
+    area : 1.2;
+    
+    pin (a) {
+      direction : input;
+      capacitance : 1.0;
+    }
+    
+    pin (b) {
+      direction : input;
+      capacitance : 1.0;
+    }
+    
+    pin (o) {
+      direction : output;
+      function : "(a | b)";
+      
+      timing () {
+        related_pin : "a";
+        timing_sense : positive_unate;
+        intrinsic_rise : 120;
+        intrinsic_fall : 120;
+      }
+      
+      timing () {
+        related_pin : "b";
+        timing_sense : positive_unate;
+        intrinsic_rise : 120;
+        intrinsic_fall : 120;
+      }
+    }
+  }
+  
+  /******************************************************************************
+   * INV_X2: Inverter
+   * Delay: 80ps from input to output
+   ******************************************************************************/
+  cell (INV_X2) {
+    area : 0.8;
+    
+    pin (a) {
+      direction : input;
+      capacitance : 0.8;
+    }
+    
+    pin (o) {
+      direction : output;
+      function : "!a";
+      
+      timing () {
+        related_pin : "a";
+        timing_sense : negative_unate;
+        intrinsic_rise : 80;
+        intrinsic_fall : 80;
+      }
+    }
+  }
+  
+  /******************************************************************************
+   * NOR2_X1: 2-input NOR gate
+   * Delay: 110ps from any input to output
+   ******************************************************************************/
+  cell (NOR2_X1) {
+    area : 1.1;
+    
+    pin (a) {
+      direction : input;
+      capacitance : 0.95;
+    }
+    
+    pin (b) {
+      direction : input;
+      capacitance : 0.95;
+    }
+    
+    pin (o) {
+      direction : output;
+      function : "!(a | b)";
+      
+      timing () {
+        related_pin : "a";
+        timing_sense : negative_unate;
+        intrinsic_rise : 110;
+        intrinsic_fall : 110;
+      }
+      
+      timing () {
+        related_pin : "b";
+        timing_sense : negative_unate;
+        intrinsic_rise : 110;
+        intrinsic_fall : 110;
+      }
+    }
+  }
+  
+  /******************************************************************************
+   * REG: D-type Flip-Flop
+   * Clock-to-Q delay: 20ps
+   * Setup time: 10ps
+   ******************************************************************************/
+  cell (REG) {
+    area : 2.0;
+    
+    ff("IQ", "IQN") {
+      next_state : "d";
+      clocked_on : "clk";
+    }
+    
+    pin (clk) {
+      direction : input;
+      clock : true;
+      capacitance : 1.5;  /* Clock pin typically has higher capacitance */
+    }
+    
+    pin (d) {
+      direction : input;
+      capacitance : 1.0;
+      
+      timing () {
+        related_pin : "clk";
+        timing_type : setup_rising;
+        intrinsic_rise : 15;  /* Setup time in ps */
+        intrinsic_fall : 15;
+      }
+      
+      timing () {
+        related_pin : "clk";
+        timing_type : hold_rising;
+        intrinsic_rise : 10;   /* Hold time (simplified, typically small) */
+        intrinsic_fall : 10;
+      }
+    }
+    
+    pin (q) {
+      direction : output;
+      function : "IQ";
+      
+      timing () {
+        related_pin : "clk";
+        timing_type : rising_edge;
+        intrinsic_rise : 20;  /* Clock-to-Q delay in ps */
+        intrinsic_fall : 20;
+      }
+    }
+  }
+  
+} /* end library */

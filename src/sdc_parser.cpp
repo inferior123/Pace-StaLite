@@ -1,4 +1,4 @@
-#include "sdc_parser.hpp"
+#include "sdc/sdc_parser.hpp"
 #include <cassert>
 #include <fstream>
 #include <sstream>
@@ -226,6 +226,10 @@ void SDCParser::register_default_commands() {
         handle_read_verilog(cmd);
     };
 
+    command_handlers_["read_liberty"] = [this](SDCParserInterface* iface, const SDCCommand& cmd) {
+        handle_read_liberty(cmd);
+    };
+
     command_handlers_["create_clock"] = [this](SDCParserInterface* iface, const SDCCommand& cmd) {
         handle_create_clock(cmd);
     };
@@ -262,6 +266,22 @@ void SDCParser::handle_read_verilog(const SDCCommand& cmd) {
     }
 
     assert(false && "read_verilog command should contants a file name");
+}
+
+void SDCParser::handle_read_liberty(const SDCCommand& cmd) {
+    for(const auto &value : cmd.values) {
+        if(value.type == SDCValue::STRING) {
+            return interface_->read_liberty(value.string_value);
+        }
+    }
+
+    for(const auto &opt : cmd.options) {
+        if(opt.name == "file") {
+            return interface_->read_liberty(opt.value.string_value);
+        }
+    }
+
+    assert(false && "read_liberty command should contain a file name");
 }
 
 void SDCParser::handle_create_clock(const SDCCommand& cmd) {

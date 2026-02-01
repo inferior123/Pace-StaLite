@@ -70,7 +70,7 @@ TimingPath STAReportGenerator::build_timing_path(
         path.data_arrival_time = arrival_time.count(canonical_endpoint) ? 
                                  arrival_time.at(canonical_endpoint) : 0;
         // 使用 worker 的方法计算考虑所有时序参数后的 data required time
-        int setup_time = endpoint.required_time;
+        int setup_time = endpoint.Setup_req.value();
         path.data_required_time = worker.calculate_data_required_time(setup_time);
         path.slack = path.data_required_time - path.data_arrival_time;
         path.met = path.slack >= 0;
@@ -259,7 +259,7 @@ void STAReportGenerator::print_data_required(const TimingPath& path, const STAWo
     const auto& endpoints = worker.get_endpoints();
     SignalBit canonical_endpoint = worker.get_canonical_signal(path.endpoint);
     if (endpoints.count(canonical_endpoint)) {
-        int setup_time = endpoints.at(canonical_endpoint).required_time;
+        int setup_time = endpoints.at(canonical_endpoint).Setup_req.value();
         if (setup_time > 0) {
             std::cout << std::left << std::setw(40) << "library setup time";
             std::cout << std::right << std::setw(10) << format_time(-setup_time);
@@ -340,7 +340,7 @@ void STAReportGenerator::generate_report(
         }
         
         int arrival = arrival_time.at(canonical);
-        int setup_time = endpoint.required_time;
+        int setup_time = endpoint.Setup_req.value();
         // 使用 worker 的方法计算考虑所有时序参数后的 data required time
         int data_required_time = worker.calculate_data_required_time(setup_time);
         

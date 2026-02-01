@@ -1,4 +1,5 @@
 #include "verilog_data.hpp"
+#include "parser-verilog/verilog_driver.hpp"
 #include "sta/sta_data_structures.hpp"
 #include "cell/cell_data_structure.hpp"
 #include "cell/liberty_parser.hpp"
@@ -12,6 +13,7 @@ private:
   std::string filename;     // 存储文件名
 
 public:
+
   // 构造函数：注入 worker 引用
   explicit MyVerilogParser(sta::STAWorker& worker, std::string file_name = "") 
       : worker_(worker), filename(file_name) {}
@@ -93,11 +95,13 @@ struct SampleParser : public verilog::ParserVerilogInterface {
 struct MySDCParser : public sdc::SDCParserInterface {
 private:
     sta::STAWorker& worker_;
-    MyVerilogParser& verilog_parser_;
         
 public:
-    explicit MySDCParser(sta::STAWorker& worker, MyVerilogParser& verilog_parser)
-        : worker_(worker), verilog_parser_(verilog_parser) {}
+    std::string verilog_file_name;
+    std::string celllib_file_name;
+
+    explicit MySDCParser(sta::STAWorker& worker)
+        : worker_(worker) {}
     
     virtual ~MySDCParser() {}
     
@@ -143,13 +147,11 @@ public:
     }
     
     void read_verilog(const std::string& filename) override {
-      verilog_parser_.set_filename(filename);
+      verilog_file_name = filename;
     }
 
     void read_liberty(const std::string& filename) override {
-      // TODO implement this funciton
-      assert(false && "not implement");
-      return ;
+        celllib_file_name = filename;
     };
 
     void unknown_command(const sdc::SDCCommand& cmd) override {
@@ -189,6 +191,15 @@ public:
         }
         
         // 将解析结果合并到cell_library_中
+        // 1. 复制table templates
+        for (const auto& template_name : lib.get_table_template_names()) {
+            const auto* templ = lib.get_table_template(template_name);
+            if (templ) {
+                cell_library_.add_table_template(*templ);
+            }
+        }
+        
+        // 2. 复制cells
         for (const auto& cell_name : lib.get_cell_names()) {
             const auto* cell = lib.get_cell(cell_name);
             if (cell) {
@@ -286,6 +297,15 @@ public:
         }
         
         // 将解析结果合并到cell_library_中
+        // 1. 复制table templates
+        for (const auto& template_name : lib.get_table_template_names()) {
+            const auto* templ = lib.get_table_template(template_name);
+            if (templ) {
+                cell_library_.add_table_template(*templ);
+            }
+        }
+        
+        // 2. 复制cells
         for (const auto& cell_name : lib.get_cell_names()) {
             const auto* cell = lib.get_cell(cell_name);
             if (cell) {

@@ -2,3 +2,9 @@
 using namespace sta;
 void fanout_debuger(sta::STAWorker& worker);
 void run_debuger(sta::STAWorker& worker, bool verbose);
+
+int test_celllib_parser(int argc, char *argv[]);
+int test_transition_calculation(int argc, char *argv[]);
+
+int test_all_sta_functions(int argc, char *argv[]);
+int setup_hold_test(int argc, char *argv[]);

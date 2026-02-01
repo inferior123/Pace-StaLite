@@ -85,6 +85,7 @@ private:
     // ========== 单位转换函数 ==========
     double parse_time_unit(const std::string& unit_str);
     double parse_capacitance_unit(const std::string& unit_str);
+    double convert_time_to_ps(double time_value);  // 将时间值转换为ps单位
     
     // ========== 辅助工具函数：跳过未知内容 ==========
     void skip_parentheses_block();

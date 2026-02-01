@@ -1,5 +1,12 @@
-no verilog file specific, use "/home/ysyx/project/pba-sta-base/proj/Testing/reg.v "
-
+Parsing SDC file: ./test.sdc
+finish parse SDC file
+  [DEBUG] Parsed table template: Hold_3_3 (var1=constrained_pin_transition, var2=related_pin_transition, index_1 size=3, index_2 size=3)
+  [DEBUG] Parsed table template: Timing_7_7 (var1=input_net_transition, var2=total_output_net_capacitance, index_1 size=7, index_2 size=7)
+  [DEBUG] Parsed table template: Setup_3_3 (var1=constrained_pin_transition, var2=related_pin_transition, index_1 size=3, index_2 size=3)
+Step 1: build_fanouts()...
+Step 2: calculate_load_capacitance()...
+Step 3: calculate_timing_arcs()...
+✓ Three-stage flow completed
 
 ╔══════════════════════════════════════════════════════════╗
 ║              Timing Propagation Trace                    ║
@@ -7,128 +14,210 @@ no verilog file specific, use "/home/ysyx/project/pba-sta-base/proj/Testing/reg.
 
 Initial State:
 ----------------------------------------
-Queue size: 3
+Queue size: 6
 Signals in queue:
   - a[0] (arrival: 0ps)
   - b[0] (arrival: 0ps)
+  - c[0] (arrival: 0ps)
+  - d[0] (arrival: 0ps)
+  - clk[0] (arrival: 0ps)
   - __clk__[0] (arrival: 0ps)
 
 Executing timing propagation...
 ----------------------------------------
+[DEBUG] start the endpoint caculate
+[DEBUG] start the setup/holdon caculate
+
+[DEBUG] Setup/Hold Calculation for endpoint:
+  Signal: w2[0]
+  Cell: DFF_X1, Port: D
+  Data transition: rise=4.30343ps, fall=4.36914ps, max=4.36914ps
+  Clock transition: rise=0ps, fall=0ps, max=0ps
+  [HOLD] Found hold timing arc (related_pin: CK)
+    rise_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_rise=4.42589ps
+    fall_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_fall=1.58646ps
+    => Final Hold Time: 4ps (max of rise=4.42589, fall=1.58646)
+  [SETUP] Found setup timing arc (related_pin: CK)
+    rise_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_rise=30.3012ps
+    fall_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_fall=38.5203ps
+    => Final Setup Time: 38ps (max of rise=30.3012, fall=38.5203)
+  => Required Time (Setup): 38ps
+[DEBUG] start the endpoint caculate
+[DEBUG] start the endpoint caculate
+[DEBUG] start the setup/holdon caculate
+
+[DEBUG] Setup/Hold Calculation for endpoint:
+  Signal: w2[0]
+  Cell: DFF_X1, Port: D
+  Data transition: rise=4.30343ps, fall=4.36914ps, max=4.36914ps
+  Clock transition: rise=0ps, fall=0ps, max=0ps
+  [HOLD] Found hold timing arc (related_pin: CK)
+    rise_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_rise=4.42589ps
+    fall_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_fall=1.58646ps
+    => Final Hold Time: 4ps (max of rise=4.42589, fall=1.58646)
+  [SETUP] Found setup timing arc (related_pin: CK)
+    rise_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_rise=30.3012ps
+    fall_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_fall=38.5203ps
+    => Final Setup Time: 38ps (max of rise=30.3012, fall=38.5203)
+  => Required Time (Setup): 38ps
+[DEBUG] start the endpoint caculate
 ✓ Timing propagation completed
 
 ----------------------------------------
 Final Results:
 ----------------------------------------
-Max arrival time: 130ps
-Critical signal: c1[0]
-Critical signal arrival time: 120ps
-Required time: 10ps
-Total time: 130ps
+Max arrival time: 114ps
+Critical signal: tar[0]
+Critical signal arrival time: 114ps
+Library Setup time: 0ps
+Total time: 114ps
 
 All arrival times:
 ----------------------------------------
-  c1[0]: 120ps [endpoint, required: 10ps, total: 130ps]
-  reg_reg2_q[0]: 20ps
-  reg_reg3_q[0]: 20ps [endpoint, required: 0ps, total: 20ps]
-  reg_reg1_q[0]: 20ps
+  tar[0]: 114ps [endpoint, library setup required: 0ps, total: 114ps]
+  __reg_input__reg1__D[0]: 40ps
+  reg_q[0]: 98ps
+  w2[0]: 40ps [endpoint, library setup required: 38ps, total: 78ps]
+  w1[0]: 24ps
   __clk__[0]: 0ps
-  b[0]: 0ps [endpoint, required: 10ps, total: 10ps]
-  a[0]: 0ps [endpoint, required: 10ps, total: 10ps]
+  c[0]: 0ps
+  clk[0]: 0ps
+  b[0]: 0ps
+  d[0]: 0ps
+  a[0]: 0ps
 
 ╔══════════════════════════════════════════════════════════╗
 ║              End of Timing Propagation Trace              ║
 ╚══════════════════════════════════════════════════════════╝
 
-no clk period specific, use 10
 
 ⚠ Timing violations detected!
-  Clock period: 100ps
-  Max arrival time: 130ps
-  Worst slack: -30ps
+  Clock period: 1ps (effective: -29ps after uncertainty)
+  Max arrival time: 114ps
+  Worst slack: -143ps
 
 Violating paths:
 ----------------------------------------
 
-[1] Violation at: c1[0]
-  Arrival time: 120ps
-  Setup time: 10ps
-  Data required time: 90ps
-  Slack: -30ps (violation: 30ps)
-  Endpoint: reg_reg3 (REG.d)
+[1] Violation at: w2[0]
+  Arrival time: 40ps
+  Setup time: 38ps
+  Data required time: -67ps (clock period 1ps - setup 38ps - uncertainty 30ps)
+  Slack: -107ps (violation: 107ps)
+  Endpoint: reg1 (DFF_X1.D)
 
   Path trace (from input to endpoint):
-    [0] __clk__[0] (arrival: 0ps) [Virtual Clock]
-    [1] reg_reg1_q[0] (arrival: 20ps)
-        → reg_reg1 (REG) via port clk
+    [0] b[0] (arrival: 0ps) [Primary Input]
+    [1] w1[0] (arrival: 24ps)
+        → and1 (AND2_X2) via port A2
 
-    [2] c1[0] (arrival: 120ps)
-        → g1 (AND2_X1) via port a
+    [2] w2[0] (arrival: 40ps)
+        → and2 (AND2_X2) via port A1
+ [Endpoint]
+
+[2] Violation at: tar[0]
+  Arrival time: 114ps
+  Setup time: 0ps
+  Data required time: -29ps (clock period 1ps - setup 0ps - uncertainty 30ps)
+  Slack: -143ps (violation: 143ps)
+  Endpoint: Top module output (tar)
+
+  Path trace (from input to endpoint):
+    [0] clk[0] (arrival: 0ps) [Primary Input]
+    [1] reg_q[0] (arrival: 98ps)
+        → reg1 (DFF_X1) via port CK
+
+    [2] tar[0] (arrival: 114ps)
+        → and3 (AND2_X2) via port A1
  [Endpoint]
 
 ----------------------------------------
-Total violations: 1
+Total violations: 2
 
 ╔══════════════════════════════════════════════════════════╗
 ║              Static Timing Analysis Report               ║
 ╚══════════════════════════════════════════════════════════╝
 
-Module: and
-Clock Period: 100ps (0.10ns)
+Module: nangate_test_2
+Clock Period: 1ps (0.00ns)
 ===========================================================
 
 Critical Path Report:
 
-Startpoint: Virtual Clock (rising edge-triggered flip-flop clocked by __clk__)
-Endpoint: g1 (rising edge-triggered flip-flop clocked by __clk__)
+Startpoint: clk (primary input)
+Endpoint: and3 (rising edge-triggered flip-flop clocked by __clk__)
 Path Group: __clk__
 Path Type: max
 Point                                    Incr       Path
 ---------------------------------------------------------------
-clock __clk__ (rise edge)                     0.00      0.00
-reg_reg1/clk/q (REG) r                        0.02      0.02
-g1/a/o (AND2_X1) r                            0.10      0.12
-data arrival time                                       0.12
+clk (primary input)                           0.00      0.00
+reg1 (DFF_X1) r                               0.10      0.10
+and3 (AND2_X2) r                              0.02      0.11
+data arrival time                                       0.11
 
-clock __clk__ (rise edge)                     0.10      0.10
-clock network delay (ideal)                   0.00      0.10
-library setup time                           -0.01      0.09
-data required time                                      0.09
+clock __clk__ (rise edge)                     0.00      0.00
+clock network delay (ideal)                   0.00      0.00
+clock uncertainty                            -0.03     -0.03
+data required time                                     -0.03
 ---------------------------------------------------------------
-data required time                                      0.09
-data arrival time                                       0.12
+data required time                                     -0.03
+data arrival time                                       0.11
 ---------------------------------------------------------------
-slack                                   (VIOLATED)     -0.03
+slack                                   (VIOLATED)     -0.14
 
 
 ╔══════════════════════════════════════════════════════════╗
 ║              Timing Violations Summary                   ║
 ╚══════════════════════════════════════════════════════════╝
 
-Total Violations: 1
+Total Violations: 2
 
 Violation #1:
 
-Startpoint: Virtual Clock (rising edge-triggered flip-flop clocked by __clk__)
-Endpoint: g1 (rising edge-triggered flip-flop clocked by __clk__)
+Startpoint: b (primary input)
+Endpoint: and2 (rising edge-triggered flip-flop clocked by __clk__)
 Path Group: __clk__
 Path Type: max
 Point                                    Incr       Path
 ---------------------------------------------------------------
-clock __clk__ (rise edge)                     0.00      0.00
-reg_reg1/clk/q (REG) r                        0.02      0.02
-g1/a/o (AND2_X1) r                            0.10      0.12
-data arrival time                                       0.12
+b (primary input)                             0.00      0.00
+and1 (AND2_X2) r                              0.02      0.02
+and2 (AND2_X2) r                              0.02      0.04
+data arrival time                                       0.04
 
-clock __clk__ (rise edge)                     0.10      0.10
-clock network delay (ideal)                   0.00      0.10
-library setup time                           -0.01      0.09
-data required time                                      0.09
+clock __clk__ (rise edge)                     0.00      0.00
+clock network delay (ideal)                   0.00      0.00
+clock uncertainty                            -0.03     -0.03
+library setup time                           -0.04     -0.07
+data required time                                     -0.07
 ---------------------------------------------------------------
-data required time                                      0.09
-data arrival time                                       0.12
+data required time                                     -0.07
+data arrival time                                       0.04
 ---------------------------------------------------------------
-slack                                   (VIOLATED)     -0.03
+slack                                   (VIOLATED)     -0.11
+
+Violation #2:
+
+Startpoint: clk (primary input)
+Endpoint: and3 (rising edge-triggered flip-flop clocked by __clk__)
+Path Group: __clk__
+Path Type: max
+Point                                    Incr       Path
+---------------------------------------------------------------
+clk (primary input)                           0.00      0.00
+reg1 (DFF_X1) r                               0.10      0.10
+and3 (AND2_X2) r                              0.02      0.11
+data arrival time                                       0.11
+
+clock __clk__ (rise edge)                     0.00      0.00
+clock network delay (ideal)                   0.00      0.00
+clock uncertainty                            -0.03     -0.03
+data required time                                     -0.03
+---------------------------------------------------------------
+data required time                                     -0.03
+data arrival time                                       0.11
+---------------------------------------------------------------
+slack                                   (VIOLATED)     -0.14
 
 
 ╔══════════════════════════════════════════════════════════╗

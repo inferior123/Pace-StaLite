@@ -2,7 +2,8 @@
 #define STA_DATA_STRUCTURES_HPP
 
 #include "../parser-verilog/verilog_data.hpp"
-#include "../parser-verilog/verilog_driver.hpp"
+#include "../cell/cell_data_structure.hpp"
+#include <optional>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -11,6 +12,7 @@
 #include <functional>
 #include <memory>
 #include <cstddef>
+#include "cassert"
 
 
 namespace sta {
@@ -132,7 +134,7 @@ struct Instance;
  */
 struct Fanout {
     SignalBit target_bit;      // 目标信号位
-    int delay;                 // 延迟值
+    double delay;                 // 延迟值
     std::string port_name;     // 端口名称
     Instance* cell;            // 相关单元实例
     
@@ -150,6 +152,9 @@ struct Instance {
     // 端口连接：端口名 -> 信号
     std::unordered_map<std::string, SignalSpec> connections;
     
+    // 负载电容：output_pin -> 电容值(ff)
+    std::unordered_map<std::string, double> load_capacitance;
+    
     Instance(const std::string& mod, const std::string& inst)
         : module_name(mod), instance_name(inst) {}
 };
@@ -157,6 +162,15 @@ struct Instance {
 // ============================================================================
 // 4. 时序数据（Timing Data）
 // ============================================================================
+
+/**
+ * 信号转换方向枚举：用于选择使用哪个查找表（rise/fall）
+ */
+enum class TransitionDirection {
+    RISING,     // 上升沿：0 -> 1，使用 rise_transition / cell_rise
+    FALLING,    // 下降沿：1 -> 0，使用 fall_transition / cell_fall
+    UNKNOWN     // 未知：如果没有指定，使用默认值（通常取最大值或使用上升沿）
+};
 
 /**
  * 信号时序数据：存储每个信号位的时序相关信息
@@ -173,20 +187,38 @@ struct SignalTimingData {
     // 回溯信息（用于关键路径追踪）
     SignalBit backtrack;
     
-    SignalTimingData() : driver(nullptr) {}
+    // 转换时间（Transition Time/Slew）：信号从0到1或1到0的转换时间
+    // 单位：与时间单位一致（通常是ps或ns）
+    // 用于作为下一个时序弧的输入转换时间（input_slew）
+    // 在每一个时序弧之中同时计算上升和下降的值，然后对时序弧取一个最大值，但是同时记录上升和下降的transition time
+    std::optional<double> rise_transition_time;  // 根据 transition_direction 选择的转换时间
+    std::optional<double> fall_transition_time;
+    
+    // 转换方向：用于选择使用哪个查找表（rise_transition/fall_transition 或 cell_rise/cell_fall）
+    // 如果没有指定，使用默认值（UNKNOWN，在计算时取最大值或使用上升沿）
+    TransitionDirection transition_direction;
+    
+    SignalTimingData() 
+        : driver(nullptr), 
+          rise_transition_time(std::nullopt),
+          fall_transition_time(std::nullopt),
+          transition_direction(TransitionDirection::UNKNOWN) {}
 };
 
 /**
- * 时序端点：表示时序约束的端点（通常是寄存器的时钟/数据输入）
+ * 时序端点：表示时序约束的端点（通常是寄存器的时钟/数据输入，或顶层输出）
+ * 因 sigmap 合并，同一 canonical 可能既是顶层输出又是某 reg 的 D 端，需同时保留。
  */
 struct TimingEndpoint {
     Instance* sink;                 // 接收信号的单元实例, 若为none，则为top module的output
-    std::string port;               // 端口名称
-    int required_time;              // 所需时间（setup/hold constraint）
+    std::string port;               // 端口名称（sink 的端口或顶层输出端口名）
+    std::optional<std::string> primary_output_port;  // 若该 net 同时为顶层输出，保留其端口名（如 "out"）
+    std::optional<int> Setup_req;
+    std::optional<int> Hold_req;
     
-    TimingEndpoint() : sink(nullptr), required_time(0) {}
-    TimingEndpoint(Instance* s, const std::string& p, int req)
-        : sink(s), port(p), required_time(req) {}
+    TimingEndpoint() : sink(nullptr) {}
+    TimingEndpoint(Instance* s, const std::string& p)
+        : sink(s), port(p) {}
 };
 
 // ============================================================================
@@ -262,6 +294,9 @@ private:
     std::unordered_map<SignalBit, TimingEndpoint, SignalBitHash> endpoints;
     std::deque<SignalBit> timing_queue;
     std::unordered_set<SignalBit, SignalBitHash> driven_signals;
+    
+    // 顶层模块端口信息
+    std::unordered_set<SignalBit, SignalBitHash> top_module_inputs;  // 顶层模块的输入端口
 
     std::unordered_map<std::string, std::vector<SignalBit>> signal_registry;
     
@@ -275,6 +310,8 @@ private:
     
     // 单元实例管理
     std::vector<std::unique_ptr<Instance>> instances;
+
+    const celllib::CellLibrary *cell_library_ = nullptr;
     
     // 时序配置
     struct sta_config {
@@ -286,8 +323,30 @@ private:
     sta_config cfg;
     
 public:
-    STAWorker() : max_arrival_time(0) {}
+    /**
+     * 仿真颗粒度：控制时序分析的精度级别
+     */
+    enum class AnalysisGranularity {
+        COARSE,     // 粗略模式：使用固定延迟，使用一个查找表之中的悲观值，不考虑负载电容和转换时间
+        MEDIUM,     // 中等模式：考虑负载电容，使用完成查找表插值
+        FINE        // 精确模式：后续版本再考虑实现，遇到直接assert
+    };
     
+private:
+    AnalysisGranularity analysis_granularity_ = AnalysisGranularity::MEDIUM;
+    
+public:
+    STAWorker() : max_arrival_time(0) {}
+
+    explicit STAWorker(const celllib::CellLibrary& lib) 
+        : max_arrival_time(0), cell_library_(&lib) {}
+    
+    // 仿真颗粒度访问器
+    AnalysisGranularity get_analysis_granularity() const { return analysis_granularity_; }
+    void set_analysis_granularity(AnalysisGranularity granularity) { 
+        analysis_granularity_ = granularity; 
+    }
+
     // 和verilog parser相耦合的函数
     void collect_net(verilog::Net &net); 
     void collect_port(verilog::Port &port);
@@ -296,9 +355,10 @@ public:
     
     // 核心工作函数
     void build_fanouts();
+    void calculate_load_capacitance();
+    void calculate_timing_arcs();
     void run();
     void sta_check(int clock_period);
-    void report(int clock_period = 0);  // 详细的时序报告，参考 yosys
 
     SignalSpec get_signal_bits(const std::string &signame) const;
 
@@ -344,7 +404,25 @@ public:
         return effective_period - setup_time;
     }
 
+    void set_cell_library(const celllib::CellLibrary& lib) {
+        cell_library_ = &lib;
+    }
+
+    bool has_cell_library() const { return cell_library_ != nullptr; }
+
+    const celllib::CellLibrary* get_cell_library() const { return cell_library_; }
+    
     bool is_reg(std::string name);
+    
+    /**
+     * 检查信号是否是顶层模块的输入端口
+     * @param bit 要检查的信号位（可以是原始信号或规范代表）
+     * @return 如果是顶层模块输入则返回true，否则返回false
+     */
+    bool is_top_module_input(const SignalBit& bit) const {
+        SignalBit canonical = sigmap.find(bit);
+        return top_module_inputs.count(canonical) > 0;
+    }
 
     // 用于外部访问的接口
     const std::vector<std::unique_ptr<Instance>>& get_instances() const { return instances; }
