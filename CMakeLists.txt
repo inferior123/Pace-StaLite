@@ -32,6 +32,69 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/parser-verilog)  # For Flex/Bison generated files
 
+# -----------------------------------------------------------------------------
+# Rust Liberty Parser (from iEDA)
+# -----------------------------------------------------------------------------
+set(LIBERTY_RUST_PROJECT liberty_parser)
+set(LIBERTY_RUST_DIR ${PROJECT_SOURCE_DIR}/third_party/liberty-parser/lib-rust/liberty-parser)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  set(LIBERTY_RUST_LIB_PATH ${LIBERTY_RUST_DIR}/target/debug/libliberty_parser.a)
+  set(LIBERTY_RUST_CARGO_FLAGS "")
+else()
+  set(LIBERTY_RUST_LIB_PATH ${LIBERTY_RUST_DIR}/target/release/libliberty_parser.a)
+  set(LIBERTY_RUST_CARGO_FLAGS "--release")
+endif()
+
+include(ExternalProject)
+ExternalProject_Add(${LIBERTY_RUST_PROJECT}
+  PREFIX ${LIBERTY_RUST_DIR}
+  SOURCE_DIR ${LIBERTY_RUST_DIR}
+  BINARY_DIR ${LIBERTY_RUST_DIR}
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND cargo build ${LIBERTY_RUST_CARGO_FLAGS}
+  INSTALL_COMMAND ""
+  BUILD_BYPRODUCTS ${LIBERTY_RUST_LIB_PATH}
+)
+
+add_library(liberty_rust STATIC IMPORTED GLOBAL)
+set_target_properties(liberty_rust PROPERTIES
+  IMPORTED_LOCATION ${LIBERTY_RUST_LIB_PATH}
+)
+add_dependencies(liberty_rust ${LIBERTY_RUST_PROJECT})
+
+target_include_directories(liberty_rust INTERFACE
+  ${PROJECT_SOURCE_DIR}/third_party/liberty-parser
+)
+
+message(STATUS "Liberty Rust parser: ${LIBERTY_RUST_LIB_PATH}")
+
+# -----------------------------------------------------------------------------
+# nlohmann/json (for LibLibrary::printLibertyLibraryJson)
+# -----------------------------------------------------------------------------
+find_package(nlohmann_json 3.2.0 QUIET)
+if(NOT nlohmann_json_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.2
+  )
+  set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(json)
+endif()
+
+# -----------------------------------------------------------------------------
+# Lib parser C++ (ported from third_party/liberty-parser, no iEDA deps)
+# -----------------------------------------------------------------------------
+add_library(lib_parser_cpp STATIC
+  ${PROJECT_SOURCE_DIR}/src/lib_parser/Lib.cc
+  ${PROJECT_SOURCE_DIR}/src/lib_parser/LibParserRustC.cc
+  ${PROJECT_SOURCE_DIR}/src/lib_parser/LibClassifyCell.cc
+  ${PROJECT_SOURCE_DIR}/src/lib_parser/lib_to_celllib_converter.cpp
+)
+target_include_directories(lib_parser_cpp PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(lib_parser_cpp PUBLIC liberty_rust nlohmann_json::nlohmann_json)
+add_dependencies(lib_parser_cpp liberty_rust)
 
 # -----------------------------------------------------------------------------
 # Flex & Bison
@@ -70,6 +133,7 @@ add_executable(pba_sta
   ${FLEX_verilog_lexer_OUTPUTS}
   ${BISON_verilog_parser_OUTPUTS}
 )
+target_link_libraries(pba_sta PRIVATE lib_parser_cpp pthread dl)
 
 # -----------------------------------------------------------------------------
 # Custom targets
@@ -111,3 +175,8 @@ add_custom_target(tar
   COMMENT "Building executable, generating tags, and compile_commands.json"
 )
 
+# -----------------------------------------------------------------------------
+# Test: Rust liberty parser (standalone)
+# -----------------------------------------------------------------------------
+add_executable(test_rust_lib third_party_test/lib_parser_test.cpp)
+target_link_libraries(test_rust_lib PRIVATE liberty_rust pthread dl)

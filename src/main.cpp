@@ -4,9 +4,9 @@
 
 #include "cell/cell_data_structure.hpp"
 #include "cell/liberty_parser.hpp"
+#include "sdc/sdc_parser.hpp"
 #include "sta/sta_data_structures.hpp"
 #include "sta/sta_report.hpp"
-#include "sdc/sdc_parser.hpp"
 
 #include "sta/debug.h"
 
@@ -19,28 +19,33 @@ int sta_main(int argc, char *argv[]) {
   MyVerilogParser verilog_parser(worker);
   MySDCParser sdc_interface(worker);
   MyCellLibParser lib_parser(cell_lib);
-  
+
   // 创建并解析 SDC 解析器，传入接口实现
-  sdc::SDCParser sdc_parser(&sdc_interface);  
-  if(argc > 1) {
+  sdc::SDCParser sdc_parser(&sdc_interface);
+  if (argc > 1) {
     std::string sdc_file = argv[1];
     std::cout << "Parsing SDC file: " << sdc_file << std::endl;
     sdc_parser.parse_file(sdc_file);
   }
   std::cout << "finish parse SDC file" << std::endl;
 
-  if(sdc_interface.celllib_file_name.empty()) {
+  if (sdc_interface.celllib_file_name.empty()) {
     std::cout << "not stanard lib specific, abort" << std::endl;
     assert(false && "no stanard lib specificed");
   }
 
-  lib_parser.parse_from_file(sdc_interface.celllib_file_name);
+  for (const auto &file : sdc_interface.celllib_file_name) {
+    std::cout << "liberty parser handle file " << file << std::endl;
+    lib_parser.parse_from_file(file);
+  }
   worker.set_cell_library(cell_lib);
 
   // parse verilog file
   verilog_parser.set_filename(sdc_interface.verilog_file_name);
-  if(verilog_parser.get_filename().empty()) {
-    std::cout << "no verilog file specific, use \"/home/ysyx/project/pba-sta-base/proj/Testing/reg.v \"\n" << std::endl;
+  if (verilog_parser.get_filename().empty()) {
+    std::cout << "no verilog file specific, use "
+                 "\"/home/ysyx/project/pba-sta-base/proj/Testing/reg.v \"\n"
+              << std::endl;
     verilog_parser.read("/home/ysyx/project/pba-sta-base/proj/Testing/reg.v");
   } else {
     verilog_parser.read_with_filename();
@@ -57,19 +62,18 @@ int sta_main(int argc, char *argv[]) {
   // fanout_debuger(worker);
 
   // run_debuger(worker, true);
-  worker.run();
-  worker.print_all_timing_paths_bfs();
-  // worker.run_dfs();
-  // std::cout << "\n=== DFS 枚举所有时序路径 ===\n";
-  // worker.print_all_timing_paths_dfs();
+  // worker.run();
+  worker.run_dfs();
+  std::cout << "\n=== DFS 枚举所有时序路径 ===\n";
+  worker.print_all_timing_paths_dfs();
 
   // 设置时钟配置
-  if(worker.get_config().clk_period == 0) {
-    std::cout << "no clk period specific, use 10" << std::endl;
+  if (worker.get_config().clk_period == 0) {
+    std::cout << "no clk period specified, use 1000ps (1ns)" << std::endl;
     worker.get_config().clk_period = 100;
   }
   worker.sta_check(worker.get_config().clk_period);
-  
+
   // 使用新的解耦报告生成器
   sta::STAReportGenerator::generate_report(worker, "__clk__");
 
