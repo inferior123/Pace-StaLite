@@ -998,8 +998,7 @@ double STAWorker::process_endpoint_timing(TimingEndpoint &ep,
               arc.fall_constraint.value(), data_trans, clk_trans,
               t->variable_1.value(), t->variable_2.value());
       }
-      ep.Setup_req = static_cast<int>(std::max(setup_rise, setup_fall) *
-                                      NS_TO_PS); // ns -> ps
+      ep.Setup_req = std::max(setup_rise, setup_fall) * NS_TO_PS; // ns -> ps
     }
     if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
         arc.timing_type == celllib::TimingType::HOLD_FALLING) {
@@ -1022,8 +1021,7 @@ double STAWorker::process_endpoint_timing(TimingEndpoint &ep,
               arc.fall_constraint.value(), data_trans, clk_trans,
               t->variable_1.value(), t->variable_2.value());
       }
-      ep.Hold_req = static_cast<int>(std::max(hold_rise, hold_fall) *
-                                     NS_TO_PS); // ns -> ps
+      ep.Hold_req = std::max(hold_rise, hold_fall) * NS_TO_PS; // ns -> ps
     }
   }
   return ep.Setup_req.value_or(0);
