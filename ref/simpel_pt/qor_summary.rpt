@@ -1,0 +1,28 @@
+
+Version 2.05
+
+Running report_qor -pba_mode none ; report_qor -pba_mode none -summary ... Done
+
+NVP    - No. of Violating Paths
+FREQ   - Estimated Frequency, not accurate in some cases, multi/half-cycle, etc
+WNS(H) - Hold WNS
+TNS(H) - Hold TNS
+NVP(H) - Hold NVP
+
+Path Group                  WNS        TNS     NVP      FREQ      WNS(H)     TNS(H)  NVP(H)
+-------------------------------------------------------------------------------------------
+clk                       9.856        0.0       0    6964MHz      0.034        0.0       0
+-------------------------------------------------------------------------------------------
+Summary                   9.856        0.0       0    6964MHz      0.034        0.0       0
+-------------------------------------------------------------------------------------------
+    CAP  FANOUT    TRAN    TDRC      CELLA    BUFS     LEAFS       TNETS      CTBUF    REGS
+-------------------------------------------------------------------------------------------
+      0       0       0       0         18      ~K        0K          ~K          ~       ~
+-------------------------------------------------------------------------------------------
+#Union TNS/NVP not found in report_qor, Summary line will report pessimistic summation TNS/NVP
+Written qor.csv
+
+Starting  Histogram (proc_histogram) 1.11
+
+Acquiring GBA Endpoints (Slack < 0.0) - ignores REGOUT ... 
+No Violations or Not enough Violations Found

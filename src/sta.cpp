@@ -602,6 +602,53 @@ double get_lut_avg(std::optional<celllib::LookupTable> lut) {
   }
 }
 
+double caculate_delay_rise(const celllib::TimingArc arc,
+                           const celllib::CellLibrary *lib,
+                           double input_slew_rise, double load_cap) {
+  // 计算cell_rise延迟（使用rise的slew）
+  double delay_rise = 0.0;
+  if (arc.cell_rise.has_value() && arc.cell_rise->template_name.has_value()) {
+    std::string template_name = arc.cell_rise->template_name.value();
+    const auto *templ = lib->get_table_template(template_name);
+    if (templ && templ->variable_1.has_value() &&
+        templ->variable_2.has_value()) {
+      std::string var1 = templ->variable_1.value();
+      std::string var2 = templ->variable_2.value();
+      delay_rise = lib->caculate_lookuptable(
+          arc.cell_rise.value(), input_slew_rise, load_cap, var1, var2);
+      delay_rise *= NS_TO_PS; // Liberty ns -> ps
+    }
+
+  } else if (arc.intrinsic_rise.has_value()) {
+    delay_rise = arc.intrinsic_rise.value() * NS_TO_PS;
+  }
+
+  return delay_rise;
+}
+
+double caculate_delay_fall(const celllib::TimingArc arc,
+                           const celllib::CellLibrary *lib,
+                           double input_slew_fall, double load_cap) {
+  double delay_fall = 0.0;
+  // 计算cell_fall延迟（使用fall的slew）
+  if (arc.cell_fall.has_value() && arc.cell_fall->template_name.has_value()) {
+    std::string template_name = arc.cell_fall->template_name.value();
+    const auto *templ = lib->get_table_template(template_name);
+    if (templ && templ->variable_1.has_value() &&
+        templ->variable_2.has_value()) {
+      std::string var1 = templ->variable_1.value();
+      std::string var2 = templ->variable_2.value();
+      delay_fall = lib->caculate_lookuptable(
+          arc.cell_fall.value(), input_slew_fall, load_cap, var1, var2);
+      delay_fall *= NS_TO_PS; // Liberty ns -> ps
+    }
+  } else if (arc.intrinsic_fall.has_value()) {
+    delay_fall = arc.intrinsic_fall.value() * NS_TO_PS;
+  }
+
+  return delay_fall;
+}
+
 void STAWorker::calculate_timing_arcs() {
   assert(cell_library_);
 
@@ -666,11 +713,15 @@ void STAWorker::calculate_timing_arcs() {
         // rise延迟使用rise的slew，fall延迟使用fall的slew
         double input_slew_rise = 0.0;
         double input_slew_fall = 0.0;
+        // 记录输入信号的转换方向，用于通过 timing_sense 推导输出方向
+        TransitionDirection input_direction = TransitionDirection::UNKNOWN;
 
         if (!related_signals.empty()) {
           SignalBit input_canonical = sigmap.find(related_signals[0]);
           if (timing_data.count(input_canonical)) {
             const auto &input_timing = timing_data[input_canonical];
+            // 记录该输入端当前的转换方向
+            input_direction = input_timing.transition_direction;
 
             // 获取rise和fall的转换时间（STA 内部存 ps，LUT 需要 ns）
             if (input_timing.rise_transition_time.has_value()) {
@@ -725,47 +776,83 @@ void STAWorker::calculate_timing_arcs() {
           }
         }
 
+        // 确定输出转换方向
+        // 对于clock-to-Q，可以根据时序弧类型确定；
+        // 对于组合逻辑，根据 timing_sense 和前一级的方向推导
+        TransitionDirection output_direction = TransitionDirection::UNKNOWN;
+        if (is_clock_to_q) {
+          if (arc.timing_type == celllib::TimingType::RISING_EDGE) {
+            output_direction = TransitionDirection::RISING;
+          } else if (arc.timing_type == celllib::TimingType::FALLING_EDGE) {
+            output_direction = TransitionDirection::FALLING;
+          }
+        } else {
+          // 如果不是 clock-to-Q 那么就直接使用前一级设置的值推算
+          if (arc.timing_sense == celllib::TimingSense::NEGATIVE_UNATE) {
+            // 负单边：输入上升 -> 输出下降；输入下降 -> 输出上升
+            if (input_direction == TransitionDirection::RISING) {
+              output_direction = TransitionDirection::FALLING;
+            } else if (input_direction == TransitionDirection::FALLING) {
+              output_direction = TransitionDirection::RISING;
+            } else {
+              output_direction = TransitionDirection::UNKNOWN;
+            }
+          } else if (arc.timing_sense == celllib::TimingSense::POSITIVE_UNATE) {
+            // 正单边：输入沿方向保持不变
+            output_direction = input_direction;
+          } else {
+            // celllib::TimingSense::NON_UNATE
+            // 非单边：无法从输入方向唯一推断，保持 UNKNOWN
+            output_direction = TransitionDirection::UNKNOWN;
+          }
+        }
+        // 注意：虽然同时计算rise和fall，但仍记录一个主导方向用于报告显示
+
         // 同时计算cell_rise和cell_fall的延迟，取最大值
         double delay_rise = 0.0;
         double delay_fall = 0.0;
         double delay = 0.0;
 
-        // 计算cell_rise延迟（使用rise的slew）
-        if (arc.cell_rise.has_value() &&
-            arc.cell_rise->template_name.has_value()) {
-          std::string template_name = arc.cell_rise->template_name.value();
-          const auto *templ = cell_library_->get_table_template(template_name);
-          if (templ && templ->variable_1.has_value() &&
-              templ->variable_2.has_value()) {
-            std::string var1 = templ->variable_1.value();
-            std::string var2 = templ->variable_2.value();
-            delay_rise = cell_library_->caculate_lookuptable(
-                arc.cell_rise.value(), input_slew_rise, load_cap, var1, var2);
-            delay_rise *= NS_TO_PS; // Liberty ns -> ps
-          }
-        } else if (arc.intrinsic_rise.has_value()) {
-          delay_rise = arc.intrinsic_rise.value() * NS_TO_PS;
-        }
+        double delay_rise_slew =
+            (input_direction == TransitionDirection::RISING ||
+             input_direction == TransitionDirection::UNKNOWN)
+                ? input_slew_rise
+                : input_slew_fall;
 
-        // 计算cell_fall延迟（使用fall的slew）
-        if (arc.cell_fall.has_value() &&
-            arc.cell_fall->template_name.has_value()) {
-          std::string template_name = arc.cell_fall->template_name.value();
-          const auto *templ = cell_library_->get_table_template(template_name);
-          if (templ && templ->variable_1.has_value() &&
-              templ->variable_2.has_value()) {
-            std::string var1 = templ->variable_1.value();
-            std::string var2 = templ->variable_2.value();
-            delay_fall = cell_library_->caculate_lookuptable(
-                arc.cell_fall.value(), input_slew_fall, load_cap, var1, var2);
-            delay_fall *= NS_TO_PS; // Liberty ns -> ps
-          }
-        } else if (arc.intrinsic_fall.has_value()) {
-          delay_fall = arc.intrinsic_fall.value() * NS_TO_PS;
-        }
+        double delay_fall_slew =
+            (input_direction == TransitionDirection::FALLING ||
+             input_direction == TransitionDirection::UNKNOWN)
+                ? input_slew_fall
+                : input_slew_rise;
+
+        delay_rise =
+            caculate_delay_rise(arc, cell_library_, delay_rise_slew, load_cap);
+        // 调试信息， 打印一下这个查表得到的信息
+        std::cout << "  [INFO]" << " cell: " << instance->module_name << " -- "
+                  << instance->instance_name << " delay rise lut caculate "
+                  << std::endl
+                  << "\t" << "input slew rise: " << input_slew_rise << std::endl
+                  << "\t" << "load capacitance: " << load_cap << std::endl
+                  << "\t" << "delay rise res: " << delay_rise << std::endl;
+
+        delay_fall =
+            caculate_delay_fall(arc, cell_library_, delay_fall_slew, load_cap);
+        // 调试信息， 打印一下这个查表得到的信息
+        std::cout << "  [INFO]" << " cell: " << instance->module_name << " -- "
+                  << instance->instance_name << " delay fall lut caculate "
+                  << std::endl
+                  << "\t" << "input slew fall: " << input_slew_fall << std::endl
+                  << "\t" << "load capacitance: " << load_cap << std::endl
+                  << "\t" << "delay fall res: " << delay_fall << std::endl;
 
         // 取最大值作为延迟
-        delay = std::max(delay_rise, delay_fall);
+        if (output_direction == TransitionDirection::RISING) {
+          delay = delay_rise;
+        } else if (output_direction == TransitionDirection::FALLING) {
+          delay = delay_fall;
+        } else {
+          delay = std::max(delay_rise, delay_fall);
+        }
 
         if (delay == 0.0) {
           std::cerr << "  [WARNING] Delay is 0 for instance "
@@ -829,19 +916,6 @@ void STAWorker::calculate_timing_arcs() {
           }
         }
 
-        // 确定输出转换方向
-        // 由于同时计算rise和fall的转换时间，output_direction保持UNKNOWN
-        // 对于clock-to-Q，可以根据时序弧类型确定
-        TransitionDirection output_direction = TransitionDirection::UNKNOWN;
-        if (is_clock_to_q) {
-          if (arc.timing_type == celllib::TimingType::RISING_EDGE) {
-            output_direction = TransitionDirection::RISING;
-          } else if (arc.timing_type == celllib::TimingType::FALLING_EDGE) {
-            output_direction = TransitionDirection::FALLING;
-          }
-        }
-        // 对于组合逻辑，由于同时计算rise和fall，保持UNKNOWN
-
         if (is_combinational) {
           // 组合逻辑没那么复杂，仅仅更新fanout之内的delau就可以了
           // 然后存储一下转换时间和方向
@@ -858,12 +932,11 @@ void STAWorker::calculate_timing_arcs() {
                     fanout.port_name == related_pin_name) {
                   fanout.delay = delay;
                   found = true;
-                  // if (delay > 0) {
-                  //     std::cout << "  [DEBUG] Updated fanout delay: "
-                  //               << delay << "ps for "
-                  //               << input_connect.wire_name << " -> "
-                  //               << output_connect.wire_name << std::endl;
-                  // }
+                  if (delay > 0) {
+                    std::cout << "  [DEBUG] Updated fanout delay: " << delay
+                              << "ps for " << input_connect.wire_name << " -> "
+                              << output_connect.wire_name << std::endl;
+                  }
                   break;
                 }
               }
@@ -951,8 +1024,9 @@ void STAWorker::calculate_timing_arcs() {
   }
 }
 
-double STAWorker::process_endpoint_timing(TimingEndpoint &ep,
-                                          const SignalBit &dst_canonical) {
+double STAWorker::process_endpoint_timing(
+    TimingEndpoint &ep, const SignalBit &dst_canonical,
+    TransitionDirection input_transition_direction) {
   if (ep.sink == nullptr)
     return 0;
   const auto *cell = cell_library_->get_cell(ep.sink->module_name);
@@ -998,7 +1072,15 @@ double STAWorker::process_endpoint_timing(TimingEndpoint &ep,
               arc.fall_constraint.value(), data_trans, clk_trans,
               t->variable_1.value(), t->variable_2.value());
       }
-      ep.Setup_req = std::max(setup_rise, setup_fall) * NS_TO_PS; // ns -> ps
+      // ep.Setup_req = std::max(setup_rise, setup_fall) * NS_TO_PS; // ns -> ps
+      if (input_transition_direction == TransitionDirection::RISING) {
+        ep.Setup_req = setup_rise * NS_TO_PS;
+      } else if (input_transition_direction == TransitionDirection::FALLING) {
+        ep.Setup_req = setup_fall * NS_TO_PS;
+      } else {
+        // TransitionDirection::UNKNOWN
+        ep.Setup_req = std::max(setup_rise, setup_fall) * NS_TO_PS; // ns -> ps
+      }
     }
     if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
         arc.timing_type == celllib::TimingType::HOLD_FALLING) {
@@ -1021,7 +1103,15 @@ double STAWorker::process_endpoint_timing(TimingEndpoint &ep,
               arc.fall_constraint.value(), data_trans, clk_trans,
               t->variable_1.value(), t->variable_2.value());
       }
-      ep.Hold_req = std::max(hold_rise, hold_fall) * NS_TO_PS; // ns -> ps
+      // ep.Hold_req = std::max(hold_rise, hold_fall) * NS_TO_PS; // ns -> ps
+      if (input_transition_direction == TransitionDirection::RISING) {
+        ep.Hold_req = hold_rise * NS_TO_PS;
+      } else if (input_transition_direction == TransitionDirection::FALLING) {
+        ep.Hold_req = hold_fall * NS_TO_PS;
+      } else {
+        // TransitionDirection::UNKNOWN
+        ep.Hold_req = std::max(hold_rise, hold_fall) * NS_TO_PS; // ns -> ps
+      }
     }
   }
   return ep.Setup_req.value_or(0);
@@ -1056,15 +1146,13 @@ void STAWorker::run() {
       double new_arrival = src_arrival + delay;
 
       // 调试输出：显示传播信息
-      // if (delay > 0) {
-      //     std::cout << "  [DEBUG] Propagating: " << canonical_bit.wire_name
-      //               << "[" << canonical_bit.bit_offset << "] (arrival=" <<
-      //               src_arrival
-      //               << "ps) -> " << dst_canonical.wire_name << "["
-      //               << dst_canonical.bit_offset << "] (delay=" << delay
-      //               << "ps, new_arrival=" << new_arrival << "ps)" <<
-      //               std::endl;
-      // }
+      if (delay > 0) {
+        std::cout << "  [DEBUG] Propagating: " << canonical_bit.wire_name << "["
+                  << canonical_bit.bit_offset << "] (arrival=" << src_arrival
+                  << "ps) -> " << dst_canonical.wire_name << "["
+                  << dst_canonical.bit_offset << "] (delay=" << delay
+                  << "ps, new_arrival=" << new_arrival << "ps)" << std::endl;
+      }
 
       // 初始化目标信号的arrival_time（如果不存在）
       if (!arrival_time.count(dst_canonical)) {
@@ -1094,7 +1182,8 @@ void STAWorker::run() {
             double required_time =
                 (ep.sink == nullptr)
                     ? 0
-                    : process_endpoint_timing(ep, dst_canonical);
+                    : process_endpoint_timing(ep, dst_canonical,
+                                              timing.transition_direction);
             double total_time = new_arrival + required_time;
             // 只有源信号被驱动时才更新max_arrival_time
             if (total_time > max_arrival_time &&
@@ -1160,12 +1249,19 @@ void STAWorker::run_dfs() {
 
         dfs_stack.push(dst_canonical);
 
+        // dst_canonical 是 canonical 这个端口的上一级端口
+        // 应该去使用canoncial 这个端口的transition direction
+        // 来计算下一级端口的 setup hold
+
+        TransitionDirection input_transition_direction =
+            timing.transition_direction;
         if (endpoints.count(dst_canonical)) {
           for (auto &ep : endpoints[dst_canonical]) {
             double required_time =
                 (ep.sink == nullptr)
                     ? 0
-                    : process_endpoint_timing(ep, dst_canonical);
+                    : process_endpoint_timing(ep, dst_canonical,
+                                              input_transition_direction);
             double total_time = new_arrival + required_time;
             if (total_time > max_arrival_time &&
                 driven_signals.count(canonical_bit)) {
@@ -1273,7 +1369,12 @@ void STAWorker::print_all_timing_paths_dfs() {
             const auto &n = path[i];
             std::cout << "  [" << i << "] " << n.signal.wire_name << "["
                       << n.signal.bit_offset << "]";
-            std::cout << " (arrival: " << n.arrival << "ps)";
+            if (i != 0) {
+              std::cout << " (arrival: " << n.arrival << "ps, "
+                        << "delay: " << n.arrival - path[i - 1].arrival << ")";
+            } else {
+              std::cout << " (arrival: " << n.arrival << "ps)";
+            }
             if (driven_signals.count(n.signal) && n.arrival == 0)
               std::cout << (n.signal.wire_name == "__clk__"
                                 ? " [Clock]"

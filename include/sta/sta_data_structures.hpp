@@ -478,9 +478,12 @@ private:
   SignalBit *get_virtual_clock();
   void propagate_timing(const SignalBit &bit);
   void trace_critical_path();
+
   // 处理单个 endpoint 的 setup/hold 计算，返回 required_time
-  double process_endpoint_timing(TimingEndpoint &ep,
-                                 const SignalBit &dst_canonical);
+  double
+  process_endpoint_timing(TimingEndpoint &ep, const SignalBit &dst_canonical,
+                          TransitionDirection input_transition_direction);
+
   void trace_path(const SignalBit &endpoint_bit); // 回溯并打印路径
   SignalBit create_signal_bit(const std::string &name, int offset);
 };

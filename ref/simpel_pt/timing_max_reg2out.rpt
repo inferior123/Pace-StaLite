@@ -1,0 +1,54 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : simple
+Version: U-2022.12-SP3
+Date   : Tue Feb  3 16:32:04 2026
+****************************************
+
+
+  Startpoint: f2 (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: out (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000010139
+                                                  0.0000010139
+  f2/CK (DFFQX1H7L)                    0.0000000000
+                                                  0.0000010139 r
+  f2/Q (DFFQX1H7L)                     0.0803544894 &
+                                                  0.0803555027 r
+  u5/Y (INVX0P5H7L)                    0.0136182830 &
+                                                  0.0939737856 f
+  u6/Y (INVX0P5H7L)                    0.0101333186 &
+                                                  0.1041071042 r
+  out (out)                            0.0000000000 &
+                                                  0.1041071042 r
+  data arrival time                               0.1041071042
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               -0.1041071042
+  ---------------------------------------------------------------
+  slack (MET)                                     9.8958930969
+
+
+1

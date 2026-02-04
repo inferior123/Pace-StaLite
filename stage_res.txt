@@ -1,224 +1,222 @@
-Parsing SDC file: ./test.sdc
+Parsing SDC file: ./simple_test.sdc
 finish parse SDC file
-  [DEBUG] Parsed table template: Hold_3_3 (var1=constrained_pin_transition, var2=related_pin_transition, index_1 size=3, index_2 size=3)
-  [DEBUG] Parsed table template: Timing_7_7 (var1=input_net_transition, var2=total_output_net_capacitance, index_1 size=7, index_2 size=7)
-  [DEBUG] Parsed table template: Setup_3_3 (var1=constrained_pin_transition, var2=related_pin_transition, index_1 size=3, index_2 size=3)
+liberty parser handle file /home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib
+rust read lib file /home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib
+liberty parser handle file /home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib
+rust read lib file /home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib
+liberty parser handle file /home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib
+rust read lib file /home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib
 Step 1: build_fanouts()...
 Step 2: calculate_load_capacitance()...
 Step 3: calculate_timing_arcs()...
+  [INFO] cell: NAND2BX0P5H7L -- u1 delay rise lut caculate 
+	input slew rise: 0
+	load capacitance: 0.000677881
+	delay rise res: 25.9367
+  [INFO] cell: NAND2BX0P5H7L -- u1 delay fall lut caculate 
+	input slew fall: 0
+	load capacitance: 0.000677881
+	delay fall res: 31.2414
+  [DEBUG] Updated fanout delay: 31.2414ps for inp1 -> n1
+  [INFO] cell: NAND2BX0P5H7L -- u1 delay rise lut caculate 
+	input slew rise: 0
+	load capacitance: 0.000677881
+	delay rise res: 13.4339
+  [INFO] cell: NAND2BX0P5H7L -- u1 delay fall lut caculate 
+	input slew fall: 0
+	load capacitance: 0.000677881
+	delay fall res: 14.8642
+  [DEBUG] Updated fanout delay: 14.8642ps for inp2 -> n1
+  [INFO] cell: DFFQX1H7L -- f1 delay rise lut caculate 
+	input slew rise: 0
+	load capacitance: 0.00162474
+	delay rise res: 86.774
+  [INFO] cell: DFFQX1H7L -- f1 delay fall lut caculate 
+	input slew fall: 0
+	load capacitance: 0.00162474
+	delay fall res: 65.6435
+  [INFO] cell: INVX0P5H7L -- u2 delay rise lut caculate 
+	input slew rise: 0.0290157
+	load capacitance: 0.000795738
+	delay rise res: 21.6686
+  [INFO] cell: INVX0P5H7L -- u2 delay fall lut caculate 
+	input slew fall: 0.0284711
+	load capacitance: 0.000795738
+	delay fall res: 15.0535
+  [DEBUG] Updated fanout delay: 15.0535ps for n3 -> n4
+  [INFO] cell: INVX0P5H7L -- u3 delay rise lut caculate 
+	input slew rise: 0.0220695
+	load capacitance: 0.000816887
+	delay rise res: 18.0638
+  [INFO] cell: INVX0P5H7L -- u3 delay fall lut caculate 
+	input slew fall: 0.016008
+	load capacitance: 0.000816887
+	delay fall res: 12.6558
+  [DEBUG] Updated fanout delay: 18.0638ps for n4 -> n5
+  [INFO] cell: NOR2X0P5H7L -- u4 delay rise lut caculate 
+	input slew rise: 0.0230821
+	load capacitance: 0.000816887
+	delay rise res: 33.7494
+  [INFO] cell: NOR2X0P5H7L -- u4 delay fall lut caculate 
+	input slew fall: 0.0214022
+	load capacitance: 0.000816887
+	delay fall res: 15.1285
+  [DEBUG] Updated fanout delay: 33.7494ps for n1 -> n2
+  [INFO] cell: NOR2X0P5H7L -- u4 delay rise lut caculate 
+	input slew rise: 0.0290157
+	load capacitance: 0.000816887
+	delay rise res: 34.7236
+  [INFO] cell: NOR2X0P5H7L -- u4 delay fall lut caculate 
+	input slew fall: 0.0284711
+	load capacitance: 0.000816887
+	delay fall res: 16.311
+  [DEBUG] Updated fanout delay: 16.311ps for n3 -> n2
+  [INFO] cell: DFFQX1H7L -- f2 delay rise lut caculate 
+	input slew rise: 0
+	load capacitance: 0.000795738
+	delay rise res: 80.3545
+  [INFO] cell: DFFQX1H7L -- f2 delay fall lut caculate 
+	input slew fall: 0
+	load capacitance: 0.000795738
+	delay fall res: 59.2749
+  [INFO] cell: INVX0P5H7L -- u5 delay rise lut caculate 
+	input slew rise: 0.0207589
+	load capacitance: 0.000795738
+	delay rise res: 19.3658
+  [INFO] cell: INVX0P5H7L -- u5 delay fall lut caculate 
+	input slew fall: 0.0218039
+	load capacitance: 0.000795738
+	delay fall res: 13.6207
+  [DEBUG] Updated fanout delay: 13.6207ps for n6 -> n7
+  [INFO] cell: INVX0P5H7L -- u6 delay rise lut caculate 
+	input slew rise: 0.0202467
+	load capacitance: 0
+	delay rise res: 10.2204
+  [INFO] cell: INVX0P5H7L -- u6 delay fall lut caculate 
+	input slew fall: 0.0142311
+	load capacitance: 0
+	delay fall res: 7.65188
+  [DEBUG] Updated fanout delay: 10.2204ps for n7 -> out
 ✓ Three-stage flow completed
 
-╔══════════════════════════════════════════════════════════╗
-║              Timing Propagation Trace                    ║
-╚══════════════════════════════════════════════════════════╝
+=== DFS 枚举所有时序路径 ===
 
-Initial State:
-----------------------------------------
-Queue size: 6
-Signals in queue:
-  - a[0] (arrival: 0ps)
-  - b[0] (arrival: 0ps)
-  - c[0] (arrival: 0ps)
-  - d[0] (arrival: 0ps)
-  - clk[0] (arrival: 0ps)
-  - __clk__[0] (arrival: 0ps)
+--- Path #1 (arrival: 119.891ps) ---
+  [0] tau2015_clk[0] (arrival: 0ps) [Primary Input]
+  [1] n3[0] (arrival: 86.774ps, delay: 86.774) -> f1(DFFQX1H7L)/CK
+  [2] n4[0] (arrival: 101.827ps, delay: 15.0535) -> u2(INVX0P5H7L)/A
+  [3] n5[0] (arrival: 119.891ps, delay: 18.0638) -> u3(INVX0P5H7L)/A [Endpoint]
 
-Executing timing propagation...
-----------------------------------------
-[DEBUG] start the endpoint caculate
-[DEBUG] start the setup/holdon caculate
+--- Path #2 (arrival: 103.085ps) ---
+  [0] tau2015_clk[0] (arrival: 0ps) [Primary Input]
+  [1] n3[0] (arrival: 86.774ps, delay: 86.774) -> f1(DFFQX1H7L)/CK
+  [2] n2[0] (arrival: 103.085ps, delay: 16.311) -> u4(NOR2X0P5H7L)/B [Endpoint]
 
-[DEBUG] Setup/Hold Calculation for endpoint:
-  Signal: w2[0]
-  Cell: DFF_X1, Port: D
-  Data transition: rise=4.30343ps, fall=4.36914ps, max=4.36914ps
-  Clock transition: rise=0ps, fall=0ps, max=0ps
-  [HOLD] Found hold timing arc (related_pin: CK)
-    rise_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_rise=4.42589ps
-    fall_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_fall=1.58646ps
-    => Final Hold Time: 4ps (max of rise=4.42589, fall=1.58646)
-  [SETUP] Found setup timing arc (related_pin: CK)
-    rise_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_rise=30.3012ps
-    fall_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_fall=38.5203ps
-    => Final Setup Time: 38ps (max of rise=30.3012, fall=38.5203)
-  => Required Time (Setup): 38ps
-[DEBUG] start the endpoint caculate
-[DEBUG] start the endpoint caculate
-[DEBUG] start the setup/holdon caculate
+--- Path #3 (arrival: 104.196ps) ---
+  [0] tau2015_clk[0] (arrival: 0ps) [Primary Input]
+  [1] n6[0] (arrival: 80.3545ps, delay: 80.3545) -> f2(DFFQX1H7L)/CK
+  [2] n7[0] (arrival: 93.9752ps, delay: 13.6207) -> u5(INVX0P5H7L)/A
+  [3] out[0] (arrival: 104.196ps, delay: 10.2204) -> u6(INVX0P5H7L)/A [Endpoint]
 
-[DEBUG] Setup/Hold Calculation for endpoint:
-  Signal: w2[0]
-  Cell: DFF_X1, Port: D
-  Data transition: rise=4.30343ps, fall=4.36914ps, max=4.36914ps
-  Clock transition: rise=0ps, fall=0ps, max=0ps
-  [HOLD] Found hold timing arc (related_pin: CK)
-    rise_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_rise=4.42589ps
-    fall_constraint: template=Hold_3_3, var1=constrained_pin_transition, var2=related_pin_transition => hold_fall=1.58646ps
-    => Final Hold Time: 4ps (max of rise=4.42589, fall=1.58646)
-  [SETUP] Found setup timing arc (related_pin: CK)
-    rise_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_rise=30.3012ps
-    fall_constraint: template=Setup_3_3, var1=constrained_pin_transition, var2=related_pin_transition => setup_fall=38.5203ps
-    => Final Setup Time: 38ps (max of rise=30.3012, fall=38.5203)
-  => Required Time (Setup): 38ps
-[DEBUG] start the endpoint caculate
-✓ Timing propagation completed
+--- Path #4 (arrival: 48.6137ps) ---
+  [0] inp2[0] (arrival: 0ps) [Primary Input]
+  [1] n1[0] (arrival: 14.8642ps, delay: 14.8642) -> u1(NAND2BX0P5H7L)/AN
+  [2] n2[0] (arrival: 48.6137ps, delay: 33.7494) -> u4(NOR2X0P5H7L)/B [Endpoint]
 
-----------------------------------------
-Final Results:
-----------------------------------------
-Max arrival time: 114ps
-Critical signal: tar[0]
-Critical signal arrival time: 114ps
-Library Setup time: 0ps
-Total time: 114ps
+--- Path #5 (arrival: 64.9908ps) ---
+  [0] inp1[0] (arrival: 0ps) [Primary Input]
+  [1] n1[0] (arrival: 31.2414ps, delay: 31.2414) -> u1(NAND2BX0P5H7L)/AN
+  [2] n2[0] (arrival: 64.9908ps, delay: 33.7494) -> u4(NOR2X0P5H7L)/B [Endpoint]
 
-All arrival times:
-----------------------------------------
-  tar[0]: 114ps [endpoint, library setup required: 0ps, total: 114ps]
-  __reg_input__reg1__D[0]: 40ps
-  reg_q[0]: 98ps
-  w2[0]: 40ps [endpoint, library setup required: 38ps, total: 78ps]
-  w1[0]: 24ps
-  __clk__[0]: 0ps
-  c[0]: 0ps
-  clk[0]: 0ps
-  b[0]: 0ps
-  d[0]: 0ps
-  a[0]: 0ps
+Total paths found: 5
 
-╔══════════════════════════════════════════════════════════╗
-║              End of Timing Propagation Trace              ║
-╚══════════════════════════════════════════════════════════╝
-
-
-⚠ Timing violations detected!
-  Clock period: 1ps (effective: -29ps after uncertainty)
-  Max arrival time: 114ps
-  Worst slack: -143ps
-
-Violating paths:
-----------------------------------------
-
-[1] Violation at: w2[0]
-  Arrival time: 40ps
-  Setup time: 38ps
-  Data required time: -67ps (clock period 1ps - setup 38ps - uncertainty 30ps)
-  Slack: -107ps (violation: 107ps)
-  Endpoint: reg1 (DFF_X1.D)
-
-  Path trace (from input to endpoint):
-    [0] b[0] (arrival: 0ps) [Primary Input]
-    [1] w1[0] (arrival: 24ps)
-        → and1 (AND2_X2) via port A2
-
-    [2] w2[0] (arrival: 40ps)
-        → and2 (AND2_X2) via port A1
- [Endpoint]
-
-[2] Violation at: tar[0]
-  Arrival time: 114ps
-  Setup time: 0ps
-  Data required time: -29ps (clock period 1ps - setup 0ps - uncertainty 30ps)
-  Slack: -143ps (violation: 143ps)
-  Endpoint: Top module output (tar)
-
-  Path trace (from input to endpoint):
-    [0] clk[0] (arrival: 0ps) [Primary Input]
-    [1] reg_q[0] (arrival: 98ps)
-        → reg1 (DFF_X1) via port CK
-
-    [2] tar[0] (arrival: 114ps)
-        → and3 (AND2_X2) via port A1
- [Endpoint]
-
-----------------------------------------
-Total violations: 2
+✓ No timing violations found.
+  Max arrival time: 159.891ps (0.159891ps)
+  Clock period: 1000ps (1ps)
+  Slack: 840.109ps
 
 ╔══════════════════════════════════════════════════════════╗
 ║              Static Timing Analysis Report               ║
 ╚══════════════════════════════════════════════════════════╝
 
-Module: nangate_test_2
-Clock Period: 1ps (0.00ns)
+Module: simple
+Clock Period: 1000ps (1.00ns)
 ===========================================================
 
-Critical Path Report:
+Top 3 Longest Path(s):
 
-Startpoint: clk (primary input)
-Endpoint: and3 (rising edge-triggered flip-flop clocked by __clk__)
+--- Path #1 (total time: 159ps) ---
+
+Startpoint: tau2015_clk (primary input)
+Endpoint: f2 (rising edge-triggered flip-flop clocked by __clk__)
 Path Group: __clk__
 Path Type: max
 Point                                    Incr       Path
 ---------------------------------------------------------------
-clk (primary input)                           0.00      0.00
-reg1 (DFF_X1) r                               0.10      0.10
-and3 (AND2_X2) r                              0.02      0.11
-data arrival time                                       0.11
+tau2015_clk (primary input)                   0.00      0.00 n
+f1 (DFFQX1H7L)                                0.09      0.09 r
+u2 (INVX0P5H7L)                               0.01      0.10 f
+u3 (INVX0P5H7L)                               0.02      0.12 r
+data arrival time                                       0.12
 
-clock __clk__ (rise edge)                     0.00      0.00
-clock network delay (ideal)                   0.00      0.00
-clock uncertainty                            -0.03     -0.03
-data required time                                     -0.03
+clock __clk__ (rise edge)                     1.00      1.00
+clock network delay (ideal)                   0.00      1.00
+library setup time                           -0.04      0.96
+data required time                                      0.96
 ---------------------------------------------------------------
-data required time                                     -0.03
-data arrival time                                       0.11
+data required time                                      0.96
+data arrival time                                       0.12
 ---------------------------------------------------------------
-slack                                   (VIOLATED)     -0.14
+slack                                        (MET)      0.84
 
+--- Path #2 (total time: 130ps) ---
 
-╔══════════════════════════════════════════════════════════╗
-║              Timing Violations Summary                   ║
-╚══════════════════════════════════════════════════════════╝
-
-Total Violations: 2
-
-Violation #1:
-
-Startpoint: b (primary input)
-Endpoint: and2 (rising edge-triggered flip-flop clocked by __clk__)
+Startpoint: tau2015_clk (primary input)
+Endpoint: f1 (rising edge-triggered flip-flop clocked by __clk__)
 Path Group: __clk__
 Path Type: max
 Point                                    Incr       Path
 ---------------------------------------------------------------
-b (primary input)                             0.00      0.00
-and1 (AND2_X2) r                              0.02      0.02
-and2 (AND2_X2) r                              0.02      0.04
-data arrival time                                       0.04
+tau2015_clk (primary input)                   0.00      0.00 n
+f1 (DFFQX1H7L)                                0.09      0.09 r
+u4 (NOR2X0P5H7L)                              0.02      0.10 n
+data arrival time                                       0.10
 
-clock __clk__ (rise edge)                     0.00      0.00
-clock network delay (ideal)                   0.00      0.00
-clock uncertainty                            -0.03     -0.03
-library setup time                           -0.04     -0.07
-data required time                                     -0.07
+clock __clk__ (rise edge)                     1.00      1.00
+clock network delay (ideal)                   0.00      1.00
+library setup time                           -0.03      0.97
+data required time                                      0.97
 ---------------------------------------------------------------
-data required time                                     -0.07
-data arrival time                                       0.04
+data required time                                      0.97
+data arrival time                                       0.10
 ---------------------------------------------------------------
-slack                                   (VIOLATED)     -0.11
+slack                                        (MET)      0.87
 
-Violation #2:
+--- Path #3 (total time: 104ps) ---
 
-Startpoint: clk (primary input)
-Endpoint: and3 (rising edge-triggered flip-flop clocked by __clk__)
+Startpoint: tau2015_clk (primary input)
+Endpoint: out (primary output)
 Path Group: __clk__
 Path Type: max
 Point                                    Incr       Path
 ---------------------------------------------------------------
-clk (primary input)                           0.00      0.00
-reg1 (DFF_X1) r                               0.10      0.10
-and3 (AND2_X2) r                              0.02      0.11
-data arrival time                                       0.11
+tau2015_clk (primary input)                   0.00      0.00 n
+f2 (DFFQX1H7L)                                0.08      0.08 r
+u5 (INVX0P5H7L)                               0.01      0.09 f
+u6 (INVX0P5H7L)                               0.01      0.10 r
+data arrival time                                       0.10
 
-clock __clk__ (rise edge)                     0.00      0.00
-clock network delay (ideal)                   0.00      0.00
-clock uncertainty                            -0.03     -0.03
-data required time                                     -0.03
+clock __clk__ (rise edge)                     1.00      1.00
+clock network delay (ideal)                   0.00      1.00
+data required time                                      1.00
 ---------------------------------------------------------------
-data required time                                     -0.03
-data arrival time                                       0.11
+data required time                                      1.00
+data arrival time                                       0.10
 ---------------------------------------------------------------
-slack                                   (VIOLATED)     -0.14
+slack                                        (MET)      0.90
 
+
+✓ No timing violations found. All paths meet timing requirements.
 
 ╔══════════════════════════════════════════════════════════╗
 ║              End of Report                               ║
