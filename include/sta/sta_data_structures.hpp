@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <queue>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -259,7 +260,109 @@ struct CellTiming {
 };
 
 // ============================================================================
-// 6. 关键路径（Critical Path）
+// 6. 无知节点 (Candidate)
+// ============================================================================
+// 这个数据结构用来存储无法确定为上升和下降的节点
+// 然后使用这个无知节点构建出来的图来计算最后的 max 和 min
+// 无知节点包含三种情况 clk2q、input、无单调cell的input
+/**
+ * 无知节点的 key，用于在图中快速索引一个“端口”
+ * - inst == nullptr 表示顶层 input/output 端口
+ * - inst != nullptr 表示某个实例上的端口
+ */
+struct CandidateNodeKey {
+  Instance *inst; // 顶层端口时为 nullptr
+  std::string port_name;
+
+  bool operator==(const CandidateNodeKey &other) const {
+    return inst == other.inst && port_name == other.port_name;
+  }
+};
+
+struct CandidateNodeKeyHash {
+  std::size_t operator()(const CandidateNodeKey &k) const {
+    std::size_t h1 = std::hash<Instance *>{}(k.inst);
+    std::size_t h2 = std::hash<std::string>{}(k.port_name);
+    return h1 ^ (h2 << 1);
+  }
+};
+
+struct CandidatePathArcKey {
+  std::size_t path_id; // 对应 CandidatePath::id
+  bool is_rise;
+
+  bool operator==(const CandidatePathArcKey &other) const {
+    return path_id == other.path_id && is_rise == other.is_rise;
+  }
+};
+
+struct CandidatePathArcKeyHash {
+  std::size_t operator()(const CandidatePathArcKey &k) const {
+    return (std::hash<std::size_t>{}(k.path_id) << 1) ^
+           std::hash<bool>{}(k.is_rise);
+  }
+};
+
+/**
+ * 无知图的边：从一个 CandidateNode 到下一个 CandidateNode 的压缩段
+ * - 不再重复保存起止端口字符串，而是通过节点 id 关联
+ */
+struct CandidatePath {
+  std::size_t id;         // 在 CandidateGraphy::paths 中的下标
+  std::size_t start_node; // 起点节点 id（下标）
+  std::size_t end_node;
+  std::optional<std::size_t>
+      next_path; // 如果不存在，那么就是寄存器的d端，或者是output端口
+
+  // 起点到终点之间压缩的一段扇出链
+  std::vector<Fanout> fanouts;
+};
+
+/**
+ * 无知图中的节点：
+ * 表示一个“关键端口”（clk2q段、input、无单调 cell 的 output）
+ * 或者是一个关键路径的结束，一个寄存器的d端，或者是一个输出端口，或者是一个unnate
+ * 原件的一个时序弧的输出端
+ * 特别的时序弧的输出端应该是相互重合的，endpoint 和 startpoint是重合的
+ */
+struct CandidateNode {
+  std::size_t id; // 在 CandidateGraphy::nodes 中的下标
+
+  // 该节点对应的 (实例, 端口)
+  // - inst == nullptr 表示顶层端口
+  Instance *inst;
+  std::string port_name;
+
+  // 从该节点出发的所有 candidate path 的 id（索引到 CandidateGraphy::paths）
+  std::vector<std::size_t> fanout_paths;
+};
+
+struct CandidatePathArc {
+  CandidatePath path;
+  bool is_rise;
+};
+
+/**
+ * 无知图：用于在 PBA/精细时序中只在“无法确定上升/下降”的节点之间建图
+ *
+ * 设计要点：
+ * - 节点和边统一用下标（id）相互索引，便于 O(1) 访问和遍历
+ * - 通过 node_index 实现从 (Instance*, port_name) 到节点 id 的 O(1) 查找
+ */
+struct CandidateGraphy {
+  std::vector<CandidateNode> nodes;
+  std::vector<CandidatePath> paths;
+
+  // (inst, port_name) -> node_id 的索引，加速查找/复用节点
+  std::unordered_map<CandidateNodeKey, std::size_t, CandidateNodeKeyHash>
+      node_index;
+
+  std::unordered_map<CandidatePathArcKey, double, CandidatePathArcKeyHash>
+      candidate_path_res;
+};
+
+// ============================================================================
+// 7. 关键路径（Critical Path）
 // ============================================================================
 
 /**
@@ -279,7 +382,7 @@ struct CriticalPathNode {
 using CriticalPath = std::vector<CriticalPathNode>;
 
 // ============================================================================
-// 7. STA 工作器（STA Worker）
+// 8. STA 工作器（STA Worker）
 // ============================================================================
 
 /**
@@ -293,7 +396,12 @@ private:
   std::unordered_map<SignalBit, std::vector<TimingEndpoint>, SignalBitHash>
       endpoints;
   std::deque<SignalBit> timing_queue;
+  // 从 startpoint（clk / 顶层 input）出发的 path 的 id，供 PBA 传播用
+  std::deque<std::size_t> candidate_timing_queue;
   std::unordered_set<SignalBit, SignalBitHash> driven_signals;
+
+  // 无知节点图（用于处理clk2q段 / input / 非单调cell输入等“沿不确定”场景）
+  CandidateGraphy candidate_graphy_;
 
   // 顶层模块端口信息
   std::unordered_set<SignalBit, SignalBitHash>
@@ -364,15 +472,24 @@ public:
   void
   run_dfs(); // DFS 版本：从 input 端口出发，使用 stack 模拟递归寻找时序路径
   void print_all_timing_paths_dfs(); // DFS 枚举并打印每一条时序路径
-  void
-  print_all_timing_paths_bfs(); // BFS/拓扑序：用队列按层枚举并打印每一条时序路径（不依赖
-                                // timing_queue）
+
+  std::size_t get_or_create_candidate_node(Instance *inst,
+                                           const std::string &port_name);
+
+  void build_candidate_graphy_dfs();
+  void caculate_candidate_path_arc();
+  void run_candidate_graphy_dfs();
+
+  // void print_all_timing_paths_bfs(); //
+  // BFS/拓扑序：用队列按层枚举并打印每一条时序路径（不依赖 timing_queue）
   void sta_check(int clock_period);
 
   SignalSpec get_signal_bits(const std::string &signame) const;
 
   SignalSpec convert_to_signalspec(const verilog::RHS &rhs);
   SignalSpec convert_to_signalspec(const verilog::LHS &lhs);
+
+  void display_candidate_path();
 
   // top module name
   std::string top_moudle;
@@ -462,6 +579,14 @@ public:
   const std::deque<SignalBit> &get_timing_queue() const { return timing_queue; }
   SignalBit get_canonical_signal(const SignalBit &bit) const {
     return sigmap.find(bit);
+  }
+
+  // 无知图访问器（供PBA或调试使用）
+  const CandidateGraphy &get_candidate_graphy() const {
+    return candidate_graphy_;
+  }
+  const std::deque<std::size_t> &get_candidate_timing_queue() const {
+    return candidate_timing_queue;
   }
 
   // 用于调试的访问器

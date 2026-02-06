@@ -1547,6 +1547,27 @@ class LibLibrary : public LibObject
   // characterization trip points.
   double _slew_derate_from_library = 1.0;
 
+  void _rebuild_str2cell() {
+    _str2cell.clear();
+    for (auto& p : _cells)
+      if (p) _str2cell[p->get_cell_name()] = p.get();
+  }
+  void _rebuild_str2template() {
+    _str2template.clear();
+    for (auto& p : _lut_templates)
+      if (p) _str2template[p->get_template_name()] = p.get();
+  }
+  void _rebuild_str2type() {
+    _str2type.clear();
+    for (auto& p : _types)
+      if (p) _str2type[p->get_type_name()] = p.get();
+  }
+  void _rebuild_str2wireLoad() {
+    _str2wireLoad.clear();
+    for (auto& p : _wire_loads)
+      if (p) _str2wireLoad[p->get_wire_load_name()] = p.get();
+  }
+
   FORBIDDEN_COPY(LibLibrary);
 };
 

@@ -130,6 +130,7 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/sdc_parser.cpp
   ${PROJECT_SOURCE_DIR}/src/cell_data_structure.cpp
   ${PROJECT_SOURCE_DIR}/src/liberty_parser.cpp
+  ${PROJECT_SOURCE_DIR}/src/candidate.cpp
   ${FLEX_verilog_lexer_OUTPUTS}
   ${BISON_verilog_parser_OUTPUTS}
 )
