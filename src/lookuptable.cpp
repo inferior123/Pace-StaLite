@@ -3,8 +3,8 @@
 // Liberty LUT 返回 ns，STA 内部统一用 ps
 static constexpr double NS_TO_PS = 1000.0;
 
-namespace sta {
-    double get_lut_avg(std::optional<celllib::LookupTable> lut) {
+// 以下函数按头文件声明在全局命名空间实现
+double get_lut_avg(std::optional<celllib::LookupTable> lut) {
   if (lut.has_value() && !lut->index_1.empty()) {
     size_t mid = lut->index_1.size() / 2;
     return lut->index_1[mid];
@@ -14,7 +14,6 @@ namespace sta {
     return 0.0;
   }
 }
-
 double caculate_delay_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib,
                            double input_slew_rise, double load_cap) {
@@ -177,17 +176,17 @@ double caculate_hold_fall(const celllib::TimingArc arc,
   return hold_fall;
 }
 
-TransitionDirection
-specualte_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
-                               TransitionDirection input_direction) {
-  TransitionDirection output_direction = TransitionDirection::UNKNOWN;
+sta::TransitionDirection
+speculate_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
+                               sta::TransitionDirection input_direction) {
+  sta::TransitionDirection output_direction = sta::TransitionDirection::UNKNOWN;
 
   if (is_clock_to_q) {
-    if (input_direction == TransitionDirection::UNKNOWN) {
+    if (input_direction == sta::TransitionDirection::UNKNOWN) {
       if (arc.timing_type == celllib::TimingType::RISING_EDGE) {
-        output_direction = TransitionDirection::RISING;
+        output_direction = sta::TransitionDirection::RISING;
       } else if (arc.timing_type == celllib::TimingType::FALLING_EDGE) {
-        output_direction = TransitionDirection::FALLING;
+        output_direction = sta::TransitionDirection::FALLING;
       }
     } else {
       output_direction = input_direction;
@@ -196,12 +195,12 @@ specualte_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
     // 如果不是 clock-to-Q 那么就直接使用前一级设置的值推算
     if (arc.timing_sense == celllib::TimingSense::NEGATIVE_UNATE) {
       // 负单边：输入上升 -> 输出下降；输入下降 -> 输出上升
-      if (input_direction == TransitionDirection::RISING) {
-        output_direction = TransitionDirection::FALLING;
-      } else if (input_direction == TransitionDirection::FALLING) {
-        output_direction = TransitionDirection::RISING;
+      if (input_direction == sta::TransitionDirection::RISING) {
+        output_direction = sta::TransitionDirection::FALLING;
+      } else if (input_direction == sta::TransitionDirection::FALLING) {
+        output_direction = sta::TransitionDirection::RISING;
       } else {
-        output_direction = TransitionDirection::UNKNOWN;
+        output_direction = sta::TransitionDirection::UNKNOWN;
       }
     } else if (arc.timing_sense == celllib::TimingSense::POSITIVE_UNATE) {
       // 正单边：输入沿方向保持不变
@@ -209,10 +208,9 @@ specualte_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
     } else {
       // celllib::TimingSense::NON_UNATE
       // 非单边：无法从输入方向唯一推断，保持 UNKNOWN
-      output_direction = TransitionDirection::UNKNOWN;
+      output_direction = sta::TransitionDirection::UNKNOWN;
     }
   }
 
   return output_direction;
 }
-};

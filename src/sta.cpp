@@ -1,18 +1,14 @@
 #include "cell/cell_data_structure.hpp"
-#include "parser-verilog/verilog_data.hpp"
 #include "sta/sta_data_structures.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
-#include <iterator>
 #include <memory>
 #include <optional>
 #include <stack>
 #include <string>
-#include <type_traits>
 #include <unordered_set>
-#include <variant>
 #include <vector>
 
 using namespace verilog;
@@ -59,28 +55,43 @@ double get_pessimistic_delay_from_lut(const celllib::LookupTable &lut) {
 
 SignalBit *STAWorker::get_virtual_clock() {
   static SignalBit global_clk("__clk__", 0);
-  // 初始化虚拟时钟信号的时序数据（只需初始化一次）
-  if (!timing_data.count(global_clk)) {
-    timing_data[global_clk] = SignalTimingData();
-    // 虚拟时钟信号的arrival_time默认为0（理想时钟树，无delay）
-    arrival_time[global_clk] = 0;
-    // 标记虚拟时钟为已驱动，并加入队列开始传播
-    driven_signals.insert(global_clk);
-    timing_queue.push_back(global_clk);
-  }
-
   return &global_clk;
 }
 
 void STAWorker::build_fanouts() {
-  // 必须要有CellLibrary，不再使用硬编码
   if (!cell_library_) {
     assert(false && "CellLibrary is required, no hardcoded fallback");
     return;
   }
 
+  // bit -> driver point id（用于建立 WIRE 边）
+  std::unordered_map<SignalBit, std::size_t, SignalBitHash> bit_to_driver;
+
+  // 1. 预填 bit_to_driver：来自 collect_port 的 INPUT points
+  for (std::size_t pt_id : input_clk_point_ids) {
+    if (pt_id < res.points.size() && res.points[pt_id].bit.has_value()) {
+      bit_to_driver[res.points[pt_id].bit.value()] = pt_id;
+    }
+  }
+
+  // 2. 确保虚拟时钟 CLK point 存在
+  SignalBit virtual_clk = *get_virtual_clock();
+  std::size_t virtual_clk_pt =
+      get_or_create_point(nullptr, "__clk__", virtual_clk, CLK);
+  if (std::find(input_clk_point_ids.begin(), input_clk_point_ids.end(),
+                virtual_clk_pt) == input_clk_point_ids.end()) {
+    input_clk_point_ids.push_back(virtual_clk_pt);
+  }
+  bit_to_driver[virtual_clk] = virtual_clk_pt;
+
+  // 第一遍：创建所有 point，填充 bit_to_driver
+  struct PendingEdge {
+    std::size_t from_pt, to_pt;
+    EdgeType type;
+  };
+  std::vector<PendingEdge> pending_edges;
+
   for (auto &instance : instances) {
-    // 从CellLibrary获取单元信息
     const auto *cell = cell_library_->get_cell(instance->module_name);
     if (!cell) {
       std::cerr << "Warning: Cannot find cell '" << instance->module_name
@@ -88,988 +99,509 @@ void STAWorker::build_fanouts() {
       continue;
     }
 
-    // 判断是否为寄存器（时序单元）
     bool is_sequential = cell->ff.has_value();
 
     if (is_sequential) {
-      // 处理寄存器：建立从时钟到输出端的路径
       const auto &ff_def = cell->ff.value();
-      std::string clock_pin_name =
-          ff_def.clocked_on.value_or("CK"); // 默认使用"CK" -> 全局时钟
+      std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
 
-      // 获取时钟pin的连接（如果存在）
-      SignalBit clock_source = *get_virtual_clock(); // 默认使用全局时钟
+      SignalBit clock_canonical = *get_virtual_clock();
       if (instance->connections.count(clock_pin_name)) {
         SignalSpec clock_signals = instance->connections[clock_pin_name];
         if (!clock_signals.empty()) {
-          clock_source = sigmap.find(clock_signals[0]);
+          clock_canonical = sigmap.find(clock_signals[0]);
         }
       }
 
-      // 确保时钟源在timing_data中
-      if (!timing_data.count(clock_source)) {
-        timing_data[clock_source] = SignalTimingData();
+      std::size_t clk_pt;
+      if (clock_canonical.wire_name == "__clk__") {
+        clk_pt = virtual_clk_pt;
+      } else {
+        auto it = bit_to_driver.find(clock_canonical);
+        if (it != bit_to_driver.end()) {
+          clk_pt = it->second;
+          // 将连接到 FF 时钟端的 input 标为 CLK，便于 path group 归为 REG2REG
+          if (clk_pt < res.points.size())
+            res.points[clk_pt].type = CLK;
+        } else {
+          clk_pt = get_or_create_point(nullptr, clock_canonical.wire_name,
+                                       clock_canonical, CLK);
+          bit_to_driver[clock_canonical] = clk_pt;
+          // 确保从该 CLK 起点做 DFS，才能产生 reg2reg（CLK→REGQ→…→REGD）路径
+          if (std::find(input_clk_point_ids.begin(), input_clk_point_ids.end(),
+                       clk_pt) == input_clk_point_ids.end()) {
+            input_clk_point_ids.push_back(clk_pt);
+          }
+        }
       }
 
-      // 遍历所有输出pin，查找clock-to-Q时序弧
-      auto output_pins = cell->get_output_pins();
-      for (const auto &output_pin_name : output_pins) {
+      for (const auto &output_pin_name : cell->get_output_pins()) {
         const auto *output_pin = cell->get_pin(output_pin_name);
-        if (!output_pin)
+        if (!output_pin || !instance->connections.count(output_pin_name))
           continue;
-
-        if (!instance->connections.count(output_pin_name)) {
-          continue;
-        }
         SignalSpec output_signals = instance->connections[output_pin_name];
 
-        // 查找clock-to-Q时序弧（RISING_EDGE或FALLING_EDGE类型，related_pin是时钟pin）
         for (const auto &arc : output_pin->timing_arcs) {
           if ((arc.timing_type == celllib::TimingType::RISING_EDGE ||
                arc.timing_type == celllib::TimingType::FALLING_EDGE) &&
               arc.related_pin == clock_pin_name) {
-
-            // 根据颗粒度决定延迟值
-            double delay = 0;
-            if (analysis_granularity_ == AnalysisGranularity::COARSE) {
-              // COARSE模式：获取悲观延迟值
-              if (arc.cell_rise.has_value()) {
-                delay = get_pessimistic_delay_from_lut(arc.cell_rise.value());
-              } else if (arc.cell_fall.has_value()) {
-                delay = get_pessimistic_delay_from_lut(arc.cell_fall.value());
-              } else if (arc.intrinsic_rise.has_value() ||
-                         arc.intrinsic_fall.has_value()) {
-                double rise = arc.intrinsic_rise.value_or(0.0);
-                double fall = arc.intrinsic_fall.value_or(0.0);
-                delay = std::max(rise, fall) * NS_TO_PS; // Liberty ns -> ps
-              }
-            } else {
-              // 在这产生 candidate node（clk2q 起点）
-              get_or_create_candidate_node(instance.get(), clock_pin_name);
+            if (analysis_granularity_ != AnalysisGranularity::COARSE) {
+              get_or_create_candidate_node(clk_pt);
             }
-            // MEDIUM/FINE模式：delay保持为0（占位符），后续分为 fine 和 medium
-            // 来计算
-
-            // 建立从时钟到输出的fanout
             for (size_t i = 0; i < output_signals.size(); ++i) {
-              SignalBit output_connect = sigmap.find(output_signals[i]);
-
-              if (!timing_data.count(output_connect)) {
-                timing_data[output_connect] = SignalTimingData();
-              }
-
-              timing_data[clock_source].fanouts.emplace_back(
-                  output_connect, delay, clock_pin_name, instance.get());
-
-              // 标记输出端为已驱动
-              driven_signals.insert(output_connect);
+              SignalBit output_canonical = sigmap.find(output_signals[i]);
+              std::size_t regq_pt = get_or_create_point(
+                  instance.get(), output_pin_name, output_canonical, REGQ);
+              pending_edges.push_back({clk_pt, regq_pt, SEQ_ARC});
+              bit_to_driver[output_canonical] = regq_pt;
             }
-            break; // 找到第一个clock-to-Q弧即可
+            break;
           }
         }
       }
 
-      // 建立寄存器输入端的fanout关系（用于负载电容计算）
-      // 遍历所有输入pin（如D端），建立fanout关系，并将D端注册为endpoint
-      auto input_pins = cell->get_input_pins();
-      for (const auto &input_pin_name : input_pins) {
-        // 跳过时钟pin，因为时钟pin的fanout已经建立（clock-to-Q）
-        if (input_pin_name == clock_pin_name) {
+      for (const auto &input_pin_name : cell->get_input_pins()) {
+        if (input_pin_name == clock_pin_name)
           continue;
-        }
-
-        if (!instance->connections.count(input_pin_name)) {
+        if (!instance->connections.count(input_pin_name))
           continue;
-        }
-
         SignalSpec input_signals = instance->connections[input_pin_name];
-
-        // 为每个输入信号建立fanout到寄存器实例（用于负载电容计算）
-        // 使用一个特殊的target_bit：创建一个虚拟信号，名称包含寄存器实例名和输入pin名
-        // 这样可以在calculate_load_capacitance中识别这是寄存器输入端的连接
         for (size_t i = 0; i < input_signals.size(); ++i) {
-          SignalBit input_connect = sigmap.find(input_signals[i]);
-
-          if (!timing_data.count(input_connect)) {
-            timing_data[input_connect] = SignalTimingData();
-          }
-
-          // 创建一个虚拟的target_bit用于标识寄存器输入端连接
-          // 格式：__reg_input__<instance_name>__<pin_name>
-          SignalBit reg_input_target("__reg_input__" + instance->instance_name +
-                                         "__" + input_pin_name,
-                                     0);
-          timing_data[input_connect].fanouts.emplace_back(
-              reg_input_target, 0, input_pin_name, instance.get());
-
-          // 将寄存器的D端（数据输入端）注册为endpoint；若该 net
-          // 已是顶层输出（sigmap 合并），保留 primary output 端口名
-          TimingEndpoint ep(instance.get(), input_pin_name);
-          if (endpoints.count(input_connect)) {
-            for (const auto &existing : endpoints[input_connect]) {
-              if (existing.sink == nullptr) {
-                ep.primary_output_port = existing.port;
-                break;
-              }
-            }
-          }
-          // 避免重复：同一 (sink, port) 只添加一次
-          auto &eps = endpoints[input_connect];
-          bool is_dup = std::any_of(
-              eps.begin(), eps.end(), [&ep](const TimingEndpoint &e) {
-                return e.sink == ep.sink && e.port == ep.port;
-              });
-          if (!is_dup) {
-            eps.push_back(std::move(ep));
+          SignalBit input_canonical = sigmap.find(input_signals[i]);
+          std::size_t regd_pt = get_or_create_point(
+              instance.get(), input_pin_name, input_canonical, REGD);
+          auto it = bit_to_driver.find(input_canonical);
+          if (it != bit_to_driver.end()) {
+            pending_edges.push_back({it->second, regd_pt, WIRE});
           }
         }
       }
     } else {
-      // 处理组合逻辑：建立从输入到输出的路径
-      auto output_pins = cell->get_output_pins();
-      for (const auto &output_pin_name : output_pins) {
+      for (const auto &output_pin_name : cell->get_output_pins()) {
         const auto *output_pin = cell->get_pin(output_pin_name);
-        if (!output_pin)
+        if (!output_pin || !instance->connections.count(output_pin_name))
           continue;
-
-        if (!instance->connections.count(output_pin_name)) {
-          continue;
-        }
         SignalSpec output_signals = instance->connections[output_pin_name];
 
-        // 遍历时序弧（只处理组合逻辑类型）
         for (const auto &arc : output_pin->timing_arcs) {
-          if (arc.timing_type != celllib::TimingType::COMBINATIONAL) {
+          if (arc.timing_type != celllib::TimingType::COMBINATIONAL)
             continue;
-          }
-
           std::string input_pin_name = arc.related_pin;
-          if (!instance->connections.count(input_pin_name)) {
+          if (!instance->connections.count(input_pin_name))
             continue;
-          }
           SignalSpec input_signals = instance->connections[input_pin_name];
 
-          // 根据颗粒度决定延迟值
-          double delay = 0;
-          if (analysis_granularity_ == AnalysisGranularity::COARSE) {
-            // COARSE模式：获取悲观延迟值
-            if (arc.cell_rise.has_value()) {
-              delay = get_pessimistic_delay_from_lut(arc.cell_rise.value());
-            } else if (arc.cell_fall.has_value()) {
-              delay = get_pessimistic_delay_from_lut(arc.cell_fall.value());
-            } else if (arc.intrinsic_rise.has_value() ||
-                       arc.intrinsic_fall.has_value()) {
-              double rise = arc.intrinsic_rise.value_or(0.0);
-              double fall = arc.intrinsic_fall.value_or(0.0);
-              delay = std::max(rise, fall) * NS_TO_PS; // Liberty ns -> ps
-            }
-          } else {
-            if (arc.timing_sense == celllib::TimingSense::NON_UNATE) {
-              // 在这个情况之中，input是确定的，output 是不确定的
-              // 计算的时候要将不确定的值给带入进去，
-              // 在计算的时候，cell rise 和 cell fall 是相对于 output 来说的
-              get_or_create_candidate_node(instance.get(), output_pin_name);
-            }
-          }
-          // MEDIUM/FINE模式：delay保持为0（占位符），后续在calculate_timing_arcs中计算
-
-          // 建立fanout连接
           for (size_t i = 0;
                i < input_signals.size() && i < output_signals.size(); ++i) {
-            SignalBit input_connect = sigmap.find(input_signals[i]);
-            SignalBit output_connect = sigmap.find(output_signals[i]);
+            SignalBit input_canonical = sigmap.find(input_signals[i]);
+            SignalBit output_canonical = sigmap.find(output_signals[i]);
 
-            if (!timing_data.count(input_connect)) {
-              timing_data[input_connect] = SignalTimingData();
+            std::size_t input_pt = get_or_create_point(
+                instance.get(), input_pin_name, input_canonical, COMB_PIN);
+            std::size_t output_pt = get_or_create_point(
+                instance.get(), output_pin_name, output_canonical, COMB_PIN);
+
+            if (analysis_granularity_ != AnalysisGranularity::COARSE &&
+                arc.timing_sense == celllib::TimingSense::NON_UNATE) {
+              get_or_create_candidate_node(output_pt);
             }
-            if (!timing_data.count(output_connect)) {
-              timing_data[output_connect] = SignalTimingData();
+
+            pending_edges.push_back({input_pt, output_pt, COMB_ARC});
+            auto it = bit_to_driver.find(input_canonical);
+            if (it != bit_to_driver.end()) {
+              pending_edges.push_back({it->second, input_pt, WIRE});
             }
-
-            timing_data[input_connect].fanouts.emplace_back(
-                output_connect, delay, input_pin_name, instance.get());
-
-            driven_signals.insert(output_connect);
-          }
+            bit_to_driver[output_canonical] = output_pt;
         }
       }
+    }
+  }
+}
+
+  // 2.5. 补充 REGD 的 WIRE 边（实例处理顺序可能导致 comb 在 seq 之后，首遍时 bit_to_driver 尚未就绪）
+  auto pending_has = [&pending_edges](size_t from_pt, size_t to_pt) {
+    for (const auto &e : pending_edges)
+      if (e.from_pt == from_pt && e.to_pt == to_pt) return true;
+    return false;
+  };
+  for (auto &instance : instances) {
+    const auto *cell = cell_library_->get_cell(instance->module_name);
+    if (!cell || !cell->ff.has_value())
+      continue;
+    const auto &ff_def = cell->ff.value();
+    std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
+    for (const auto &input_pin_name : cell->get_input_pins()) {
+      if (input_pin_name == clock_pin_name || !instance->connections.count(input_pin_name))
+        continue;
+      SignalSpec input_signals = instance->connections[input_pin_name];
+      for (size_t i = 0; i < input_signals.size(); ++i) {
+        SignalBit input_canonical = sigmap.find(input_signals[i]);
+        TimingPointRefKey key{instance.get(), input_pin_name, input_canonical};
+        auto kit = res.point_index.find(key);
+        if (kit == res.point_index.end())
+          continue;
+        std::size_t regd_pt = kit->second;
+        auto bit_it = bit_to_driver.find(input_canonical);
+        if (bit_it != bit_to_driver.end()) {
+          std::size_t from_pt = bit_it->second;
+          if (!pending_has(from_pt, regd_pt))
+            pending_edges.push_back({from_pt, regd_pt, WIRE});
+        }
+      }
+    }
+  }
+
+  // 3. 添加 WIRE 边：驱动顶层 OUTPUT 端口的 net 的 driver -> OUTPUT point
+  for (const auto &pt : res.points) {
+    if (pt.type != OUTPUT || !pt.bit.has_value())
+      continue;
+    const SignalBit &out_bit = pt.bit.value();
+    auto it = bit_to_driver.find(out_bit);
+    if (it != bit_to_driver.end())
+      pending_edges.push_back({it->second, pt.id, WIRE});
+  }
+
+  // 第二遍：应用所有 pending edges（同一 (from_pt, to_pt) 只保留一条，避免 candidate DFS 产生重复 path）
+  for (const auto &e : pending_edges) {
+    auto &fanouts = res.points[e.from_pt].fanouts;
+    bool already = false;
+    for (const auto &f : fanouts)
+      if (f.target_point == e.to_pt) {
+        already = true;
+        break;
+      }
+    if (!already)
+      fanouts.push_back(TimingEdge{e.type, e.from_pt, e.to_pt});
+  }
+}
+
+void STAWorker::build_res_edges() {
+  res.edges.clear();
+  for (std::size_t i = 0; i < res.points.size(); ++i) {
+    for (const TimingEdge &e : res.points[i].fanouts) {
+      res.edges.push_back(
+          TimingEdge{e.type, i, e.target_point});
     }
   }
 }
 
 void STAWorker::calculate_load_capacitance() {
-  assert(cell_library_); // 必须要加载单元库以后再调用这个函数
+  assert(cell_library_);
 
+  // 初始化每个 instance 的 output pin 负载为 0
   for (auto &instance : instances) {
-    const auto cell = cell_library_->get_cell(instance->module_name);
-    if (cell == nullptr) {
+    const auto *cell = cell_library_->get_cell(instance->module_name);
+    if (!cell) {
       std::cerr << "could not find the standard cell " << instance->module_name
                 << std::endl;
       assert(false);
     }
+    for (const auto &out_pin : cell->get_output_pins()) {
+      instance->load_capacitance[out_pin] = 0.0;
+    }
+  }
 
-    auto output_pins = cell->get_output_pins();
-    for (const auto &output_pin_name : output_pins) {
-      double total_load = 0.0;
+  // 从 input_clk_point_ids 出发，拓扑遍历
+  std::deque<std::size_t> queue(input_clk_point_ids.begin(),
+                                input_clk_point_ids.end());
+  std::unordered_set<std::size_t> visited;
 
-      if (!instance->connections.count(output_pin_name)) {
-        continue;
-      }
+  while (!queue.empty()) {
+    std::size_t pt_id = queue.front();
+    queue.pop_front();
+    if (visited.count(pt_id))
+      continue;
+    visited.insert(pt_id);
 
-      SignalSpec output_signals = instance->connections[output_pin_name];
-      for (auto &output_signal : output_signals) {
-        SignalBit cannocial = sigmap.find(output_signal);
+    const TimingPointRef &pt = res.points[pt_id];
 
-        if (timing_data.count(cannocial)) {
-          for (auto fanout : timing_data[cannocial].fanouts) {
-            if (fanout.cell) {
-              // cell 存在，计算负载电容
-              // 包括正常的组合逻辑fanout和寄存器输入端的fanout
-              const auto *fanout_cell =
-                  cell_library_->get_cell(fanout.cell->module_name);
-              if (fanout_cell) {
-                const auto *input_pin = fanout_cell->get_pin(fanout.port_name);
-                if (input_pin && input_pin->capacitance.has_value()) {
-                  total_load += input_pin->capacitance.value();
-                }
-              } else {
-                std::cerr << "invalid cell " << fanout.cell->module_name
-                          << std::endl;
-                assert(false);
-              }
-            }
-          }
+    // 若为 cell 输出点（COMB_PIN 或 REGQ），将该输出端口的所有 fanout 的 input pin 电容累加
+    if (pt.inst && (pt.type == COMB_PIN || pt.type == REGQ)) {
+      for (const TimingEdge &e : pt.fanouts) {
+        const TimingPointRef &target = res.points[e.target_point];
+        if (!target.inst)
+          continue; // 顶层端口，无电容
+        const auto *fanout_cell =
+            cell_library_->get_cell(target.inst->module_name);
+        if (!fanout_cell) {
+          std::cerr << "invalid cell " << target.inst->module_name << std::endl;
+          assert(false);
+        }
+        const auto *input_pin = fanout_cell->get_pin(target.port_name);
+        if (input_pin && input_pin->capacitance.has_value()) {
+          pt.inst->load_capacitance[pt.port_name] +=
+              input_pin->capacitance.value();
         }
       }
+    }
 
-      instance->load_capacitance[output_pin_name] = total_load;
+    for (const TimingEdge &e : pt.fanouts) {
+      if (visited.count(e.target_point) == 0) {
+        queue.push_back(e.target_point);
+      }
     }
   }
 }
 
-void STAWorker::calculate_timing_arcs() {
+void STAWorker::run_timing_analysis_dfs() {
   assert(cell_library_);
+  res.paths.clear();
 
   if (analysis_granularity_ == AnalysisGranularity::FINE) {
-    assert(false && "should not reach here, fine mode use candidate data way");
+    assert(false && "FINE mode uses candidate path, not run_timing_analysis_dfs");
   }
 
-  if (analysis_granularity_ == AnalysisGranularity::COARSE) {
-    return; // 无需计算
-  }
-
-  for (auto &instance : instances) {
-    const auto *cell = cell_library_->get_cell(instance->module_name);
-    if (!cell) {
-      std::cerr << "invalid cell " << instance->module_name << std::endl;
-      assert(false);
-    }
-
-    auto output_pins = cell->get_output_pins();
-    for (const auto &output_pin_name : output_pins) {
-      const auto *output_pin = cell->get_pin(output_pin_name);
-
-      if (!output_pin) {
-        continue;
-      }
-
-      double load_cap = instance->load_capacitance.count(output_pin_name)
-                            ? instance->load_capacitance[output_pin_name]
-                            : 0.0;
-
-      // 调试输出：显示负载电容
-      if (load_cap == 0.0) {
-        std::cerr << "  [WARNING] Load capacitance is 0 for instance "
-                  << instance->instance_name << " output pin "
-                  << output_pin_name << std::endl;
-      }
-
-      for (const auto &arc : output_pin->timing_arcs) {
-        // 当时设计的时候 pin 是output和input放在一起了
-        // 然后要找到所有的output的pin的transition
-        bool is_combinational =
-            (arc.timing_type == celllib::TimingType::COMBINATIONAL);
-        bool is_clock_to_q =
-            (arc.timing_type == celllib::TimingType::RISING_EDGE ||
-             arc.timing_type == celllib::TimingType::FALLING_EDGE);
-
-        if (!is_combinational && !is_clock_to_q) {
-          continue;
-        }
-
-        std::string related_pin_name = arc.related_pin;
-
-        if (!instance->connections.count(related_pin_name) ||
-            !instance->connections.count(output_pin_name)) {
-          continue;
-        }
-
-        SignalSpec related_signals = instance->connections[related_pin_name];
-        SignalSpec output_signals = instance->connections[output_pin_name];
-
-        // 获取输入信号的转换时间（input_slew）
-        // rise延迟使用rise的slew，fall延迟使用fall的slew
-        double input_slew_rise = 0.0;
-        double input_slew_fall = 0.0;
-        // 记录输入信号的转换方向，用于通过 timing_sense 推导输出方向
-        TransitionDirection input_direction = TransitionDirection::UNKNOWN;
-
-        if (!related_signals.empty()) {
-          SignalBit input_canonical = sigmap.find(related_signals[0]);
-          if (timing_data.count(input_canonical)) {
-            const auto &input_timing = timing_data[input_canonical];
-            // 记录该输入端当前的转换方向
-            input_direction = input_timing.transition_direction;
-
-            // 获取rise和fall的转换时间（STA 内部存 ps，LUT 需要 ns）
-            if (input_timing.rise_transition_time.has_value()) {
-              input_slew_rise =
-                  input_timing.rise_transition_time.value() / NS_TO_PS;
-            } else {
-              std::cerr << "  [WARNING] rise_transition_time not available for "
-                           "signal "
-                        << input_canonical.wire_name << "["
-                        << input_canonical.bit_offset << "], instance "
-                        << instance->instance_name << ", input pin "
-                        << related_pin_name << " (will use default value)"
-                        << std::endl;
-            }
-            if (input_timing.fall_transition_time.has_value()) {
-              input_slew_fall =
-                  input_timing.fall_transition_time.value() / NS_TO_PS;
-            } else {
-              std::cerr << "  [WARNING] fall_transition_time not available for "
-                           "signal "
-                        << input_canonical.wire_name << "["
-                        << input_canonical.bit_offset << "], instance "
-                        << instance->instance_name << ", input pin "
-                        << related_pin_name << " (will use default value)"
-                        << std::endl;
-            }
-          }
-
-          // 如果转换时间为0，使用默认值
-          double default_slew = 0.0;
-          if (is_top_module_input(input_canonical)) {
-            // 作为顶层模块输入
-            // 查看一下在sdc文件之中有没有设置，若有设置，那么就直接使用设置的值
-            // 否则就直接设置为 0
-
-            // TODO 由于这里sdc文件的 parser 还不支持set input delay
-            // 这里先直接返回 0
-            auto cfg = get_config();
-            default_slew = std::max((double)cfg.clock_transit_raise,
-                                    (double)cfg.clock_transit_fall);
-          } else {
-            // 其他情况：使用查找表index_1的中间值作为默认值
-            default_slew = get_lut_avg(arc.cell_rise);
-          }
-
-          // 如果rise或fall的转换时间为0，使用默认值
-          if (input_slew_rise == 0.0) {
-            input_slew_rise = default_slew;
-          }
-          if (input_slew_fall == 0.0) {
-            input_slew_fall = default_slew;
-          }
-        }
-
-        // 确定输出转换方向
-        // 对于clock-to-Q，可以根据时序弧类型确定；
-        // 对于组合逻辑，根据 timing_sense 和前一级的方向推导
-        TransitionDirection output_direction =
-            specualte_transition_direction(is_clock_to_q, arc, input_direction);
-
-        // 注意：虽然同时计算rise和fall，但仍记录一个主导方向用于报告显示
-
-        // 同时计算cell_rise和cell_fall的延迟，取最大值
-        double delay_rise = 0.0;
-        double delay_fall = 0.0;
-        double delay = 0.0;
-
-        double delay_rise_slew =
-            (input_direction == TransitionDirection::RISING ||
-             input_direction == TransitionDirection::UNKNOWN)
-                ? input_slew_rise
-                : input_slew_fall;
-
-        double delay_fall_slew =
-            (input_direction == TransitionDirection::FALLING ||
-             input_direction == TransitionDirection::UNKNOWN)
-                ? input_slew_fall
-                : input_slew_rise;
-
-        delay_rise =
-            caculate_delay_rise(arc, cell_library_, delay_rise_slew, load_cap);
-        // 调试信息， 打印一下这个查表得到的信息
-        std::cout << "  [INFO]" << " cell: " << instance->module_name << " -- "
-                  << instance->instance_name << " delay rise lut caculate "
-                  << std::endl
-                  << "\t"
-                  << "input slew rise: " << delay_rise_slew << std::endl
-                  << "\t"
-                  << "load capacitance: " << load_cap << std::endl
-                  << "\t"
-                  << "delay rise res: " << delay_rise << std::endl;
-
-        delay_fall =
-            caculate_delay_fall(arc, cell_library_, delay_fall_slew, load_cap);
-        // 调试信息， 打印一下这个查表得到的信息
-        std::cout << "  [INFO]" << " cell: " << instance->module_name << " -- "
-                  << instance->instance_name << " delay fall lut caculate "
-                  << std::endl
-                  << "\t"
-                  << "input slew fall: " << delay_fall_slew << std::endl
-                  << "\t"
-                  << "load capacitance: " << load_cap << std::endl
-                  << "\t"
-                  << "delay fall res: " << delay_fall << std::endl;
-
-        if (output_direction == TransitionDirection::RISING) {
-          delay = delay_rise;
-        } else if (output_direction == TransitionDirection::FALLING) {
-          delay = delay_fall;
-        } else {
-          delay = std::max(delay_rise, delay_fall);
-        }
-
-        if (delay == 0.0) {
-          std::cerr << "  [WARNING] Delay is 0 for instance "
-                    << instance->instance_name << ", output pin "
-                    << output_pin_name << ", related pin " << related_pin_name
-                    << std::endl;
-        }
-
-        // // 调试输出：显示计算的延迟值
-        // if (delay > 0) {
-        //     std::cout << "  [DEBUG] Calculated delay: " << delay << "ps for "
-        //               << instance->instance_name << " " << output_pin_name
-        //               << " (load_cap=" << load_cap << "ff, input_slew="
-        //               << input_slew << "ps, related_pin=" << related_pin_name
-        //               << ")" << std::endl;
-        // } else if (delay == 0 && load_cap > 0) {
-        //     std::cerr << "  [WARNING] Delay is 0 for " <<
-        //     instance->instance_name
-        //               << " " << output_pin_name << " (load_cap=" << load_cap
-        //               << "ff, input_slew=" << input_slew << "ps)" <<
-        //               std::endl;
-        // }
-
-        // 计算转换时间（transition time）
-        // 同时计算rise_transition和fall_transition，分别记录
-        // rise_transition使用rise的slew，fall_transition使用fall的slew
-        double rise_transition_time = caculate_transition_rise(
-            arc, cell_library_, input_slew_rise, load_cap);
-        double fall_transition_time = caculate_transition_fall(
-            arc, cell_library_, input_slew_fall, load_cap);
-
-        if (is_combinational) {
-          // 组合逻辑没那么复杂，仅仅更新fanout之内的delau就可以了
-          // 然后存储一下转换时间和方向
-          for (size_t i = 0; i < related_signals.size(); i++) {
-            SignalBit input_connect = sigmap.find(related_signals[i]);
-            SignalBit output_connect = sigmap.find(output_signals[i]);
-
-            if (timing_data.count(input_connect)) {
-              auto &fanouts = timing_data[input_connect].fanouts;
-              bool found = false;
-              for (auto &fanout : fanouts) {
-                if (fanout.target_bit == output_connect &&
-                    fanout.cell == instance.get() &&
-                    fanout.port_name == related_pin_name) {
-                  fanout.delay = delay;
-                  found = true;
-                  if (delay > 0) {
-                    std::cout << "  [DEBUG] Updated fanout delay: " << delay
-                              << "ps for " << input_connect.wire_name << " -> "
-                              << output_connect.wire_name << std::endl;
-                  }
-                  break;
-                }
-              }
-              if (!found && delay > 0) {
-                std::cerr << "  [WARNING] Could not find matching fanout for "
-                          << "instance " << instance->instance_name
-                          << ", input " << related_pin_name
-                          << " (port_name in fanout: ";
-                for (const auto &f : fanouts) {
-                  std::cerr << f.port_name << " ";
-                }
-                std::cerr << "), output " << output_pin_name
-                          << ", delay=" << delay << "ps" << std::endl;
-              }
-            }
-
-            // 存储转换时间和方向到输出信号的SignalTimingData
-            // 对于多输入门，应该使用延迟最大的路径的转换时间（更保守）
-            if (!timing_data.count(output_connect)) {
-              timing_data[output_connect] = SignalTimingData();
-            }
-
-            // FIXME 这里存在一个设计逻辑上的bug
-            // 这个问题通过使用 dfs_run
-            // 解决了，但是依靠纯的拓扑排序始终没办法解决这个问题
-            // 本质原因是当我丢弃一个节点的时候就必然会丢弃其信息
-
-            // 查找所有输入路径到该输出的最大延迟
-            double max_delay_for_output = 0.0;
-            for (const auto &[src_bit, timing] : timing_data) {
-              for (const auto &f : timing.fanouts) {
-                SignalBit f_target = sigmap.find(f.target_bit);
-                if (f_target == output_connect && f.cell == instance.get()) {
-                  max_delay_for_output =
-                      std::max(max_delay_for_output, f.delay);
-                }
-              }
-            }
-
-            // 如果当前计算的延迟大于等于最大延迟，更新转换时间
-            // 或者如果转换时间还未设置，则设置它
-            if (!timing_data[output_connect].rise_transition_time.has_value() ||
-                delay >= max_delay_for_output) {
-              timing_data[output_connect].rise_transition_time =
-                  rise_transition_time;
-              timing_data[output_connect].fall_transition_time =
-                  fall_transition_time;
-              timing_data[output_connect].transition_direction =
-                  output_direction;
-            }
-          }
-        } else {
-          // 时序逻辑，clock to q
-          for (size_t i = 0;
-               i < related_signals.size() && i < output_signals.size(); ++i) {
-            SignalBit clock_connect = sigmap.find(related_signals[i]);
-            SignalBit output_connect = sigmap.find(output_signals[i]);
-
-            // 更新fanout中的延迟
-            if (timing_data.count(clock_connect)) {
-              auto &fanouts = timing_data[clock_connect].fanouts;
-              for (auto &fanout : fanouts) {
-                if (fanout.target_bit == output_connect &&
-                    fanout.cell == instance.get() &&
-                    fanout.port_name == related_pin_name) {
-                  fanout.delay = delay;
-                  break;
-                }
-              }
-            }
-
-            // 存储转换时间和方向到输出信号的SignalTimingData
-            if (!timing_data.count(output_connect)) {
-              timing_data[output_connect] = SignalTimingData();
-            }
-            timing_data[output_connect].rise_transition_time =
-                rise_transition_time;
-            timing_data[output_connect].fall_transition_time =
-                fall_transition_time;
-            timing_data[output_connect].transition_direction = output_direction;
-          }
-        }
-      }
-    }
-  }
-}
-
-double STAWorker::process_endpoint_timing(
-    TimingEndpoint &ep, const SignalBit &dst_canonical,
-    TransitionDirection input_transition_direction) {
-  if (ep.sink == nullptr)
-    return 0;
-  const auto *cell = cell_library_->get_cell(ep.sink->module_name);
-  if (!cell)
-    return 0;
-  const auto *pin = cell->get_pin(ep.port);
-  if (!pin)
-    return 0;
-
-  double data_trans_rise = 0.0, data_trans_fall = 0.0;
-  if (timing_data.count(dst_canonical)) {
-    const auto &dt = timing_data.at(dst_canonical);
-    if (dt.rise_transition_time.has_value())
-      data_trans_rise =
-          dt.rise_transition_time.value() / NS_TO_PS; // ps -> ns for LUT
-    if (dt.fall_transition_time.has_value())
-      data_trans_fall = dt.fall_transition_time.value() / NS_TO_PS;
-  }
-  double data_trans = std::max(data_trans_rise, data_trans_fall);
-  double clk_trans = std::max(
-      static_cast<double>(cfg.clock_transit_raise) / NS_TO_PS,
-      static_cast<double>(cfg.clock_transit_fall) / NS_TO_PS); // cfg in ps
-
-  for (const auto &arc : pin->timing_arcs) {
-    if (arc.timing_type == celllib::TimingType::SETUP_RISING ||
-        arc.timing_type == celllib::TimingType::SETUP_FALLING) {
-      double setup_rise =
-          caculate_setup_rise(arc, cell_library_, data_trans, clk_trans);
-      double setup_fall =
-          caculate_setup_fall(arc, cell_library_, data_trans, clk_trans);
-      // ep.Setup_req = std::max(setup_rise, setup_fall) * NS_TO_PS; // ns -> ps
-      if (input_transition_direction == TransitionDirection::RISING) {
-        ep.Setup_req = setup_rise * NS_TO_PS;
-      } else if (input_transition_direction == TransitionDirection::FALLING) {
-        ep.Setup_req = setup_fall * NS_TO_PS;
-      } else {
-        // TransitionDirection::UNKNOWN
-        ep.Setup_req = std::max(setup_rise, setup_fall) * NS_TO_PS; // ns -> ps
-      }
-    }
-    if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
-        arc.timing_type == celllib::TimingType::HOLD_FALLING) {
-      double hold_rise =
-          caculate_hold_rise(arc, cell_library_, data_trans, clk_trans);
-      double hold_fall =
-          caculate_hold_fall(arc, cell_library_, data_trans, clk_trans);
-      // ep.Hold_req = std::max(hold_rise, hold_fall) * NS_TO_PS; // ns -> ps
-      if (input_transition_direction == TransitionDirection::RISING) {
-        ep.Hold_req = hold_rise * NS_TO_PS;
-      } else if (input_transition_direction == TransitionDirection::FALLING) {
-        ep.Hold_req = hold_fall * NS_TO_PS;
-      } else {
-        // TransitionDirection::UNKNOWN
-        ep.Hold_req = std::max(hold_rise, hold_fall) * NS_TO_PS; // ns -> ps
-      }
-    }
-  }
-  return ep.Setup_req.value_or(0);
-}
-
-void STAWorker::run() {
-  while (!timing_queue.empty()) {
-    SignalBit bit = timing_queue.front();
-    timing_queue.pop_front();
-
-    SignalBit canonical_bit = sigmap.find(bit);
-
-    // 获取当前信号的arrival time（基于规范代表）
-    // 如果不存在，说明这个信号还没有被初始化，跳过
-    if (!arrival_time.count(canonical_bit)) {
-      continue;
-    }
-    double src_arrival = arrival_time[canonical_bit];
-
-    // 获取该信号的时序数据
-    // 如果不存在，说明这个信号没有fanout，跳过
-    if (!timing_data.count(canonical_bit)) {
-      continue;
-    }
-    auto &timing = timing_data[canonical_bit];
-
-    // 遍历所有fanout（fanout中的target_bit应该是规范代表）
-    for (const auto &fanout : timing.fanouts) {
-      SignalBit dst_canonical =
-          sigmap.find(fanout.target_bit); // 确保是规范代表
-      double delay = fanout.delay;
-      double new_arrival = src_arrival + delay;
-
-      // 调试输出：显示传播信息
-      if (delay > 0) {
-        std::cout << "  [DEBUG] Propagating: " << canonical_bit.wire_name << "["
-                  << canonical_bit.bit_offset << "] (arrival=" << src_arrival
-                  << "ps) -> " << dst_canonical.wire_name << "["
-                  << dst_canonical.bit_offset << "] (delay=" << delay
-                  << "ps, new_arrival=" << new_arrival << "ps)" << std::endl;
-      }
-
-      // 初始化目标信号的arrival_time（如果不存在）
-      if (!arrival_time.count(dst_canonical)) {
-        arrival_time[dst_canonical] = -1; // 初始化为-1，表示未到达
-      }
-
-      // 更新arrival time（取最大值，基于规范代表）
-      if (new_arrival > arrival_time[dst_canonical]) {
-        arrival_time[dst_canonical] = new_arrival;
-
-        // 确保目标信号的时序数据存在
-        if (!timing_data.count(dst_canonical)) {
-          timing_data[dst_canonical] = SignalTimingData();
-        }
-
-        // 记录backtrack信息用于关键路径追踪
-        timing_data[dst_canonical].backtrack = canonical_bit;
-        timing_data[dst_canonical].source_port = fanout.port_name;
-        timing_data[dst_canonical].driver = fanout.cell;
-
-        // 将目标信号加入队列继续传播
-        timing_queue.push_back(dst_canonical);
-
-        // 检查是否是endpoint（endpoint中的key也应该是规范代表）
-        if (endpoints.count(dst_canonical)) {
-          for (auto &ep : endpoints[dst_canonical]) {
-            double required_time =
-                (ep.sink == nullptr)
-                    ? 0
-                    : process_endpoint_timing(ep, dst_canonical,
-                                              timing.transition_direction);
-            double total_time = new_arrival + required_time;
-            // 只有源信号被驱动时才更新max_arrival_time
-            if (total_time > max_arrival_time &&
-                driven_signals.count(canonical_bit)) {
-              max_arrival_time = total_time;
-              critical_signal = dst_canonical;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-void STAWorker::run_dfs() {
-  max_arrival_time = 0;
-  critical_signal = SignalBit();
-
-  // 重置 arrival_time：仅保留 startpoint (driven_signals 且 arrival=0)，其余置
-  // -1
-  for (auto &[bit, t] : arrival_time) {
-    if (!(driven_signals.count(bit) && t == 0))
-      t = -1;
-  }
-
-  // 使用 stack 模拟 DFS：从 input 端口出发，沿 fanout 深度优先遍历
-  // 栈中存储待处理的 SignalBit，处理顺序为 LIFO（深度优先）
-  std::stack<SignalBit> dfs_stack;
-
-  for (const auto &bit : timing_queue) {
-    SignalBit canonical = sigmap.find(bit);
-    if (arrival_time.count(canonical) && arrival_time[canonical] == 0)
-      dfs_stack.push(canonical);
-  }
-
-  while (!dfs_stack.empty()) {
-    SignalBit canonical_bit = dfs_stack.top();
-    dfs_stack.pop();
-
-    if (!arrival_time.count(canonical_bit) || arrival_time[canonical_bit] < 0)
-      continue;
-    double src_arrival = arrival_time[canonical_bit];
-
-    if (!timing_data.count(canonical_bit))
-      continue;
-    auto &timing = timing_data[canonical_bit];
-
-    for (const auto &fanout : timing.fanouts) {
-      SignalBit dst_canonical = sigmap.find(fanout.target_bit);
-      double delay = fanout.delay;
-      double new_arrival = src_arrival + delay;
-
-      if (!arrival_time.count(dst_canonical))
-        arrival_time[dst_canonical] = -1;
-
-      if (new_arrival > arrival_time[dst_canonical]) {
-        arrival_time[dst_canonical] = new_arrival;
-        if (!timing_data.count(dst_canonical))
-          timing_data[dst_canonical] = SignalTimingData();
-        timing_data[dst_canonical].backtrack = canonical_bit;
-        timing_data[dst_canonical].source_port = fanout.port_name;
-        timing_data[dst_canonical].driver = fanout.cell;
-
-        dfs_stack.push(dst_canonical);
-
-        // dst_canonical 是 canonical 这个端口的上一级端口
-        // 应该去使用canoncial 这个端口的transition direction
-        // 来计算下一级端口的 setup hold
-
-        TransitionDirection input_transition_direction =
-            timing.transition_direction;
-        if (endpoints.count(dst_canonical)) {
-          for (auto &ep : endpoints[dst_canonical]) {
-            double required_time =
-                (ep.sink == nullptr)
-                    ? 0
-                    : process_endpoint_timing(ep, dst_canonical,
-                                              input_transition_direction);
-            double total_time = new_arrival + required_time;
-            if (total_time > max_arrival_time &&
-                driven_signals.count(canonical_bit)) {
-              max_arrival_time = total_time;
-              critical_signal = dst_canonical;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // TODO
-  // 关于关键路径的部分后面可以删掉了
-  if (max_arrival_time == 0 && critical_signal.wire_name.empty()) {
-    for (const auto &[bit, eps] : endpoints) {
-      SignalBit canonical = sigmap.find(bit);
-      if (!arrival_time.count(canonical))
-        continue;
-      double arr = arrival_time.at(canonical);
-      for (const auto &ep : eps) {
-        double req = ep.Setup_req.value_or(0);
-        double total = arr + req;
-        if (total > max_arrival_time) {
-          max_arrival_time = total;
-          critical_signal = canonical;
-        }
-      }
-    }
-  }
-
-  // Fallback: 若 max_arrival_time 仍为 0 但存在 arrival > 0 的 endpoint
-  // （例如纯组合电路、顶层输出路径因 driven_signals 检查未通过），则重新计算
-  if (max_arrival_time == 0 && critical_signal.wire_name.empty()) {
-    for (const auto &[bit, eps] : endpoints) {
-      SignalBit canonical = sigmap.find(bit);
-      if (!arrival_time.count(canonical))
-        continue;
-      double arr = arrival_time.at(canonical);
-      for (const auto &ep : eps) {
-        double req = ep.Setup_req.value_or(0);
-        double total = arr + req;
-        if (total > max_arrival_time) {
-          max_arrival_time = total;
-          critical_signal = canonical;
-        }
-      }
-    }
-  }
-}
-
-void STAWorker::print_all_timing_paths_dfs() {
-  struct PathNodeInfo {
-    SignalBit signal;
+  const double clk_slew_ns =
+      std::max(static_cast<double>(cfg.clock_transit_raise),
+               static_cast<double>(cfg.clock_transit_fall)) /
+      NS_TO_PS;
+
+  struct PathFrame {
+    std::size_t point_id;
     double arrival;
-    Instance *driver;
-    std::string port;
+    double slew_rise_ns;
+    double slew_fall_ns;
     TransitionDirection dir;
-    double require;
+    std::size_t fanout_idx;
   };
-  std::vector<PathNodeInfo> path;
   struct StackFrame {
-    SignalBit signal;
-    double path_arrival;
-    size_t fanout_idx;
+    std::size_t point_id;
+    double arrival;
+    double slew_rise_ns;
+    double slew_fall_ns;
+    TransitionDirection dir;
+    std::size_t fanout_idx;
   };
-  std::stack<StackFrame> stk;
+
+  auto find_arc = [this](const TimingPointRef &origin,
+                         const TimingPointRef &target,
+                         EdgeType edge_type) -> const celllib::TimingArc * {
+    if (!target.inst)
+      return nullptr;
+    const auto *cell = cell_library_->get_cell(target.inst->module_name);
+    if (!cell)
+      return nullptr;
+    const auto *out_pin = cell->get_pin(target.port_name);
+    if (!out_pin)
+      return nullptr;
+
+    if (edge_type == COMB_ARC) {
+      for (const auto &a : out_pin->timing_arcs) {
+        if (a.timing_type == celllib::TimingType::COMBINATIONAL &&
+            a.related_pin == origin.port_name)
+          return &a;
+      }
+    } else if (edge_type == SEQ_ARC) {
+      std::string clk_pin = "CK";
+      if (cell->ff.has_value() && cell->ff->clocked_on.has_value())
+        clk_pin = cell->ff->clocked_on.value();
+      for (const auto &a : out_pin->timing_arcs) {
+        if ((a.timing_type == celllib::TimingType::RISING_EDGE ||
+             a.timing_type == celllib::TimingType::FALLING_EDGE) &&
+            a.related_pin == clk_pin)
+          return &a;
+      }
+    }
+    return nullptr;
+  };
+
+  auto compute_setup_hold = [this, clk_slew_ns](Instance *sink, const std::string &port,
+                                   double data_arrival_ps,
+                                   double data_slew_rise_ns,
+                                   double data_slew_fall_ns,
+                                   TransitionDirection data_dir)
+      -> std::pair<double, double> {
+    if (!sink || !cell_library_)
+      return {0, 0};
+    const auto *cell = cell_library_->get_cell(sink->module_name);
+    if (!cell)
+      return {0, 0};
+    const auto *pin = cell->get_pin(port);
+    if (!pin)
+      return {0, 0};
+    double data_trans =
+        std::max(data_slew_rise_ns, data_slew_fall_ns);
+    double setup_ps = 0, hold_ps = 0;
+    for (const auto &arc : pin->timing_arcs) {
+      if (arc.timing_type == celllib::TimingType::SETUP_RISING ||
+          arc.timing_type == celllib::TimingType::SETUP_FALLING) {
+        double sr = caculate_setup_rise(arc, cell_library_, data_trans, clk_slew_ns);
+        double sf = caculate_setup_fall(arc, cell_library_, data_trans, clk_slew_ns);
+        if (data_dir == TransitionDirection::RISING)
+          setup_ps = sr * NS_TO_PS;
+        else if (data_dir == TransitionDirection::FALLING)
+          setup_ps = sf * NS_TO_PS;
+        else
+          setup_ps = std::max(sr, sf) * NS_TO_PS;
+      }
+      if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
+          arc.timing_type == celllib::TimingType::HOLD_FALLING) {
+        double hr = caculate_hold_rise(arc, cell_library_, data_trans, clk_slew_ns);
+        double hf = caculate_hold_fall(arc, cell_library_, data_trans, clk_slew_ns);
+        if (data_dir == TransitionDirection::RISING)
+          hold_ps = hr * NS_TO_PS;
+        else if (data_dir == TransitionDirection::FALLING)
+          hold_ps = hf * NS_TO_PS;
+        else
+          hold_ps = std::max(hr, hf) * NS_TO_PS;
+      }
+    }
+    return {setup_ps, hold_ps};
+  };
+
   int path_count = 0;
-  std::unordered_set<std::string> path_printed; // 已打印路径的指纹，用于去重
+  std::unordered_set<std::string> path_printed;
 
-  std::unordered_set<SignalBit, SignalBitHash> startpoints;
-  for (const auto &bit : timing_queue) {
-    SignalBit canonical = sigmap.find(bit);
-    if (!driven_signals.count(canonical))
+  for (std::size_t start_id : input_clk_point_ids) {
+    if (start_id >= res.points.size())
       continue;
-    if (arrival_time.count(canonical) && arrival_time.at(canonical) != 0)
-      continue;
-    startpoints.insert(canonical);
-  }
 
-  for (const SignalBit &canonical : startpoints) {
-    stk.push({canonical, 0, 0});
+    double slew_ns = clk_slew_ns;
+
+    std::stack<StackFrame> stk;
+    std::vector<PathFrame> path;
+    stk.push({start_id, 0.0, slew_ns, slew_ns, TransitionDirection::UNKNOWN, 0});
 
     while (!stk.empty()) {
       StackFrame f = stk.top();
-      SignalBit cur = sigmap.find(f.signal);
-      double arr = f.path_arrival;
+      stk.pop();
 
       if (f.fanout_idx == 0) {
-        path.push_back({cur, arr, nullptr, ""});
-        if (timing_data.count(cur)) {
-          path.back().driver = timing_data.at(cur).driver;
-          path.back().port = timing_data.at(cur).source_port;
-          path.back().dir = timing_data.at(cur).transition_direction;
-        }
+        path.push_back({f.point_id, f.arrival, f.slew_rise_ns, f.slew_fall_ns,
+                        f.dir, 0});
       }
 
-      if (endpoints.count(cur)) {
-        std::string fingerprint;
-        for (const auto &n : path) {
-          fingerprint += n.signal.wire_name + "[" +
-                         std::to_string(n.signal.bit_offset) +
-                         "]:" + std::to_string(n.arrival) + "->";
-        }
+      const TimingPointRef &cur = res.points[f.point_id];
 
-        if (path_printed.insert(fingerprint).second) {
-          size_t start_point;
-          TimingPathResult res_path;
+      if (cur.type == REGD || cur.type == OUTPUT) {
+        std::string fp;
+        for (const auto &pf : path)
+          fp += std::to_string(pf.point_id) + ":" + std::to_string(pf.arrival) + "->";
+        if (path_printed.insert(fp).second) {
           path_count++;
-          std::cout << "\n--- Path #" << path_count << " (arrival: " << arr
-                    << "ps) ---\n";
-          for (size_t i = 0; i < path.size(); ++i) {
-            const auto &n = path[i];
-            std::cout << "  [" << i << "] " << n.signal.wire_name << "["
-                      << n.signal.bit_offset << "]";
-            if (i != 0) {
-              std::cout << " (arrival: " << n.arrival << "ps, "
-                        << "delay: " << n.arrival - path[i - 1].arrival << ")";
-            } else {
-              std::cout << " (arrival: " << n.arrival << "ps)";
-            }
-            if (driven_signals.count(n.signal) && n.arrival == 0)
-              std::cout << (n.signal.wire_name == "__clk__"
-                                ? " [Clock]"
-                                : " [Primary Input]");
-            if (n.driver) {
-              std::cout << " -> " << n.driver->instance_name << "("
-                        << n.driver->module_name << ")";
-              if (!n.port.empty())
-                std::cout << "/" << n.port;
-            }
-            if (i == path.size() - 1)
-              std::cout << " [Endpoint]";
-            std::cout << "\n";
+          TimingPathResult pr;
+          pr.startpoint = path.front().point_id;
+          pr.endpoint = path.back().point_id;
+          pr.data_arrival_time = f.arrival;
+          pr.group = classify_path_group(
+              effective_start_type_for_group(res.points[pr.startpoint]),
+              cur.type);
 
-            if (i == 0) {
-              // 第一个节点，仅仅创建开始头结点
-              start_point =
-                  get_or_create_point_node(n.driver, n.signal, n.port);
-              res_path.startpoint = start_point;
-            } else {
-              size_t end_point =
-                  get_or_create_point_node(n.driver, n.signal, n.port);
-              TimingStep step{start_point, end_point,
-                              n.arrival - path[i - 1].arrival, n.arrival,
-                              n.dir};
-              res_path.steps.push_back(step);
-              if (i == path.size() - 1) {
-                // 最后一个节点
-                res_path.endpoint = end_point;
-              } else {
-                start_point = end_point;
-              }
-            }
+          if (cur.type == REGD && cur.inst) {
+            auto [setup_ps, hold_ps] = compute_setup_hold(
+                cur.inst, cur.port_name, f.arrival, f.slew_rise_ns, f.slew_fall_ns, f.dir);
+            pr.library_setup_time = setup_ps;
+            pr.library_hold_time = hold_ps;
           }
-          res.paths.push_back(res_path);
+
+          for (size_t i = 0; i < path.size(); ++i) {
+            if (i == 0) {
+              continue;
+            }
+            double incr = path[i].arrival - path[i - 1].arrival;
+            double slew =
+                std::max(path[i].slew_rise_ns, path[i].slew_fall_ns) * NS_TO_PS;
+            TimingStep step{path[i - 1].point_id, path[i].point_id, incr, slew,
+                            path[i].arrival, path[i].dir};
+            pr.steps.push_back(step);
+          }
+          res.paths.push_back(pr);
+
+          std::cout << "  [DEBUG] Path #" << path_count << " pt" << pr.startpoint
+                    << "->pt" << pr.endpoint << " arrival=" << f.arrival << "ps"
+                    << ", steps=" << pr.steps.size() << "\n";
         }
       }
 
-      if (!timing_data.count(cur)) {
+      if (f.fanout_idx >= cur.fanouts.size()) {
         path.pop_back();
-        stk.pop();
-        continue;
-      }
-      const auto &timing = timing_data.at(cur);
-      if (f.fanout_idx >= timing.fanouts.size()) {
-        path.pop_back();
-        stk.pop();
         continue;
       }
 
-      const auto &fanout = timing.fanouts[f.fanout_idx];
-      SignalBit dst = sigmap.find(fanout.target_bit);
-      // 跳过重复：若同一节点有多个 fanout 指向同一 dst（不同
-      // port），避免重复枚举同一条路径
-      bool dup = false;
-      for (size_t j = 0; j < f.fanout_idx; ++j) {
-        if (sigmap.find(timing.fanouts[j].target_bit) == dst) {
-          dup = true;
-          break;
+      const TimingEdge &e = cur.fanouts[f.fanout_idx];
+      stk.push({f.point_id, f.arrival, f.slew_rise_ns, f.slew_fall_ns, f.dir,
+                f.fanout_idx + 1});
+
+      const TimingPointRef &target = res.points[e.target_point];
+
+      double delay_ps = 0.0;
+      double out_slew_rise_ns = f.slew_rise_ns;
+      double out_slew_fall_ns = f.slew_fall_ns;
+      TransitionDirection out_dir = f.dir;
+
+      if (e.type == WIRE) {
+        delay_ps = 0.0;
+        out_slew_rise_ns = f.slew_rise_ns;
+        out_slew_fall_ns = f.slew_fall_ns;
+        out_dir = f.dir;
+      } else {
+        const celllib::TimingArc *arc = find_arc(cur, target, e.type);
+        if (!arc) {
+          std::cerr << "  [DEBUG] arc not found: pt " << f.point_id << " -> "
+                    << e.target_point << " type "
+                    << (e.type == COMB_ARC ? "COMB_ARC" : "SEQ_ARC") << "\n";
+          // 不 pop_back：target 尚未加入 path，cur 仍应保留在 path 中
+        continue;
+      }
+
+        double load_cap = 0.0;
+        if (target.inst &&
+            target.inst->load_capacitance.count(target.port_name))
+          load_cap = target.inst->load_capacitance.at(target.port_name);
+
+        double in_slew_rise = f.slew_rise_ns;
+        double in_slew_fall = f.slew_fall_ns;
+        bool is_start = (cur.type == INPUT || cur.type == CLK);
+        if (is_start && in_slew_rise == 0)
+          in_slew_rise = clk_slew_ns;
+        if (is_start && in_slew_fall == 0)
+          in_slew_fall = clk_slew_ns;
+
+        bool is_ck2q = (e.type == SEQ_ARC);
+
+        if (analysis_granularity_ == AnalysisGranularity::COARSE) {
+          delay_ps = get_pessimistic_delay_from_lut(
+              arc->cell_rise.has_value() ? arc->cell_rise.value()
+                                         : celllib::LookupTable{});
+          if (delay_ps == 0 && arc->cell_fall.has_value())
+            delay_ps = get_pessimistic_delay_from_lut(arc->cell_fall.value());
+          if (delay_ps == 0 && arc->intrinsic_rise.has_value())
+            delay_ps = std::max(arc->intrinsic_rise.value_or(0),
+                               arc->intrinsic_fall.value_or(0)) *
+                      NS_TO_PS;
+        } else {
+          double dr = caculate_delay_rise(*arc, cell_library_, in_slew_rise, load_cap);
+          double df = caculate_delay_fall(*arc, cell_library_, in_slew_fall, load_cap);
+          out_slew_rise_ns =
+              caculate_transition_rise(*arc, cell_library_, in_slew_rise, load_cap) /
+              NS_TO_PS;
+          out_slew_fall_ns =
+              caculate_transition_fall(*arc, cell_library_, in_slew_fall, load_cap) /
+              NS_TO_PS;
+          out_dir = speculate_transition_direction(is_ck2q, *arc, f.dir);
+          if (out_dir == TransitionDirection::RISING)
+            delay_ps = dr;
+          else if (out_dir == TransitionDirection::FALLING)
+            delay_ps = df;
+          else
+            delay_ps = std::max(dr, df);
+
+          std::string cell_name = target.inst ? target.inst->instance_name : "?";
+          std::cout << "  [DEBUG] delay lut: " << cell_name << " "
+                    << cur.port_name << "->" << target.port_name
+                    << " slew_rise=" << in_slew_rise << " slew_fall=" << in_slew_fall
+                    << " load_cap=" << load_cap << " delay_rise=" << dr
+                    << " delay_fall=" << df << " -> " << delay_ps << "ps\n";
         }
       }
-      stk.pop();
-      stk.push({f.signal, f.path_arrival, f.fanout_idx + 1});
-      if (!dup) {
-        double delay = fanout.delay;
-        stk.push({dst, arr + delay, 0});
-      }
+
+      double new_arrival = f.arrival + delay_ps;
+      stk.push({e.target_point, new_arrival, out_slew_rise_ns, out_slew_fall_ns,
+                out_dir, 0});
     }
   }
-  std::cout << "\nTotal paths found: " << path_count << "\n";
-}
 
-} // namespace sta
+  std::cout << "  [DEBUG] run_timing_analysis_dfs: " << path_count
+            << " paths found, res.paths.size()=" << res.paths.size() << "\n";
+}
+} 

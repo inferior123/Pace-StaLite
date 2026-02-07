@@ -125,16 +125,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/main.cpp
   ${PROJECT_SOURCE_DIR}/src/sta.cpp
+  ${PROJECT_SOURCE_DIR}/src/verilog_collect.cpp
+  ${PROJECT_SOURCE_DIR}/src/lookuptable.cpp
   ${PROJECT_SOURCE_DIR}/src/trace_debug.cpp
   ${PROJECT_SOURCE_DIR}/src/sta_report.cpp
   ${PROJECT_SOURCE_DIR}/src/sdc_parser.cpp
   ${PROJECT_SOURCE_DIR}/src/cell_data_structure.cpp
+  ${PROJECT_SOURCE_DIR}/src/celllib_cache.cpp
   ${PROJECT_SOURCE_DIR}/src/liberty_parser.cpp
   ${PROJECT_SOURCE_DIR}/src/candidate.cpp
+  ${PROJECT_SOURCE_DIR}/src/sta_check.cpp
   ${FLEX_verilog_lexer_OUTPUTS}
   ${BISON_verilog_parser_OUTPUTS}
 )
-target_link_libraries(pba_sta PRIVATE lib_parser_cpp pthread dl)
+target_link_libraries(pba_sta PRIVATE lib_parser_cpp nlohmann_json::nlohmann_json pthread dl)
 
 # -----------------------------------------------------------------------------
 # Custom targets

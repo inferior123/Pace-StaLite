@@ -118,7 +118,6 @@ void STAWorker::collect_net(verilog::Net &net) {
       std::vector<SignalBit> bits;
       for (int i = left; i <= right; i++) {
         sta::SignalBit bit(name, i);
-        timing_data[bit] = SignalTimingData();
         bits.push_back(bit);
       }
       signal_registry[name] = std::move(bits);
@@ -145,30 +144,49 @@ void STAWorker::collect_port(verilog::Port &port) {
     std::vector<SignalBit> bits;
     for (int i = left; i <= right; i++) {
       SignalBit bit(sig_name, i);
-      if (!timing_data.count(bit)) {
-        timing_data[bit] = SignalTimingData{};
-      }
-
-      // Always add to signal_registry
       bits.push_back(bit);
 
-      // Process based on port direction
+      SignalBit canonical = sigmap.find(bit);
+      TimingPointRefKey key{nullptr, sig_name, canonical};
+
       if (port.dir == PortDirection::INOUT) {
         assert(false && "not suport the INOUT port yet");
       } else if (port.dir == PortDirection::INPUT) {
-        SignalBit input_canonical = sigmap.find(bit);
-        top_module_inputs.insert(input_canonical); // 记录顶层模块输入端口
-        driven_signals.insert(input_canonical);
-        timing_queue.push_back(input_canonical);
-        arrival_time[input_canonical] = 0;
+        std::size_t pt_id;
+        if (res.point_index.count(key)) {
+          pt_id = res.point_index[key];
+        } else {
+          pt_id = res.points.size();
+          TimingPointRef pt;
+          pt.id = pt_id;
+          pt.inst = nullptr;
+          pt.port_name = sig_name;
+          pt.bit = canonical;
+          pt.type = INPUT;
+          pt.fanouts = {};
+          res.points.push_back(std::move(pt));
+          res.point_index[key] = pt_id;
+          input_clk_point_ids.push_back(pt_id);
+        }
+        top_module_inputs.insert(canonical);
+        driven_signals.insert(canonical);
+        timing_queue.push_back(canonical);
+        arrival_time[canonical] = 0;
       } else {
         // OUTPUT
         assert(port.dir == PortDirection::OUTPUT && "invalid port dir");
-        SignalBit output_canonical = sigmap.find(bit);
-        TimingEndpoint ep{nullptr, sig_name};
-        ep.Setup_req = 0;
-        ep.Hold_req = 0;
-        endpoints[output_canonical].push_back(std::move(ep));
+        if (!res.point_index.count(key)) {
+          std::size_t pt_id = res.points.size();
+          TimingPointRef pt;
+          pt.id = pt_id;
+          pt.inst = nullptr;
+          pt.port_name = sig_name;
+          pt.bit = canonical;
+          pt.type = OUTPUT;
+          pt.fanouts = {};
+          res.points.push_back(std::move(pt));
+          res.point_index[key] = pt_id;
+        }
       }
     }
     signal_registry[sig_name] = std::move(bits);
