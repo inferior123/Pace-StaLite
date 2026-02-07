@@ -1,19 +1,31 @@
 #include "sta/sta_report.hpp"
 #include "sta/sta_data_structures.hpp"
 #include <algorithm>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <unordered_set>
 #include <vector>
+#if __cplusplus >= 201703L
+#include <filesystem>
+namespace fs = std::filesystem;
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif
 
 namespace sta {
 
-// 格式化时间显示（ps 转 ns，保留2位小数）
-std::string STAReportGenerator::format_time(int ps) {
+// 当前用于报告输出的 TimingRunResult（仅在 generate_report / generate_report_pt_files /
+// generate_path_report 调用栈内有效）
+static const TimingRunResult *g_current_timing_run = nullptr;
+
+// 格式化时间显示（ps 转 ns，小数位数可指定）
+std::string STAReportGenerator::format_time(double ps, int decimals) {
   double ns = ps / 1000.0;
   std::ostringstream oss;
-  oss << std::fixed << std::setprecision(2) << ns;
+  oss << std::fixed << std::setprecision(decimals) << ns;
   return oss.str();
 }
 
@@ -43,299 +55,242 @@ bool STAReportGenerator::is_startpoint(const STAWorker &worker,
   return false;
 }
 
-// 获取单元类型名称
-std::string STAReportGenerator::get_cell_type(Instance *inst) {
-  if (!inst)
-    return "";
-  return inst->module_name;
+static char dir_to_char(TransitionDirection d) {
+  switch (d) {
+  case TransitionDirection::RISING:
+    return 'r';
+  case TransitionDirection::FALLING:
+    return 'f';
+  case TransitionDirection::UNKNOWN:
+  default:
+    return 'n';
+  }
 }
 
-// 构建路径节点列表
-TimingPath STAReportGenerator::build_timing_path(
-    const STAWorker &worker, const SignalBit &endpoint_bit,
-    const std::string &clock_name, const TimingEndpoint *endpoint_override) {
-  TimingPath path;
-  path.endpoint = endpoint_bit;
-  path.path_group = clock_name;
-  path.path_type = "max"; // Setup check
-
-  const auto &timing_data = worker.get_timing_data();
-  const auto &arrival_time = worker.get_arrival_time();
-  const auto &endpoints = worker.get_endpoints();
-
-  SignalBit canonical_endpoint = worker.get_canonical_signal(endpoint_bit);
-
-  // 获取 endpoint 信息
-  const TimingEndpoint *ep = endpoint_override;
-  if (!ep && endpoints.count(canonical_endpoint) &&
-      !endpoints.at(canonical_endpoint).empty()) {
-    ep = &endpoints.at(canonical_endpoint).front();
-  }
-  if (ep) {
-    path.data_arrival_time = arrival_time.count(canonical_endpoint)
-                                 ? arrival_time.at(canonical_endpoint)
-                                 : 0;
-    int setup_time = ep->Setup_req.value_or(0);
-    path.setup_time = setup_time;
-    path.endpoint_sink = ep->sink;
-    path.endpoint_port = ep->port;
-    path.data_required_time = worker.calculate_data_required_time(setup_time);
-    path.slack = path.data_required_time - path.data_arrival_time;
-    path.met = path.slack >= 0;
-  }
-
-  // 回溯路径
-  SignalBit current = canonical_endpoint;
-  std::vector<PathNode> path_nodes;
-  std::unordered_set<SignalBit, SignalBitHash> visited;
-
-  int prev_arrival = 0;
-
-  while (true) {
-    SignalBit canonical = worker.get_canonical_signal(current);
-
-    // 防止循环
-    if (visited.count(canonical)) {
-      break;
+std::string
+STAReportGenerator::get_point_name_for_report(const TimingPointRef &p,
+                                              const std::string &clock_name,
+                                              bool is_startpoint) {
+  // 起点：时钟或输入端口
+  if (is_startpoint) {
+    if ((p.bit.has_value() && p.bit->wire_name == "__clk__") ||
+        (!p.port_name.empty() && p.port_name == "__clk__")) {
+      return "clock " + clock_name + " (rise edge)";
     }
-    visited.insert(canonical);
-
-    PathNode node;
-    node.signal = canonical;
-    node.arrival_time =
-        arrival_time.count(canonical) ? arrival_time.at(canonical) : 0;
-    node.incremental_delay = node.arrival_time - prev_arrival;
-    node.edge_type = "n"; // 默认未知沿（none）
-    node.is_endpoint = (canonical.wire_name == canonical_endpoint.wire_name &&
-                        canonical.bit_offset == canonical_endpoint.bit_offset);
-    node.is_startpoint = is_startpoint(worker, canonical);
-
-    // 获取驱动单元信息
-    if (timing_data.count(canonical)) {
-      const auto &timing = timing_data.at(canonical);
-      node.driver = timing.driver;
-      node.driver_port = timing.source_port;
-      if (timing.driver) {
-        node.cell_type = get_cell_type(timing.driver);
-      }
-
-      // 根据记录的转换方向设置沿类型
-      switch (timing.transition_direction) {
-      case TransitionDirection::RISING:
-        node.edge_type = "r";
-        break;
-      case TransitionDirection::FALLING:
-        node.edge_type = "f";
-        break;
-      case TransitionDirection::UNKNOWN:
-      default:
-        node.edge_type = "n";
-        break;
-      }
-    }
-
-    path_nodes.push_back(node);
-    prev_arrival = node.arrival_time;
-
-    // 检查是否是起点
-    if (node.is_startpoint) {
-      path.startpoint = canonical;
-      break;
-    }
-
-    // 继续回溯
-    if (!timing_data.count(canonical)) {
-      break;
-    }
-
-    const auto &timing = timing_data.at(canonical);
-    if (timing.backtrack.wire_name == "" ||
-        (timing.backtrack.wire_name == canonical.wire_name &&
-         timing.backtrack.bit_offset == canonical.bit_offset)) {
-      break;
-    }
-
-    current = timing.backtrack;
-  }
-
-  // 反转路径（从起点到终点）
-  std::reverse(path_nodes.begin(), path_nodes.end());
-
-  // 重新计算增量延迟（反转后从起点到终点）
-  for (size_t i = 0; i < path_nodes.size(); ++i) {
-    if (i == 0) {
-      path_nodes[i].incremental_delay = path_nodes[i].arrival_time;
-    } else {
-      path_nodes[i].incremental_delay =
-          path_nodes[i].arrival_time - path_nodes[i - 1].arrival_time;
+    // 顶层输入端口
+    if (p.inst == nullptr) {
+      return p.port_name + " (in)";
     }
   }
 
-  path.path_nodes = path_nodes;
+  // 普通点：实例/端口（尽量不依赖 worker/timing_data）
+  if (p.inst) {
+    std::string name = p.inst->instance_name;
+    if (!p.port_name.empty()) {
+      name += "/" + p.port_name;
+    }
+    if (!p.inst->module_name.empty()) {
+      name += " (" + p.inst->module_name + ")";
+    }
+    return name;
+  }
 
-  return path;
+  // 顶层输出端口或无法归类的虚拟点
+  if (!p.port_name.empty()) {
+    return p.port_name;
+  }
+  if (p.bit.has_value()) {
+    return get_signal_name(*p.bit);
+  }
+  return "";
 }
 
 // 打印路径头部信息
-void STAReportGenerator::print_path_header(const TimingPath &path) {
-  std::cout << "\n";
-  std::cout << "Startpoint: ";
+void STAReportGenerator::print_path_header(const TimingPathResult &path,
+                                           const std::string &clock_name,
+                                           std::ostream &out) {
+  const TimingPointRef *start_p = nullptr;
+  const TimingPointRef *end_p = nullptr;
 
-  // 显示起点信息
-  if (path.startpoint.wire_name == "__clk__") {
-    std::cout << "Virtual Clock (rising edge-triggered flip-flop clocked by "
-              << path.path_group << ")\n";
-  } else {
-    std::cout << get_signal_name(path.startpoint) << " (primary input)\n";
-  }
-
-  std::cout << "Endpoint: ";
-
-  // 显示终点信息：优先使用 endpoint_sink（寄存器 D 端或顶层输出）
-  if (path.endpoint_sink) {
-    std::cout << path.endpoint_sink->instance_name
-              << " (rising edge-triggered flip-flop clocked by "
-              << path.path_group << ")\n";
-  } else if (!path.endpoint_port.empty()) {
-    std::cout << get_signal_name(path.endpoint) << " (primary output)\n";
-  } else {
-    const auto &endpoint_node = path.path_nodes.back();
-    if (endpoint_node.driver) {
-      std::cout << endpoint_node.driver->instance_name
-                << " (rising edge-triggered flip-flop clocked by "
-                << path.path_group << ")\n";
-    } else {
-      std::cout << get_signal_name(path.endpoint) << " (primary output)\n";
+  if (g_current_timing_run) {
+    if (path.startpoint < g_current_timing_run->points.size()) {
+      start_p = &g_current_timing_run->points[path.startpoint];
+    }
+    if (path.endpoint < g_current_timing_run->points.size()) {
+      end_p = &g_current_timing_run->points[path.endpoint];
     }
   }
 
-  std::cout << "Path Group: " << path.path_group << "\n";
-  std::cout << "Path Type: " << path.path_type << "\n";
-  std::cout << "Point                                    Incr       Path\n";
-  std::cout
-      << "---------------------------------------------------------------\n";
+  out << "\n";
+  out << "  Startpoint: ";
+
+  if (start_p && start_p->bit.has_value() &&
+      start_p->bit->wire_name == "__clk__") {
+    out << clock_name << " (rising edge-triggered flip-flop clocked by "
+        << clock_name << ")\n";
+  } else {
+    if (start_p && start_p->bit.has_value()) {
+      out << get_signal_name(*start_p->bit) << " (input port clocked by "
+          << clock_name << ")\n";
+    } else if (start_p) {
+      out << start_p->port_name << " (input port clocked by "
+          << clock_name << ")\n";
+    } else {
+      out << "(unknown startpoint clocked by " << clock_name << ")\n";
+    }
+  }
+
+  out << "  Endpoint: ";
+
+  if (end_p && end_p->inst) {
+    out << end_p->inst->instance_name
+        << " (rising edge-triggered flip-flop clocked by " << clock_name
+        << ")\n";
+  } else if (end_p && !end_p->port_name.empty()) {
+    // 顶层输出端口
+    if (end_p->bit.has_value()) {
+      out << get_signal_name(*end_p->bit) << " (output port clocked by "
+          << clock_name << ")\n";
+    } else {
+      out << end_p->port_name << " (output port clocked by "
+          << clock_name << ")\n";
+    }
+  } else {
+    out << "(unknown endpoint)\n";
+  }
+
+  out << "  Path Group: " << clock_name << "\n";
+  out << "  Path Type: max\n";
+  out << "\n";
+  out << "  Point                                    Incr       Path\n";
+  out << "  "
+         "---------------------------------------------------------------\n";
 }
 
 // 打印数据到达时间部分
-void STAReportGenerator::print_data_arrival(const TimingPath &path) {
-  for (size_t i = 0; i < path.path_nodes.size(); ++i) {
-    const auto &node = path.path_nodes[i];
+void STAReportGenerator::print_data_arrival(const TimingPathResult &path,
+                                            const std::string &clock_name,
+                                            std::ostream &out,
+                                            int time_decimals) {
+  for (size_t i = 0; i < path.steps.size(); ++i) {
+    const auto &s = path.steps[i];
+    bool is_start = (i == 0);
 
-    std::string point_desc = "";
-    if (node.is_startpoint) {
-      // 起点：时钟或输入端口
-      if (node.signal.wire_name == "__clk__") {
-        point_desc = "clock " + path.path_group + " (rise edge)";
-      } else {
-        point_desc = get_signal_name(node.signal) + " (primary input)";
-      }
-    } else if (node.driver) {
-      // 驱动单元
-      std::string port_info = "";
-      if (!node.driver_port.empty()) {
-        port_info = node.driver_port + "/";
-      }
+    if (!g_current_timing_run)
+      continue;
 
-      // 确定输出端口
-      std::string out_port = "";
-      if (node.driver->connections.count("o")) {
-        out_port = "o";
-      } else if (node.driver->connections.count("q")) {
-        out_port = "q";
-      }
+    size_t point_idx = is_start ? path.startpoint : s.end_point;
+    if (point_idx >= g_current_timing_run->points.size())
+      continue;
 
-      if (!out_port.empty()) {
-        point_desc = node.driver->instance_name + "/" + port_info + out_port +
-                     " (" + node.cell_type + ")";
-      } else {
-        point_desc = node.driver->instance_name + " (" + node.cell_type + ")";
-      }
+    const auto &p = g_current_timing_run->points[point_idx];
 
-      // point_desc += " " + node.edge_type;
-    } else {
-      // 其他节点
-      // point_desc = get_signal_name(node.signal);
-    }
+    std::string point_desc =
+        get_point_name_for_report(p, clock_name, is_start);
+    if (point_desc.empty())
+      continue;
 
-    std::cout << std::left << std::setw(40) << point_desc;
-    std::cout << std::right << std::setw(10)
-              << format_time(node.incremental_delay);
-    std::cout << std::right << std::setw(10) << format_time(node.arrival_time)
-              << " " << node.edge_type << "\n";
+    out << "  " << std::left << std::setw(38) << point_desc;
+    out << std::right << std::setw(12) << format_time(s.incr, time_decimals);
+    out << std::right << std::setw(12) << format_time(s.arrival, time_decimals)
+        << " " << dir_to_char(s.dir) << "\n";
   }
 
-  std::cout << std::left << std::setw(40) << "data arrival time";
-  std::cout << std::right << std::setw(20)
-            << format_time(path.data_arrival_time) << "\n";
+  out << "  " << std::left << std::setw(38) << "data arrival time";
+  out << std::right << std::setw(24)
+      << format_time(path.data_arrival_time, time_decimals) << "\n";
 }
 
 // 打印数据要求时间部分
-void STAReportGenerator::print_data_required(const TimingPath &path,
-                                             const STAWorker &worker) {
+void STAReportGenerator::print_data_required(const TimingPathResult &path,
+                                             const std::string &clock_name,
+                                             const STAWorker &worker,
+                                             std::ostream &out,
+                                             int time_decimals) {
   const auto &cfg = worker.get_config();
   int clock_period = cfg.clk_period;
 
-  std::cout << "\n";
-  std::cout << std::left << std::setw(40)
-            << ("clock " + path.path_group + " (rise edge)");
-  std::cout << std::right << std::setw(10) << format_time(clock_period);
-  std::cout << std::right << std::setw(10) << format_time(clock_period) << "\n";
+  out << "\n";
+  out << "  " << std::left << std::setw(38)
+      << ("clock " + clock_name + " (rise edge)");
+  out << std::right << std::setw(12)
+      << format_time(clock_period, time_decimals);
+  out << std::right << std::setw(12) << format_time(clock_period, time_decimals)
+      << "\n";
 
-  std::cout << std::left << std::setw(40) << "clock network delay (ideal)";
-  std::cout << std::right << std::setw(10) << format_time(0);
-  std::cout << std::right << std::setw(10) << format_time(clock_period) << "\n";
+  out << "  " << std::left << std::setw(38) << "clock network delay (ideal)";
+  out << std::right << std::setw(12) << format_time(0, time_decimals);
+  out << std::right << std::setw(12) << format_time(clock_period, time_decimals)
+      << "\n";
 
-  // 如果 clock uncertainty 不为零，显示
   if (cfg.clock_uncertain != 0) {
-    std::cout << std::left << std::setw(40) << "clock uncertainty";
-    std::cout << std::right << std::setw(10)
-              << format_time(-cfg.clock_uncertain);
-    std::cout << std::right << std::setw(10)
-              << format_time(clock_period - cfg.clock_uncertain) << "\n";
+    out << "  " << std::left << std::setw(38) << "clock uncertainty";
+    out << std::right << std::setw(12)
+        << format_time(-cfg.clock_uncertain, time_decimals);
+    out << std::right << std::setw(12)
+        << format_time(clock_period - cfg.clock_uncertain, time_decimals)
+        << "\n";
   }
 
-  // 如果有 setup time，显示（从 path 中获取）
-  if (path.setup_time > 0) {
-    std::cout << std::left << std::setw(40) << "library setup time";
-    std::cout << std::right << std::setw(10) << format_time(-path.setup_time);
-    std::cout << std::right << std::setw(10)
-              << format_time(path.data_required_time) << "\n";
+  if (path.library_setup_time.has_value() &&
+      path.library_setup_time.value() > 0) {
+    out << "  " << std::left << std::setw(38) << "library setup time";
+    out << std::right << std::setw(12)
+        << format_time(-path.library_setup_time.value(), time_decimals);
+    out << std::right << std::setw(12)
+        << format_time(path.data_required_time, time_decimals) << "\n";
   }
 
-  std::cout << std::left << std::setw(40) << "data required time";
-  std::cout << std::right << std::setw(20)
-            << format_time(path.data_required_time) << "\n";
+  out << "  " << std::left << std::setw(38) << "data required time";
+  out << std::right << std::setw(24)
+      << format_time(path.data_required_time, time_decimals) << "\n";
 }
 
 // 打印 Slack 总结
-void STAReportGenerator::print_slack_summary(const TimingPath &path) {
-  std::cout
-      << "---------------------------------------------------------------\n";
-  std::cout << std::left << std::setw(40) << "data required time";
-  std::cout << std::right << std::setw(20)
-            << format_time(path.data_required_time) << "\n";
-  std::cout << std::left << std::setw(40) << "data arrival time";
-  std::cout << std::right << std::setw(20)
-            << format_time(path.data_arrival_time) << "\n";
-  std::cout
-      << "---------------------------------------------------------------\n";
-  std::cout << std::left << std::setw(40) << "slack";
-  std::cout << std::right << std::setw(10)
-            << (path.met ? "(MET)" : "(VIOLATED)");
-  std::cout << std::right << std::setw(10) << format_time(path.slack) << "\n";
+void STAReportGenerator::print_slack_summary(const TimingPathResult &path,
+                                             std::ostream &out,
+                                             int time_decimals) {
+  out << "  "
+         "---------------------------------------------------------------\n";
+  out << "  " << std::left << std::setw(38) << "data required time";
+  out << std::right << std::setw(24)
+      << format_time(path.data_required_time, time_decimals) << "\n";
+  out << "  " << std::left << std::setw(38) << "data arrival time";
+  out << std::right << std::setw(24)
+      << format_time(path.data_arrival_time, time_decimals) << "\n";
+  out << "  "
+         "---------------------------------------------------------------\n";
+  out << "  " << std::left << std::setw(38) << "slack";
+  out << std::right << std::setw(10)
+      << ((path.slack >= 0) ? "(MET)" : "(VIOLATED)");
+  out << std::right << std::setw(12) << format_time(path.slack, time_decimals)
+      << "\n";
 }
 
 // 生成单个路径的详细报告（标准格式）
 void STAReportGenerator::generate_path_report(
     const STAWorker &worker, const SignalBit &endpoint_bit,
     const std::string &clock_name, const TimingEndpoint *endpoint_override) {
-  TimingPath path =
-      build_timing_path(worker, endpoint_bit, clock_name, endpoint_override);
 
-  print_path_header(path);
-  print_data_arrival(path);
-  print_data_required(path, worker);
-  print_slack_summary(path);
+  (void)endpoint_bit;
+  (void)endpoint_override;
+
+  // FIXME: 目前简单打印第一条路径的详细信息；后续可根据 endpoint_bit 精确筛选
+  TimingRunResult run = worker.get_sta_res();
+  if (run.paths.empty()) {
+    std::cout << "No timing paths found.\n";
+    return;
+  }
+
+  g_current_timing_run = &run;
+  const TimingPathResult &path = run.paths.front();
+
+  print_path_header(path, clock_name, std::cout);
+  print_data_arrival(path, clock_name, std::cout, 2);
+  print_data_required(path, clock_name, worker, std::cout, 2);
+  print_slack_summary(path, std::cout, 2);
+
+  g_current_timing_run = nullptr;
 }
 
 // 生成标准格式的时序报告
@@ -356,28 +311,24 @@ void STAReportGenerator::generate_report(const STAWorker &worker,
   std::cout
       << "===========================================================\n\n";
 
-  // 收集所有 endpoint 路径，按 total_time (arrival + setup_req)
-  // 降序排序，取最长的前 3 条
-  const auto &endpoints = worker.get_endpoints();
-  const auto &arrival_time_map = worker.get_arrival_time();
+  // 使用统一中间结果：从 TimingRunResult 中选出需要展示的路径
+  TimingRunResult run = worker.get_sta_res();
+  g_current_timing_run = &run;
 
   struct PathCandidate {
-    SignalBit bit;
-    TimingEndpoint endpoint;
-    int total_time;
+    const TimingPathResult *path;
+    double total_time;
   };
   std::vector<PathCandidate> all_paths;
 
-  for (const auto &[bit, eps] : endpoints) {
-    SignalBit canonical = worker.get_canonical_signal(bit);
-    if (!arrival_time_map.count(canonical))
+  for (const auto &p : run.paths) {
+    // 这里只展示 MAX（setup）路径；MIN 可按需扩展
+    if (p.mode != AnalysisMode::MAX)
       continue;
-    int arrival = arrival_time_map.at(canonical);
-    for (const auto &ep : eps) {
-      int setup = ep.Setup_req.value_or(0);
-      int total = arrival + setup;
-      all_paths.push_back({canonical, ep, total});
-    }
+    double arrival = p.data_arrival_time;
+    double setup = p.library_setup_time.value_or(0.0);
+    double total = arrival + setup;
+    all_paths.push_back(PathCandidate{&p, total});
   }
 
   std::sort(all_paths.begin(), all_paths.end(),
@@ -390,38 +341,30 @@ void STAReportGenerator::generate_report(const STAWorker &worker,
 
   if (paths_to_show == 0) {
     std::cout << "No timing paths found.\n";
+    g_current_timing_run = nullptr;
     return;
   }
 
   // 默认打印最长的前 3 条路径
   std::cout << "Top " << paths_to_show << " Longest Path(s):\n";
   for (int i = 0; i < paths_to_show; ++i) {
+    const TimingPathResult &path = *all_paths[i].path;
     std::cout << "\n--- Path #" << (i + 1)
               << " (total time: " << all_paths[i].total_time << "ps) ---\n";
-    generate_path_report(worker, all_paths[i].bit, clock_name,
-                         &all_paths[i].endpoint);
+    print_path_header(path, clock_name, std::cout);
+    print_data_arrival(path, clock_name, std::cout, 2);
+    print_data_required(path, clock_name, worker, std::cout, 2);
+    print_slack_summary(path, std::cout, 2);
   }
 
   // 统计所有违规路径（每个 (bit, endpoint) 单独计数）
   int violation_count = 0;
-  std::vector<std::pair<SignalBit, TimingEndpoint>> violations;
+  std::vector<const TimingPathResult *> violations;
 
-  for (const auto &[bit, eps] : endpoints) {
-    SignalBit canonical = worker.get_canonical_signal(bit);
-
-    if (!arrival_time_map.count(canonical)) {
-      continue;
-    }
-
-    int arrival = arrival_time_map.at(canonical);
-    for (const auto &endpoint : eps) {
-      int setup_time = endpoint.Setup_req.value_or(0);
-      int data_required_time = worker.calculate_data_required_time(setup_time);
-
-      if (arrival > data_required_time) {
-        violation_count++;
-        violations.push_back({canonical, endpoint});
-      }
+  for (const auto &p : run.paths) {
+    if (p.slack < 0) {
+      violation_count++;
+      violations.push_back(&p);
     }
   }
 
@@ -437,12 +380,20 @@ void STAReportGenerator::generate_report(const STAWorker &worker,
 
     // 显示前几个违规路径
     int max_violations_to_show = 5;
+    std::sort(violations.begin(), violations.end(),
+              [](const TimingPathResult *a, const TimingPathResult *b) {
+                return a->slack < b->slack;
+              });
+
     for (size_t i = 0; i < violations.size() &&
                        i < static_cast<size_t>(max_violations_to_show);
          ++i) {
+      const TimingPathResult &path = *violations[i];
       std::cout << "Violation #" << (i + 1) << ":\n";
-      generate_path_report(worker, violations[i].first, clock_name,
-                           &violations[i].second);
+      print_path_header(path, clock_name, std::cout);
+      print_data_arrival(path, clock_name, std::cout, 2);
+      print_data_required(path, clock_name, worker, std::cout, 2);
+      print_slack_summary(path, std::cout, 2);
       std::cout << "\n";
     }
 
@@ -460,6 +411,154 @@ void STAReportGenerator::generate_report(const STAWorker &worker,
   std::cout << "║              End of Report                               ║\n";
   std::cout
       << "╚══════════════════════════════════════════════════════════╝\n\n";
+
+  g_current_timing_run = nullptr;
+}
+
+STAReportGenerator::StartEndType
+STAReportGenerator::classify_start_end_type(const TimingPathResult &path,
+                                            const std::string &clock_name) {
+  (void)clock_name; // 当前仅根据起终点类型分类，与具体时钟名无关
+
+  if (!g_current_timing_run)
+    return StartEndType::InToOut;
+
+  if (path.startpoint >= g_current_timing_run->points.size() ||
+      path.endpoint >= g_current_timing_run->points.size()) {
+    return StartEndType::InToOut;
+  }
+
+  const auto &start_p = g_current_timing_run->points[path.startpoint];
+  const auto &end_p = g_current_timing_run->points[path.endpoint];
+
+  bool start_is_clk = (start_p.bit.has_value() &&
+                       start_p.bit->wire_name == "__clk__") ||
+                      (start_p.port_name == "__clk__");
+  bool end_is_reg = (end_p.inst != nullptr);
+  if (end_is_reg) {
+    return start_is_clk ? StartEndType::RegToReg : StartEndType::InToReg;
+  }
+  return start_is_clk ? StartEndType::RegToOut : StartEndType::InToOut;
+}
+
+void STAReportGenerator::generate_report_pt_files(
+    STAWorker &worker, const std::string &clock_name,
+    const std::string &output_dir, const std::string &design_name) {
+#if __cplusplus >= 201703L
+  fs::create_directories(output_dir);
+#else
+  (void)output_dir;
+  std::cerr
+      << "generate_report_pt_files: C++17 required for mkdir, skipping.\n";
+  return;
+#endif
+
+  // 统一中间结果：直接使用 STAWorker 内部构建好的 TimingRunResult
+  const TimingRunResult run = worker.get_sta_res();
+  g_current_timing_run = &run;
+
+  struct PathEntry {
+    const TimingPathResult *path;
+  };
+  std::vector<PathEntry> max_reg2reg, max_in2reg, max_reg2out, max_in2out;
+  std::vector<PathEntry> min_reg2reg, min_in2reg, min_reg2out, min_in2out;
+
+  // 按实际起终点类型分类到 8 个容器中（替代 PathGroup 字段）
+  for (const auto &path : run.paths) {
+    PathEntry e{&path};
+    StartEndType t = classify_start_end_type(path, clock_name);
+
+    if (path.mode == AnalysisMode::MAX) {
+      switch (t) {
+      case StartEndType::RegToReg:
+        max_reg2reg.push_back(e);
+        break;
+      case StartEndType::InToReg:
+        max_in2reg.push_back(e);
+        break;
+      case StartEndType::RegToOut:
+        max_reg2out.push_back(e);
+        break;
+      case StartEndType::InToOut:
+        max_in2out.push_back(e);
+        break;
+      }
+    } else { // AnalysisMode::MIN
+      switch (t) {
+      case StartEndType::RegToReg:
+        min_reg2reg.push_back(e);
+        break;
+      case StartEndType::InToReg:
+        min_in2reg.push_back(e);
+        break;
+      case StartEndType::RegToOut:
+        min_reg2out.push_back(e);
+        break;
+      case StartEndType::InToOut:
+        min_in2out.push_back(e);
+        break;
+      }
+    }
+  }
+
+  auto by_slack_worst_first = [](const PathEntry &a, const PathEntry &b) {
+    return a.path->slack < b.path->slack;
+  };
+  std::sort(max_reg2reg.begin(), max_reg2reg.end(), by_slack_worst_first);
+  std::sort(max_in2reg.begin(), max_in2reg.end(), by_slack_worst_first);
+  std::sort(max_reg2out.begin(), max_reg2out.end(), by_slack_worst_first);
+  std::sort(max_in2out.begin(), max_in2out.end(), by_slack_worst_first);
+  std::sort(min_reg2reg.begin(), min_reg2reg.end(), by_slack_worst_first);
+  std::sort(min_in2reg.begin(), min_in2reg.end(), by_slack_worst_first);
+  std::sort(min_reg2out.begin(), min_reg2out.end(), by_slack_worst_first);
+  std::sort(min_in2out.begin(), min_in2out.end(), by_slack_worst_first);
+
+  auto write_file = [&](const std::string &filename, const char *delay_type,
+                        const char *start_end_type,
+                        const std::vector<PathEntry> &entries) {
+    std::string path = output_dir + "/" + filename;
+    std::ofstream f(path);
+    if (!f) {
+      std::cerr << "Cannot write " << path << "\n";
+      return;
+    }
+    f << "****************************************\n";
+    f << "Report : timing\n";
+    f << "\t-path_type full\n";
+    f << "\t-delay_type " << delay_type << "\n";
+    f << "\t-slack_lesser_than 1000.0000000000\n";
+    f << "\t-max_paths 1000\n";
+    f << "\t-start_end_type " << start_end_type << "\n";
+    f << "\t-sort_by slack\n";
+    f << "Design : " << design_name << "\n";
+    f << "Version: candidate\n";
+    f << "****************************************\n\n";
+
+    if (entries.empty()) {
+      f << "No constrained paths.\n\n1\n";
+      return;
+    }
+
+    for (const auto &e : entries) {
+      const TimingPathResult &path = *e.path;
+      print_path_header(path, clock_name, f);
+      print_data_arrival(path, clock_name, f, 10);
+      print_data_required(path, clock_name, worker, f, 10);
+      print_slack_summary(path, f, 10);
+    }
+    f << "\n1\n";
+  };
+
+  write_file("timing_max_reg2reg.rpt", "max", "reg_to_reg", max_reg2reg);
+  write_file("timing_max_in2reg.rpt", "max", "in_to_reg", max_in2reg);
+  write_file("timing_max_reg2out.rpt", "max", "reg_to_out", max_reg2out);
+  write_file("timing_max_in2out.rpt", "max", "in_to_out", max_in2out);
+  write_file("timing_min_reg2reg.rpt", "min", "reg_to_reg", min_reg2reg);
+  write_file("timing_min_in2reg.rpt", "min", "in_to_reg", min_in2reg);
+  write_file("timing_min_reg2out.rpt", "min", "reg_to_out", min_reg2out);
+  write_file("timing_min_in2out.rpt", "min", "in_to_out", min_in2out);
+
+  g_current_timing_run = nullptr;
 }
 
 } // namespace sta

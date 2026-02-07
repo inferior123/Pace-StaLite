@@ -1,6 +1,7 @@
 #include "sta/sta_data_structures.hpp"
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <iomanip>
 #include <string>
 #include <unordered_set>
@@ -9,23 +10,50 @@ using namespace verilog;
 
 namespace sta {
 
-// 复用 sta.cpp 中的 LUT 计算与方向推断工具函数（在 namespace sta 中定义）
-double get_lut_avg(std::optional<celllib::LookupTable> lut);
-double caculate_delay_rise(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double input_slew_rise, double load_cap);
-double caculate_delay_fall(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double input_slew_fall, double load_cap);
-double caculate_transition_fall(const celllib::TimingArc arc,
-                                const celllib::CellLibrary *lib,
-                                double input_slew_fall, double load_cap);
-double caculate_transition_rise(const celllib::TimingArc arc,
-                                const celllib::CellLibrary *lib,
-                                double input_slew_rise, double load_cap);
-TransitionDirection
-specualte_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
-                               TransitionDirection input_direction);
+std::size_t
+STAWorker::get_or_create_candidate_node(Instance *inst,
+                                        const std::string &port_name) {
+  CandidateNodeKey key{inst, port_name};
+  auto it = candidate_graphy_.node_index.find(key);
+  if (it != candidate_graphy_.node_index.end()) {
+    return it->second;
+  }
+
+  std::size_t id = candidate_graphy_.nodes.size();
+  candidate_graphy_.node_index.emplace(key, id);
+
+  CandidateNode node;
+  node.id = id;
+  node.inst = inst;
+  node.port_name = port_name;
+  candidate_graphy_.nodes.push_back(std::move(node));
+
+  return id;
+}
+
+std::size_t STAWorker::get_or_create_point_node(Instance *inst,
+                                                const SignalBit &bit,
+                                                const std::string &port_name) {
+  TimingPointRefKey key{inst, port_name, bit};
+  auto it = res.point_index.find(key);
+  if (it != res.point_index.end()) {
+    return it->second;
+  }
+
+  std::size_t id = res.points.size();
+  res.point_index.emplace(key, id);
+
+  TimingPointRef point;
+  point.id = id;
+  point.inst = inst;
+  point.bit = bit;
+  point.port_name = port_name;
+
+  res.points.push_back(point);
+  return id;
+}
+
+
 
 void STAWorker::build_candidate_graphy_dfs() {
   candidate_graphy_.paths.clear();
@@ -471,7 +499,7 @@ void STAWorker::display_candidate_path() {
   std::cout << "\n=== Candidate Paths Detailed View ===\n";
 
   // 对每条 CandidatePath，分别以起点为 rise/fall 打印
-  for (const auto &path : candidate_graphy_.paths) {
+  for (auto &path : candidate_graphy_.paths) {
     bool is_startpath = startpoint_nodes.count(path.start_node) > 0;
 
     for (bool is_rise_start : {true, false}) {
@@ -626,9 +654,40 @@ void STAWorker::display_candidate_path() {
                     << "uf";
 
           prev_slew = cur_slew;
-        }
+           // ===== 只在“最后一个节点是寄存器”时计算 setup =====
+          bool is_last_segment = (i == path.fanouts.size() - 1);
+          if (is_last_segment && path.next_path == std::nullopt) {
+            const CandidateNode &end_node = candidate_graphy_.nodes[path.end_node];
+            if (end_node.inst) {
+              const auto *end_cell =
+                  cell_library_->get_cell(end_node.inst->module_name);
+              if (end_cell) {
+                const auto *d_pin = end_cell->get_pin(end_node.port_name);
+                if (d_pin) {
+                  // 用当前这条弧的约束 + data/clk transition 来算 setup
+                  double data_trans = prev_slew; // 这里是 ns
+                  double clk_trans = 0.0;        // 简单先写 0，有需要可换成 cfg 里的时钟 slew
 
+                  double setup_r =
+                      caculate_setup_rise(arc, cell_library_, data_trans, clk_trans);
+                  double setup_f =
+                      caculate_setup_fall(arc, cell_library_, data_trans, clk_trans);
+
+                  // 保持和 STA 主流程一致：内部用 ps
+                  if (cur_dir == TransitionDirection::RISING) {
+                    path.setup = setup_r * 1000.0;
+                  } else {
+                    path.setup = setup_f * 1000.0;
+                  }
+                }
+              }
+            }
+
+            std::cout << " setup: " << path.setup << "ps" << " hold: " << path.hold << "ps";
+          }
+        }
         total_delay += seg_delay;
+
         std::cout << "  | cum=" << total_delay << "ps\n";
       }
 
@@ -639,7 +698,103 @@ void STAWorker::display_candidate_path() {
 }
 
 void STAWorker::run_candidate_graphy_dfs() {
-  // TODO: 后续在此基于 candidate_graphy_ 做 PBA / 状态 DP
+  auto get_path_res = [&](std::size_t path_id, bool is_rise) -> double {
+    CandidatePathArcKey key{path_id, is_rise};
+    auto it = candidate_graphy_.candidate_path_res.find(key);
+    if (it == candidate_graphy_.candidate_path_res.end()) {
+      std::cerr << "[WARNING] candidate_path_res missing: path_id=" << path_id
+                << " is_rise=" << (is_rise ? "true" : "false") << "\n";
+      return 0.0;
+    }
+    return it->second;
+  };
+
+  res.paths.clear();
+  res.points.clear();
+  res.point_index.clear();
+
+  // 为每个 CandidateNode 建立一个 TimingPointRef，并记录 node_id -> point_id 的映射
+  std::vector<std::size_t> node_point_idx(candidate_graphy_.nodes.size(), 0);
+
+  auto make_point = [&](const CandidateNode &node) -> std::size_t {
+    // 构造 key（用于去重）
+    TimingPointRefKey key{};
+    key.inst = node.inst;
+    key.port_name = node.port_name;
+
+    // 尝试解析 canonical bit：顶层端口或实例端口
+    std::optional<SignalBit> bit_opt = std::nullopt;
+    if (node.inst == nullptr) {
+      // 顶层端口
+      SignalSpec spec = get_signal_bits(node.port_name);
+      if (!spec.empty()) {
+        bit_opt = sigmap.find(spec[0]);
+      }
+    } else {
+      auto it = node.inst->connections.find(node.port_name);
+      if (it != node.inst->connections.end() && !it->second.empty()) {
+        bit_opt = sigmap.find(it->second[0]);
+      }
+    }
+    key.bit = bit_opt;
+
+    auto it = res.point_index.find(key);
+    if (it != res.point_index.end()) {
+      return it->second;
+    }
+
+    std::size_t id = res.points.size();
+    TimingPointRef p{};
+    p.id = id;
+    p.inst = key.inst;
+    p.port_name = key.port_name;
+    p.bit = key.bit;
+
+    res.points.push_back(p);
+    res.point_index.emplace(key, id);
+    return id;
+  };
+
+  for (const auto &node : candidate_graphy_.nodes) {
+    node_point_idx[node.id] = make_point(node);
+  }
+
+  for (const auto &path : candidate_graphy_.paths) {
+    const auto &end_node = candidate_graphy_.nodes[path.end_node];
+
+    // 这里做了简化，如果最后的fanout不是空的，要做拼接
+    // 仅处理 fanout 为空的路径（终点）
+    if (!end_node.fanout_paths.empty()) {
+      continue;
+    }
+
+    double rise_rs = get_path_res(path.id, true);
+    double fall_rs = get_path_res(path.id, false);
+    double total_delay = std::max(rise_rs, fall_rs);
+
+    TimingPathResult pr;
+    pr.mode = AnalysisMode::MAX; // 当前 candidate 仅用于 max 分析
+    // group 在报告阶段通过起终点再分类（classify_start_end_type）
+
+    pr.startpoint = node_point_idx[path.start_node];
+    pr.endpoint = node_point_idx[path.end_node];
+
+    // 先把整条路径视作单步：incr=total_delay，arrival=total_delay
+    pr.data_arrival_time = total_delay;
+    pr.data_required_time = total_delay; // 暂定 required == arrival，slack=0
+    pr.slack = 0.0;
+
+    TimingStep step;
+    step.start_point = pr.startpoint;
+    step.end_point = pr.endpoint;
+    step.incr = total_delay;
+    step.arrival = total_delay;
+    step.dir = (rise_rs >= fall_rs) ? TransitionDirection::RISING
+                                    : TransitionDirection::FALLING;
+
+    pr.steps.push_back(step);
+    res.paths.push_back(std::move(pr));
+  }
 }
 
 } // namespace sta

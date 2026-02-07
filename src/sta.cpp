@@ -5,9 +5,9 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include <optional>
-#include <queue>
 #include <stack>
 #include <string>
 #include <type_traits>
@@ -41,261 +41,6 @@ bool STAWorker::is_reg(std::string name) {
   return false;
 }
 
-SignalSpec STAWorker::convert_to_signalspec(const LHS &lhs) {
-  // Left hand side can be: a wire, a bit in a wire, a part of a wire
-  // std::vector<std::variant<std::string, NetBit, NetRange>>
-  SignalSpec result;
-
-  for (const auto &item : lhs) {
-    std::visit(
-        [&result, this](const auto &elem) {
-          using T = std::decay_t<decltype(elem)>;
-
-          if constexpr (std::is_same_v<T, std::string>) {
-            std::string target;
-            if (is_reg(elem))
-              target = "reg_" + elem + "_d";
-            else
-              target = elem;
-            auto bits = this->get_signal_bits(target);
-            result.insert(result.end(), bits.begin(), bits.end());
-          } else if constexpr (std::is_same_v<T, NetBit>) {
-            std::string target;
-            if (is_reg(elem.name))
-              target = "reg_" + elem.name + "_d";
-            else
-              target = elem.name;
-            result.emplace_back(target, elem.bit);
-          } else if constexpr (std::is_same_v<T, NetRange>) {
-            int left = elem.beg;
-            int right = elem.end;
-            // Keep the same convention as collect_net: only support ascending
-            // [left:right].
-            assert(left <= right && "unsupported NetRange with left > right; "
-                                    "use ascending range like [0:7]");
-            std::string target;
-            if (is_reg(elem.name))
-              target = "reg_" + elem.name + "_d";
-            else
-              target = elem.name;
-            for (int i = left; i <= right; ++i)
-              result.emplace_back(target, i);
-          } else {
-            assert(false && "should not reach here");
-          }
-        },
-        item);
-  }
-
-  return result;
-}
-
-SignalSpec STAWorker::convert_to_signalspec(const RHS &rhs) {
-  // Right hand side can be: a wire, a bit in a wire, a part of a wire, a
-  // constant std::vector<std::variant<std::string, NetBit, NetRange, Constant>>
-  SignalSpec result;
-
-  for (const auto &item : rhs) {
-    std::visit(
-        [&result, this](const auto &elem) {
-          using T = std::decay_t<decltype(elem)>;
-
-          if constexpr (std::is_same_v<T, std::string>) {
-            std::string target;
-            if (is_reg(elem))
-              target = "reg_" + elem + "_q";
-            else
-              target = elem;
-            auto bits = this->get_signal_bits(target);
-            result.insert(result.end(), bits.begin(), bits.end());
-          } else if constexpr (std::is_same_v<T, NetBit>) {
-            std::string target;
-            if (is_reg(elem.name))
-              target = "reg_" + elem.name + "_q";
-            else
-              target = elem.name;
-            result.emplace_back(target, elem.bit);
-          } else if constexpr (std::is_same_v<T, NetRange>) {
-            int left = elem.beg;
-            int right = elem.end;
-            assert(left <= right && "unsupported NetRange with left > right; "
-                                    "use ascending range like [0:7]");
-            std::string target;
-            if (is_reg(elem.name))
-              target = "reg_" + elem.name + "_q";
-            else
-              target = elem.name;
-            for (int i = left; i <= right; ++i)
-              result.emplace_back(target, i);
-          } else if constexpr (std::is_same_v<T, Constant>) {
-            // constants don't correspond to a SignalBit; ignore for
-            // connectivity (for proper bit-blasting of assigns with constants,
-            // handle separately)
-          } else {
-            assert(false && "should not reach here");
-          }
-        },
-        item);
-  }
-
-  return result;
-}
-
-void STAWorker::collect_net(verilog::Net &net) {
-  if (net.type == verilog::NetType::WIRE) {
-    int left = net.beg == -1 ? 0 : net.beg;
-    int right = net.end == -1 ? 0 : net.end;
-
-    // For this prototype, only accept ascending ranges like [0:7].
-    // Reject descending ranges like [7:0].
-    if (left > right) {
-      assert(false && "unsupported net range: left > right (e.g. [7:0]); use "
-                      "ascending range like [0:7]");
-    }
-    for (auto &name : net.names) {
-      std::vector<SignalBit> bits;
-      for (int i = left; i <= right; i++) {
-        sta::SignalBit bit(name, i);
-        timing_data[bit] = SignalTimingData();
-        bits.push_back(bit);
-      }
-      signal_registry[name] = std::move(bits);
-    }
-  } else if (net.type == verilog::NetType::REG) {
-    assert(false && "should not meet a reg type in the netlist");
-  } else {
-    assert(false && "other type not implement yet");
-  }
-}
-
-void STAWorker::collect_port(verilog::Port &port) {
-  int left = port.beg == -1 ? 0 : port.beg;
-  int right = port.end == -1 ? 0 : port.end;
-
-  // only accept ranges like [0:7].
-  // dont alllow ranges like [7:0].
-  if (left > right) {
-    assert(false && "unsupported net range: left > right (e.g. [7:0]); use "
-                    "ascending range like [0:7]");
-  }
-
-  for (auto &sig_name : port.names) {
-    std::vector<SignalBit> bits;
-    for (int i = left; i <= right; i++) {
-      SignalBit bit(sig_name, i);
-      if (!timing_data.count(bit)) {
-        timing_data[bit] = SignalTimingData{};
-      }
-
-      // Always add to signal_registry
-      bits.push_back(bit);
-
-      // Process based on port direction
-      if (port.dir == PortDirection::INOUT) {
-        assert(false && "not suport the INOUT port yet");
-      } else if (port.dir == PortDirection::INPUT) {
-        SignalBit input_canonical = sigmap.find(bit);
-        top_module_inputs.insert(input_canonical); // 记录顶层模块输入端口
-        driven_signals.insert(input_canonical);
-        timing_queue.push_back(input_canonical);
-        arrival_time[input_canonical] = 0;
-      } else {
-        // OUTPUT
-        assert(port.dir == PortDirection::OUTPUT && "invalid port dir");
-        SignalBit output_canonical = sigmap.find(bit);
-        TimingEndpoint ep{nullptr, sig_name};
-        ep.Setup_req = 0;
-        ep.Hold_req = 0;
-        endpoints[output_canonical].push_back(std::move(ep));
-      }
-    }
-    signal_registry[sig_name] = std::move(bits);
-  }
-}
-
-void STAWorker::collect_instance(verilog::Instance &inst) {
-  // 如果使用 CellLibrary，验证单元是否存在
-  if (cell_library_) {
-    const auto *cell = cell_library_->get_cell(inst.module_name);
-    if (!cell) {
-      std::cerr << "cannot find the cell " << inst.module_name
-                << " in CellLibrary" << std::endl;
-      // 调试信息：打印库中所有可用的单元名称
-      auto cell_names = cell_library_->get_cell_names();
-      std::cerr << "Available cells in library (" << cell_names.size() << "): ";
-      for (const auto &name : cell_names) {
-        std::cerr << name << " ";
-      }
-      std::cerr << std::endl;
-      assert(false && "Cell not found in CellLibrary");
-    }
-
-    auto input_pin_names = cell->get_input_pins();
-    auto output_pin_names = cell->get_output_pins();
-
-    // 将vector转换为set以便快速查找
-    std::unordered_set<std::string> input_pin_set(input_pin_names.begin(),
-                                                  input_pin_names.end());
-    std::unordered_set<std::string> output_pin_set(output_pin_names.begin(),
-                                                   output_pin_names.end());
-
-    for (const auto &pin_name_variant : inst.pin_names) {
-      // 从variant中提取pin名称
-      std::string pin_name;
-      if (std::holds_alternative<std::string>(pin_name_variant)) {
-        pin_name = std::get<std::string>(pin_name_variant);
-      } else if (std::holds_alternative<NetBit>(pin_name_variant)) {
-        pin_name = std::get<NetBit>(pin_name_variant).name;
-      } else if (std::holds_alternative<NetRange>(pin_name_variant)) {
-        pin_name = std::get<NetRange>(pin_name_variant).name;
-      }
-
-      // 检查pin是否在input或output pin列表中
-      if (input_pin_set.find(pin_name) == input_pin_set.end() &&
-          output_pin_set.find(pin_name) == output_pin_set.end()) {
-        std::cerr << "Invalid pin \"" << pin_name << "\" for cell \""
-                  << inst.module_name << "\" (instance: " << inst.inst_name
-                  << ")" << std::endl;
-        std::cerr << "Available input pins: ";
-        for (const auto &name : input_pin_names) {
-          std::cerr << name << " ";
-        }
-        std::cerr << std::endl;
-        std::cerr << "Available output pins: ";
-        for (const auto &name : output_pin_names) {
-          std::cerr << name << " ";
-        }
-        std::cerr << std::endl;
-        assert(false && "Invalid pin name for cell");
-      }
-    }
-  } else {
-    assert(false && "cannot find standard library");
-  }
-
-  auto instance = std::make_unique<Instance>(inst.module_name, inst.inst_name);
-  if (inst.pin_names.empty()) {
-    assert(false &&
-           "Positional port connection not supported in flattened netlist");
-  }
-
-  for (size_t i = 0; i < inst.pin_names.size() && i < inst.net_names.size();
-       i++) {
-    std::string port_name = std::get<std::string>(inst.pin_names[i]);
-    SignalSpec signals = convert_to_signalspec(inst.net_names[i]);
-    instance->connections[port_name] = std::move(signals);
-  }
-  instances.push_back(std::move(instance));
-}
-
-void STAWorker::collect_assign(verilog::Assignment &assign) {
-  SignalSpec lhs = convert_to_signalspec(assign.lhs);
-  SignalSpec rhs = convert_to_signalspec(assign.rhs);
-
-  // 建立信号连接
-  sigmap.add_connection(lhs, rhs);
-}
-
 // Liberty LUT 返回 ns，STA 内部统一用 ps
 static constexpr double NS_TO_PS = 1000.0;
 
@@ -325,27 +70,6 @@ SignalBit *STAWorker::get_virtual_clock() {
   }
 
   return &global_clk;
-}
-
-std::size_t
-STAWorker::get_or_create_candidate_node(Instance *inst,
-                                        const std::string &port_name) {
-  CandidateNodeKey key{inst, port_name};
-  auto it = candidate_graphy_.node_index.find(key);
-  if (it != candidate_graphy_.node_index.end()) {
-    return it->second;
-  }
-
-  std::size_t id = candidate_graphy_.nodes.size();
-  candidate_graphy_.node_index.emplace(key, id);
-
-  CandidateNode node;
-  node.id = id;
-  node.inst = inst;
-  node.port_name = port_name;
-  candidate_graphy_.nodes.push_back(std::move(node));
-
-  return id;
 }
 
 void STAWorker::build_fanouts() {
@@ -623,150 +347,11 @@ void STAWorker::calculate_load_capacitance() {
   }
 }
 
-double get_lut_avg(std::optional<celllib::LookupTable> lut) {
-  if (lut.has_value() && !lut->index_1.empty()) {
-    size_t mid = lut->index_1.size() / 2;
-    return lut->index_1[mid];
-  } else {
-    std::cout << "[WARNING] the LookupTable is unavaliable, use deault value 0"
-              << std::endl;
-    return 0.0;
-  }
-}
-
-double caculate_delay_rise(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double input_slew_rise, double load_cap) {
-  // 计算cell_rise延迟（使用rise的slew）
-  double delay_rise = 0.0;
-  if (arc.cell_rise.has_value() && arc.cell_rise->template_name.has_value()) {
-    std::string template_name = arc.cell_rise->template_name.value();
-    const auto *templ = lib->get_table_template(template_name);
-    if (templ && templ->variable_1.has_value() &&
-        templ->variable_2.has_value()) {
-      std::string var1 = templ->variable_1.value();
-      std::string var2 = templ->variable_2.value();
-      delay_rise = lib->caculate_lookuptable(
-          arc.cell_rise.value(), input_slew_rise, load_cap, var1, var2);
-      delay_rise *= NS_TO_PS; // Liberty ns -> ps
-    }
-
-  } else if (arc.intrinsic_rise.has_value()) {
-    delay_rise = arc.intrinsic_rise.value() * NS_TO_PS;
-  }
-
-  return delay_rise;
-}
-
-double caculate_delay_fall(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double input_slew_fall, double load_cap) {
-  double delay_fall = 0.0;
-  // 计算cell_fall延迟（使用fall的slew）
-  if (arc.cell_fall.has_value() && arc.cell_fall->template_name.has_value()) {
-    std::string template_name = arc.cell_fall->template_name.value();
-    const auto *templ = lib->get_table_template(template_name);
-    if (templ && templ->variable_1.has_value() &&
-        templ->variable_2.has_value()) {
-      std::string var1 = templ->variable_1.value();
-      std::string var2 = templ->variable_2.value();
-      delay_fall = lib->caculate_lookuptable(
-          arc.cell_fall.value(), input_slew_fall, load_cap, var1, var2);
-      delay_fall *= NS_TO_PS; // Liberty ns -> ps
-    }
-  } else if (arc.intrinsic_fall.has_value()) {
-    delay_fall = arc.intrinsic_fall.value() * NS_TO_PS;
-  }
-
-  return delay_fall;
-}
-
-double caculate_transition_rise(const celllib::TimingArc arc,
-                                const celllib::CellLibrary *lib,
-                                double input_slew_rise, double load_cap) {
-  double rise_transition_time = 0.0;
-  if (arc.rise_transition.has_value() &&
-      arc.rise_transition->template_name.has_value()) {
-    std::string template_name = arc.rise_transition->template_name.value();
-    const auto *templ = lib->get_table_template(template_name);
-    if (templ && templ->variable_1.has_value() &&
-        templ->variable_2.has_value()) {
-      std::string var1 = templ->variable_1.value();
-      std::string var2 = templ->variable_2.value();
-      rise_transition_time = lib->caculate_lookuptable(
-          arc.rise_transition.value(), input_slew_rise, load_cap, var1, var2);
-      rise_transition_time *= NS_TO_PS; // Liberty ns -> ps
-    }
-  }
-
-  return rise_transition_time;
-}
-
-double caculate_transition_fall(const celllib::TimingArc arc,
-                                const celllib::CellLibrary *lib,
-                                double input_slew_fall, double load_cap) {
-  double fall_transition_time = 0.0;
-  if (arc.fall_transition.has_value() &&
-      arc.fall_transition->template_name.has_value()) {
-    std::string template_name = arc.fall_transition->template_name.value();
-    const auto *templ = lib->get_table_template(template_name);
-    if (templ && templ->variable_1.has_value() &&
-        templ->variable_2.has_value()) {
-      std::string var1 = templ->variable_1.value();
-      std::string var2 = templ->variable_2.value();
-      fall_transition_time = lib->caculate_lookuptable(
-          arc.fall_transition.value(), input_slew_fall, load_cap, var1, var2);
-      fall_transition_time *= NS_TO_PS; // Liberty ns -> ps
-    }
-  }
-
-  return fall_transition_time;
-}
-
-TransitionDirection
-specualte_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
-                               TransitionDirection input_direction) {
-  TransitionDirection output_direction = TransitionDirection::UNKNOWN;
-
-  if (is_clock_to_q) {
-    if (input_direction == TransitionDirection::UNKNOWN) {
-      if (arc.timing_type == celllib::TimingType::RISING_EDGE) {
-        output_direction = TransitionDirection::RISING;
-      } else if (arc.timing_type == celllib::TimingType::FALLING_EDGE) {
-        output_direction = TransitionDirection::FALLING;
-      }
-    } else {
-      output_direction = input_direction;
-    }
-  } else {
-    // 如果不是 clock-to-Q 那么就直接使用前一级设置的值推算
-    if (arc.timing_sense == celllib::TimingSense::NEGATIVE_UNATE) {
-      // 负单边：输入上升 -> 输出下降；输入下降 -> 输出上升
-      if (input_direction == TransitionDirection::RISING) {
-        output_direction = TransitionDirection::FALLING;
-      } else if (input_direction == TransitionDirection::FALLING) {
-        output_direction = TransitionDirection::RISING;
-      } else {
-        output_direction = TransitionDirection::UNKNOWN;
-      }
-    } else if (arc.timing_sense == celllib::TimingSense::POSITIVE_UNATE) {
-      // 正单边：输入沿方向保持不变
-      output_direction = input_direction;
-    } else {
-      // celllib::TimingSense::NON_UNATE
-      // 非单边：无法从输入方向唯一推断，保持 UNKNOWN
-      output_direction = TransitionDirection::UNKNOWN;
-    }
-  }
-
-  return output_direction;
-}
-
 void STAWorker::calculate_timing_arcs() {
   assert(cell_library_);
 
   if (analysis_granularity_ == AnalysisGranularity::FINE) {
-    assert(false && "find mode not implement yet");
+    assert(false && "should not reach here, fine mode use candidate data way");
   }
 
   if (analysis_granularity_ == AnalysisGranularity::COARSE) {
@@ -1115,25 +700,10 @@ double STAWorker::process_endpoint_timing(
   for (const auto &arc : pin->timing_arcs) {
     if (arc.timing_type == celllib::TimingType::SETUP_RISING ||
         arc.timing_type == celllib::TimingType::SETUP_FALLING) {
-      double setup_rise = 0.0, setup_fall = 0.0;
-      if (arc.rise_constraint.has_value() &&
-          arc.rise_constraint->template_name.has_value()) {
-        const auto *t = cell_library_->get_table_template(
-            arc.rise_constraint->template_name.value());
-        if (t && t->variable_1.has_value() && t->variable_2.has_value())
-          setup_rise = cell_library_->caculate_lookuptable(
-              arc.rise_constraint.value(), data_trans, clk_trans,
-              t->variable_1.value(), t->variable_2.value());
-      }
-      if (arc.fall_constraint.has_value() &&
-          arc.fall_constraint->template_name.has_value()) {
-        const auto *t = cell_library_->get_table_template(
-            arc.fall_constraint->template_name.value());
-        if (t && t->variable_1.has_value() && t->variable_2.has_value())
-          setup_fall = cell_library_->caculate_lookuptable(
-              arc.fall_constraint.value(), data_trans, clk_trans,
-              t->variable_1.value(), t->variable_2.value());
-      }
+      double setup_rise =
+          caculate_setup_rise(arc, cell_library_, data_trans, clk_trans);
+      double setup_fall =
+          caculate_setup_fall(arc, cell_library_, data_trans, clk_trans);
       // ep.Setup_req = std::max(setup_rise, setup_fall) * NS_TO_PS; // ns -> ps
       if (input_transition_direction == TransitionDirection::RISING) {
         ep.Setup_req = setup_rise * NS_TO_PS;
@@ -1146,25 +716,10 @@ double STAWorker::process_endpoint_timing(
     }
     if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
         arc.timing_type == celllib::TimingType::HOLD_FALLING) {
-      double hold_rise = 0.0, hold_fall = 0.0;
-      if (arc.rise_constraint.has_value() &&
-          arc.rise_constraint->template_name.has_value()) {
-        const auto *t = cell_library_->get_table_template(
-            arc.rise_constraint->template_name.value());
-        if (t && t->variable_1.has_value() && t->variable_2.has_value())
-          hold_rise = cell_library_->caculate_lookuptable(
-              arc.rise_constraint.value(), data_trans, clk_trans,
-              t->variable_1.value(), t->variable_2.value());
-      }
-      if (arc.fall_constraint.has_value() &&
-          arc.fall_constraint->template_name.has_value()) {
-        const auto *t = cell_library_->get_table_template(
-            arc.fall_constraint->template_name.value());
-        if (t && t->variable_1.has_value() && t->variable_2.has_value())
-          hold_fall = cell_library_->caculate_lookuptable(
-              arc.fall_constraint.value(), data_trans, clk_trans,
-              t->variable_1.value(), t->variable_2.value());
-      }
+      double hold_rise =
+          caculate_hold_rise(arc, cell_library_, data_trans, clk_trans);
+      double hold_fall =
+          caculate_hold_fall(arc, cell_library_, data_trans, clk_trans);
       // ep.Hold_req = std::max(hold_rise, hold_fall) * NS_TO_PS; // ns -> ps
       if (input_transition_direction == TransitionDirection::RISING) {
         ep.Hold_req = hold_rise * NS_TO_PS;
@@ -1336,6 +891,8 @@ void STAWorker::run_dfs() {
     }
   }
 
+  // TODO
+  // 关于关键路径的部分后面可以删掉了
   if (max_arrival_time == 0 && critical_signal.wire_name.empty()) {
     for (const auto &[bit, eps] : endpoints) {
       SignalBit canonical = sigmap.find(bit);
@@ -1379,6 +936,8 @@ void STAWorker::print_all_timing_paths_dfs() {
     double arrival;
     Instance *driver;
     std::string port;
+    TransitionDirection dir;
+    double require;
   };
   std::vector<PathNodeInfo> path;
   struct StackFrame {
@@ -1413,6 +972,7 @@ void STAWorker::print_all_timing_paths_dfs() {
         if (timing_data.count(cur)) {
           path.back().driver = timing_data.at(cur).driver;
           path.back().port = timing_data.at(cur).source_port;
+          path.back().dir = timing_data.at(cur).transition_direction;
         }
       }
 
@@ -1423,7 +983,10 @@ void STAWorker::print_all_timing_paths_dfs() {
                          std::to_string(n.signal.bit_offset) +
                          "]:" + std::to_string(n.arrival) + "->";
         }
+
         if (path_printed.insert(fingerprint).second) {
+          size_t start_point;
+          TimingPathResult res_path;
           path_count++;
           std::cout << "\n--- Path #" << path_count << " (arrival: " << arr
                     << "ps) ---\n";
@@ -1450,7 +1013,28 @@ void STAWorker::print_all_timing_paths_dfs() {
             if (i == path.size() - 1)
               std::cout << " [Endpoint]";
             std::cout << "\n";
+
+            if (i == 0) {
+              // 第一个节点，仅仅创建开始头结点
+              start_point =
+                  get_or_create_point_node(n.driver, n.signal, n.port);
+              res_path.startpoint = start_point;
+            } else {
+              size_t end_point =
+                  get_or_create_point_node(n.driver, n.signal, n.port);
+              TimingStep step{start_point, end_point,
+                              n.arrival - path[i - 1].arrival, n.arrival,
+                              n.dir};
+              res_path.steps.push_back(step);
+              if (i == path.size() - 1) {
+                // 最后一个节点
+                res_path.endpoint = end_point;
+              } else {
+                start_point = end_point;
+              }
+            }
           }
+          res.paths.push_back(res_path);
         }
       }
 
@@ -1486,210 +1070,6 @@ void STAWorker::print_all_timing_paths_dfs() {
     }
   }
   std::cout << "\nTotal paths found: " << path_count << "\n";
-}
-
-void STAWorker::sta_check(int clock_period) {
-  // 更新配置中的时钟周期（如果传入）
-  if (clock_period > 0) {
-    cfg.clk_period = clock_period;
-  }
-
-  // 计算有效时钟周期（考虑 uncertainty 等时序参数），单位 ps
-  int effective_period_ps = get_effective_clock_period();
-
-  // 如果最大的路径时序长度小于有效时钟周期，那么直接返回没有时序违规
-  if (max_arrival_time <= effective_period_ps) {
-    std::cout << "\n✓ No timing violations found.\n";
-    std::cout << "  Max arrival time: " << max_arrival_time << "ps ("
-              << (max_arrival_time / 1000.0) << "ps)\n";
-    std::cout << "  Clock period: " << cfg.clk_period << "ps ("
-              << (cfg.clk_period / 1000.0) << "ps)";
-    if (cfg.clock_uncertain > 0) {
-      std::cout << " (effective: " << effective_period_ps
-                << "ps after uncertainty)";
-    }
-    std::cout << "\n";
-    std::cout << "  Slack: " << (effective_period_ps - max_arrival_time)
-              << "ps\n";
-    return;
-  }
-
-  // 否则找到所有大于有效时钟周期的路径（时序违规）
-  std::cout << "\n⚠ Timing violations detected!\n";
-  std::cout << "  Clock period: " << cfg.clk_period << "ps";
-  if (cfg.clock_uncertain > 0) {
-    std::cout << " (effective: " << effective_period_ps
-              << "ps after uncertainty)";
-  }
-  std::cout << "\n";
-  std::cout << "  Max arrival time: " << max_arrival_time << "ps ("
-            << (max_arrival_time / 1000.0) << "ps)\n";
-  std::cout << "  Worst slack: " << (effective_period_ps - max_arrival_time)
-            << "ps\n\n";
-
-  std::cout << "Violating paths:\n";
-  std::cout << "----------------------------------------\n";
-
-  int violation_count = 0;
-  for (const auto &[bit, eps] : endpoints) {
-    SignalBit canonical = sigmap.find(bit);
-
-    // 只检查有 arrival time 的 endpoint
-    if (!arrival_time.count(canonical)) {
-      continue;
-    }
-
-    double arrival = arrival_time.at(canonical);
-    for (const auto &endpoint : eps) {
-      double setup_time = endpoint.Setup_req.value();
-      // 计算考虑所有时序参数后的 data required time
-      double data_required_time = calculate_data_required_time(setup_time);
-
-      // 检查是否超过有效时钟周期（使用 data_required_time 进行比较）
-      if (arrival > data_required_time) {
-        violation_count++;
-        double slack = data_required_time - arrival;
-
-        std::cout << "\n[" << violation_count
-                  << "] Violation at: " << canonical.wire_name << "["
-                  << canonical.bit_offset << "]\n";
-        std::cout << "  Arrival time: " << arrival << "ps ("
-                  << (arrival / 1000.0) << "ps)\n";
-        std::cout << "  Setup time: " << setup_time << "ps\n";
-        std::cout << "  Data required time: " << data_required_time << "ps";
-        if (cfg.clock_uncertain > 0) {
-          std::cout << " (clock period " << cfg.clk_period << "ps - setup "
-                    << setup_time << "ps - uncertainty " << cfg.clock_uncertain
-                    << "ps)";
-        }
-        std::cout << "\n";
-        std::cout << "  Slack: " << slack << "ps (violation: " << (-slack)
-                  << "ps)\n";
-
-        // 显示 endpoint 信息
-        if (endpoint.sink) {
-          std::cout << "  Endpoint: " << endpoint.sink->instance_name << " ("
-                    << endpoint.sink->module_name << "." << endpoint.port
-                    << ")\n";
-        } else {
-          std::cout << "  Endpoint: Top module output (" << endpoint.port
-                    << ")\n";
-        }
-
-        // 回溯并打印完整路径
-        std::cout << "\n  Path trace (from input to endpoint):\n";
-        trace_path(canonical);
-      }
-    }
-  }
-
-  std::cout << "\n----------------------------------------\n";
-  std::cout << "Total violations: " << violation_count << "\n";
-
-  if (violation_count == 0) {
-    std::cout << "Note: No violations found in endpoints, but max_arrival_time "
-                 "exceeds clock period.\n";
-    std::cout
-        << "This may indicate an issue with the critical path calculation.\n";
-  }
-}
-
-void STAWorker::trace_path(const SignalBit &endpoint_bit) {
-  // 从 endpoint 回溯到输入端口
-  std::vector<std::pair<SignalBit, int>> path; // (signal, arrival_time)
-  SignalBit current = endpoint_bit;
-  std::unordered_set<SignalBit, SignalBitHash> visited;
-
-  while (true) {
-    SignalBit canonical = sigmap.find(current);
-
-    // 防止循环
-    if (visited.count(canonical)) {
-      break;
-    }
-    visited.insert(canonical);
-
-    // 获取 arrival time
-    int arrival = -1;
-    if (arrival_time.count(canonical)) {
-      arrival = arrival_time.at(canonical);
-    }
-
-    path.push_back({canonical, arrival});
-
-    // 检查是否是输入端口（在 driven_signals 中且 arrival_time 为 0）
-    if (driven_signals.count(canonical) && arrival == 0) {
-      // 输入端口或虚拟时钟，回溯结束
-      break;
-    }
-
-    // 检查是否有 backtrack 信息
-    if (!timing_data.count(canonical)) {
-      // 没有时序数据，无法继续回溯
-      break;
-    }
-
-    const auto &timing = timing_data.at(canonical);
-
-    // 检查 backtrack 是否有效
-    if (timing.backtrack.wire_name == "" ||
-        (timing.backtrack.wire_name == canonical.wire_name &&
-         timing.backtrack.bit_offset == canonical.bit_offset)) {
-      break;
-    }
-
-    // 继续回溯
-    current = timing.backtrack;
-  }
-
-  // 反转路径（从输入到输出）
-  std::reverse(path.begin(), path.end());
-
-  // 打印路径
-  int path_index = 0;
-  for (size_t i = 0; i < path.size(); ++i) {
-    const auto &[bit, arrival] = path[i];
-
-    // 获取时序数据
-    bool has_timing = timing_data.count(bit);
-    const auto *timing = has_timing ? &timing_data.at(bit) : nullptr;
-
-    std::cout << "    [" << path_index++ << "] ";
-
-    // 打印信号信息
-    std::cout << bit.wire_name << "[" << bit.bit_offset << "]";
-    if (arrival >= 0) {
-      std::cout << " (arrival: " << arrival << "ps)";
-    }
-
-    // 如果是输入端口（arrival_time 为 0 且在 driven_signals 中）
-    if (driven_signals.count(bit) && arrival == 0) {
-      if (bit.wire_name == "__clk__") {
-        std::cout << " [Virtual Clock]\n";
-      } else {
-        std::cout << " [Primary Input]\n";
-      }
-      continue;
-    }
-
-    // 如果有驱动单元
-    if (timing && timing->driver) {
-      std::cout << "\n        → ";
-      std::cout << timing->driver->instance_name << " ("
-                << timing->driver->module_name << ")";
-      if (!timing->source_port.empty()) {
-        std::cout << " via port " << timing->source_port;
-      }
-      std::cout << "\n";
-    }
-
-    // 如果是最后一个节点（endpoint）
-    if (i == path.size() - 1) {
-      std::cout << " [Endpoint]\n";
-    } else {
-      std::cout << "\n";
-    }
-  }
 }
 
 } // namespace sta
