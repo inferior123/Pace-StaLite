@@ -112,101 +112,16 @@ void STAWorker::sta_check() {
 }
 
 void STAWorker::trace_path(const SignalBit &endpoint_bit) {
-  // 从 endpoint 回溯到输入端口
-  std::vector<std::pair<SignalBit, int>> path; // (signal, arrival_time)
-  SignalBit current = endpoint_bit;
-  std::unordered_set<SignalBit, SignalBitHash> visited;
-
-  while (true) {
-    SignalBit canonical = sigmap.find(current);
-
-    // 防止循环
-    if (visited.count(canonical)) {
-      break;
-    }
-    visited.insert(canonical);
-
-    // 获取 arrival time
-    int arrival = -1;
-    if (arrival_time.count(canonical)) {
-      arrival = arrival_time.at(canonical);
-    }
-
-    path.push_back({canonical, arrival});
-
-    // 检查是否是输入端口（在 driven_signals 中且 arrival_time 为 0）
-    if (driven_signals.count(canonical) && arrival == 0) {
-      // 输入端口或虚拟时钟，回溯结束
-      break;
-    }
-
-    // 检查是否有 backtrack 信息
-    if (!timing_data.count(canonical)) {
-      // 没有时序数据，无法继续回溯
-      break;
-    }
-
-    const auto &timing = timing_data.at(canonical);
-
-    // 检查 backtrack 是否有效
-    if (timing.backtrack.wire_name == "" ||
-        (timing.backtrack.wire_name == canonical.wire_name &&
-         timing.backtrack.bit_offset == canonical.bit_offset)) {
-      break;
-    }
-
-    // 继续回溯
-    current = timing.backtrack;
-  }
-
-  // 反转路径（从输入到输出）
-  std::reverse(path.begin(), path.end());
-
-  // 打印路径
-  int path_index = 0;
-  for (size_t i = 0; i < path.size(); ++i) {
-    const auto &[bit, arrival] = path[i];
-
-    // 获取时序数据
-    bool has_timing = timing_data.count(bit);
-    const auto *timing = has_timing ? &timing_data.at(bit) : nullptr;
-
-    std::cout << "    [" << path_index++ << "] ";
-
-    // 打印信号信息
-    std::cout << bit.wire_name << "[" << bit.bit_offset << "]";
-    if (arrival >= 0) {
-      std::cout << " (arrival: " << arrival << "ps)";
-    }
-
-    // 如果是输入端口（arrival_time 为 0 且在 driven_signals 中）
-    if (driven_signals.count(bit) && arrival == 0) {
-      if (bit.wire_name == "__clk__") {
-        std::cout << " [Virtual Clock]\n";
-      } else {
-        std::cout << " [Primary Input]\n";
-      }
-      continue;
-    }
-
-    // 如果有驱动单元
-    if (timing && timing->driver) {
-      std::cout << "\n        → ";
-      std::cout << timing->driver->instance_name << " ("
-                << timing->driver->module_name << ")";
-      if (!timing->source_port.empty()) {
-        std::cout << " via port " << timing->source_port;
-      }
-      std::cout << "\n";
-    }
-
-    // 如果是最后一个节点（endpoint）
-    if (i == path.size() - 1) {
-      std::cout << " [Endpoint]\n";
-    } else {
-      std::cout << "\n";
-    }
-  }
+  // 仅打印 endpoint（完整路径回溯依赖 timing_data，当前未实现）
+  SignalBit canonical = sigmap.find(endpoint_bit);
+  int arrival = -1;
+  if (arrival_time.count(canonical))
+    arrival = arrival_time.at(canonical);
+  std::cout << "    [0] " << canonical.wire_name << "[" << canonical.bit_offset
+            << "]";
+  if (arrival >= 0)
+    std::cout << " (arrival: " << arrival << "ps)";
+  std::cout << " [Endpoint]\n";
 }
 
 };

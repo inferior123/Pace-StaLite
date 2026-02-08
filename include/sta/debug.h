@@ -11,4 +11,5 @@ int test_all_sta_functions(int argc, char *argv[]);
 int setup_hold_test(int argc, char *argv[]);
 
 void gcd_test();
+void singal_test(char *file_name);
 void auto_test(int /*argc*/, char * /*argv*/[]);

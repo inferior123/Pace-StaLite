@@ -1,12 +1,8 @@
 #include "cell/cell_data_structure.hpp"
-#include "cell/liberty_parser.hpp"
 #include "interface.hpp"
-#include "parser-verilog/verilog_data.hpp"
-#include "sdc/sdc_parser.hpp"
 #include "sta/sta_data_structures.hpp"
 #include "sta/sta_report.hpp"
 #include <iostream>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -35,6 +31,7 @@ const char *edge_type_str(sta::EdgeType t) {
     return "?";
   }
 }
+
 } // namespace
 
 void fanout_debuger(sta::STAWorker &worker) {
@@ -87,11 +84,10 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
     celllib::save_celllib_cache(libs, cell_lib);
   }
 
-
   // 2) 枚举 Testing/ics55 目录下所有 .v 文件
   std::vector<fs::path> verilog_files;
   const fs::path root_dir =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55";
+      "/home/ysyx/project/pba-sta-base/proj/Testing/resource";
   for (auto &entry : fs::recursive_directory_iterator(root_dir)) {
     if (!entry.is_regular_file())
       continue;
@@ -114,7 +110,6 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
 
     {
       sta::STAWorker worker;
-      worker.get_config().clk_period = 10000;
 
       worker.set_cell_library(cell_lib);
       MyVerilogParser verilog_parser(worker);
@@ -132,13 +127,21 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       std::string design_name =
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
       std::string report_dir = "./result1/candidate/" + design_name;
+
+      worker.get_config().clk_period = 10000;
+      worker.set_analysis_mode(AnalysisMode::MAX);
+      sta::STAReportGenerator::generate_report_pt_files(
+          worker, "__clk__", report_dir, design_name, 1);
+
+      worker.get_config().clk_period = 0;
+      worker.set_analysis_mode(AnalysisMode::MIN);
       sta::STAReportGenerator::generate_report_pt_files(
           worker, "__clk__", report_dir, design_name, 1);
     }
   }
 }
 
-void gcd_test() {
+void singal_test(char *file_name) {
 
   std::vector<std::string> libs;
 
@@ -166,8 +169,7 @@ void gcd_test() {
     celllib::save_celllib_cache(libs, cell_lib);
   }
 
-  std::string vfile =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55/gcd/gcd.v";
+  std::string vfile = file_name;
 
   {
     sta::STAWorker worker;
@@ -187,7 +189,15 @@ void gcd_test() {
     std::string design_name =
         worker.top_moudle.empty() ? "design" : worker.top_moudle;
     std::string report_dir = "./result1/candidate/" + design_name;
-    sta::STAReportGenerator::generate_report_pt_files(worker, "__clk__",
-                                                      report_dir, design_name, 1);
+
+    worker.get_config().clk_period = 10000;
+    worker.set_analysis_mode(AnalysisMode::MAX);
+    sta::STAReportGenerator::generate_report_pt_files(
+        worker, "__clk__", report_dir, design_name, 1);
+
+    worker.get_config().clk_period = 0;
+    worker.set_analysis_mode(AnalysisMode::MIN);
+    sta::STAReportGenerator::generate_report_pt_files(
+        worker, "__clk__", report_dir, design_name, 1);
   }
 }

@@ -120,17 +120,35 @@ void STAWorker::build_fanouts() {
         auto it = bit_to_driver.find(clock_canonical);
         if (it != bit_to_driver.end()) {
           clk_pt = it->second;
-          // 将连接到 FF 时钟端的 input 标为 CLK，便于 path group 归为 REG2REG
           if (clk_pt < res.points.size())
             res.points[clk_pt].type = CLK;
         } else {
-          clk_pt = get_or_create_point(nullptr, clock_canonical.wire_name,
-                                       clock_canonical, CLK);
-          bit_to_driver[clock_canonical] = clk_pt;
-          // 确保从该 CLK 起点做 DFS，才能产生 reg2reg（CLK→REGQ→…→REGD）路径
-          if (std::find(input_clk_point_ids.begin(), input_clk_point_ids.end(),
-                       clk_pt) == input_clk_point_ids.end()) {
-            input_clk_point_ids.push_back(clk_pt);
+          // 可能 port 的 bit 与 instance 连接的 canonical 表示不一致，先按端口名/bit 匹配已有顶层 port
+          bool found_port = false;
+          for (std::size_t i = 0; i < res.points.size(); ++i) {
+            const auto &pt = res.points[i];
+            if (pt.inst != nullptr)
+              continue;
+            bool name_match = (pt.port_name == clock_canonical.wire_name) ||
+                (pt.bit.has_value() && pt.bit->wire_name == clock_canonical.wire_name);
+            if (name_match) {
+              clk_pt = i;
+              bit_to_driver[clock_canonical] = clk_pt;
+              res.points[clk_pt].type = CLK;
+              found_port = true;
+              break;
+            }
+          }
+          if (!found_port) {
+            clk_pt = get_or_create_point(nullptr, clock_canonical.wire_name,
+                                        clock_canonical, CLK);
+            if (res.points[clk_pt].type != CLK)
+              res.points[clk_pt].type = CLK;
+            bit_to_driver[clock_canonical] = clk_pt;
+            if (std::find(input_clk_point_ids.begin(), input_clk_point_ids.end(),
+                          clk_pt) == input_clk_point_ids.end()) {
+              input_clk_point_ids.push_back(clk_pt);
+            }
           }
         }
       }
@@ -212,18 +230,33 @@ void STAWorker::build_fanouts() {
               pending_edges.push_back({it->second, input_pt, WIRE});
             }
             bit_to_driver[output_canonical] = output_pt;
+          }
         }
       }
     }
   }
-}
 
-  // 2.5. 补充 REGD 的 WIRE 边（实例处理顺序可能导致 comb 在 seq 之后，首遍时 bit_to_driver 尚未就绪）
+  // 2.5. 补充 REGD 的 WIRE 边（实例处理顺序可能导致 comb 在 seq 之后，首遍时
+  // bit_to_driver 尚未就绪）
   auto pending_has = [&pending_edges](size_t from_pt, size_t to_pt) {
     for (const auto &e : pending_edges)
-      if (e.from_pt == from_pt && e.to_pt == to_pt) return true;
+      if (e.from_pt == from_pt && e.to_pt == to_pt)
+        return true;
     return false;
   };
+  // 2.5b. 补充 REGQ（及任意 driver）到下游的 WIRE 边：若下游点先于 driver 被创建，
+  //       首遍时 bit_to_driver 尚无该 net，会漏掉 driver->consumer，这里按 bit 统一补上
+  for (const auto &pt : res.points) {
+    if (!pt.bit.has_value())
+      continue;
+    auto it = bit_to_driver.find(pt.bit.value());
+    if (it == bit_to_driver.end() || it->second == pt.id)
+      continue;
+    std::size_t driver_pt = it->second;
+    if (!pending_has(driver_pt, pt.id))
+      pending_edges.push_back({driver_pt, pt.id, WIRE});
+  }
+
   for (auto &instance : instances) {
     const auto *cell = cell_library_->get_cell(instance->module_name);
     if (!cell || !cell->ff.has_value())
@@ -231,7 +264,8 @@ void STAWorker::build_fanouts() {
     const auto &ff_def = cell->ff.value();
     std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
     for (const auto &input_pin_name : cell->get_input_pins()) {
-      if (input_pin_name == clock_pin_name || !instance->connections.count(input_pin_name))
+      if (input_pin_name == clock_pin_name ||
+          !instance->connections.count(input_pin_name))
         continue;
       SignalSpec input_signals = instance->connections[input_pin_name];
       for (size_t i = 0; i < input_signals.size(); ++i) {
@@ -261,7 +295,8 @@ void STAWorker::build_fanouts() {
       pending_edges.push_back({it->second, pt.id, WIRE});
   }
 
-  // 第二遍：应用所有 pending edges（同一 (from_pt, to_pt) 只保留一条，避免 candidate DFS 产生重复 path）
+  // 第二遍：应用所有 pending edges（同一 (from_pt, to_pt) 只保留一条，避免
+  // candidate DFS 产生重复 path）
   for (const auto &e : pending_edges) {
     auto &fanouts = res.points[e.from_pt].fanouts;
     bool already = false;
@@ -279,8 +314,7 @@ void STAWorker::build_res_edges() {
   res.edges.clear();
   for (std::size_t i = 0; i < res.points.size(); ++i) {
     for (const TimingEdge &e : res.points[i].fanouts) {
-      res.edges.push_back(
-          TimingEdge{e.type, i, e.target_point});
+      res.edges.push_back(TimingEdge{e.type, i, e.target_point});
     }
   }
 }
@@ -315,7 +349,8 @@ void STAWorker::calculate_load_capacitance() {
 
     const TimingPointRef &pt = res.points[pt_id];
 
-    // 若为 cell 输出点（COMB_PIN 或 REGQ），将该输出端口的所有 fanout 的 input pin 电容累加
+    // 若为 cell 输出点（COMB_PIN 或 REGQ），将该输出端口的所有 fanout 的 input
+    // pin 电容累加
     if (pt.inst && (pt.type == COMB_PIN || pt.type == REGQ)) {
       for (const TimingEdge &e : pt.fanouts) {
         const TimingPointRef &target = res.points[e.target_point];
@@ -348,7 +383,8 @@ void STAWorker::run_timing_analysis_dfs() {
   res.paths.clear();
 
   if (analysis_granularity_ == AnalysisGranularity::FINE) {
-    assert(false && "FINE mode uses candidate path, not run_timing_analysis_dfs");
+    assert(false &&
+           "FINE mode uses candidate path, not run_timing_analysis_dfs");
   }
 
   const double clk_slew_ns =
@@ -405,12 +441,11 @@ void STAWorker::run_timing_analysis_dfs() {
     return nullptr;
   };
 
-  auto compute_setup_hold = [this, clk_slew_ns](Instance *sink, const std::string &port,
-                                   double data_arrival_ps,
-                                   double data_slew_rise_ns,
-                                   double data_slew_fall_ns,
-                                   TransitionDirection data_dir)
-      -> std::pair<double, double> {
+  auto compute_setup_hold =
+      [this, clk_slew_ns](
+          Instance *sink, const std::string &port, double data_arrival_ps,
+          double data_slew_rise_ns, double data_slew_fall_ns,
+          TransitionDirection data_dir) -> std::pair<double, double> {
     if (!sink || !cell_library_)
       return {0, 0};
     const auto *cell = cell_library_->get_cell(sink->module_name);
@@ -419,14 +454,15 @@ void STAWorker::run_timing_analysis_dfs() {
     const auto *pin = cell->get_pin(port);
     if (!pin)
       return {0, 0};
-    double data_trans =
-        std::max(data_slew_rise_ns, data_slew_fall_ns);
+    double data_trans = std::max(data_slew_rise_ns, data_slew_fall_ns);
     double setup_ps = 0, hold_ps = 0;
     for (const auto &arc : pin->timing_arcs) {
       if (arc.timing_type == celllib::TimingType::SETUP_RISING ||
           arc.timing_type == celllib::TimingType::SETUP_FALLING) {
-        double sr = caculate_setup_rise(arc, cell_library_, data_trans, clk_slew_ns);
-        double sf = caculate_setup_fall(arc, cell_library_, data_trans, clk_slew_ns);
+        double sr =
+            caculate_setup_rise(arc, cell_library_, data_trans, clk_slew_ns);
+        double sf =
+            caculate_setup_fall(arc, cell_library_, data_trans, clk_slew_ns);
         if (data_dir == TransitionDirection::RISING)
           setup_ps = sr * NS_TO_PS;
         else if (data_dir == TransitionDirection::FALLING)
@@ -436,8 +472,10 @@ void STAWorker::run_timing_analysis_dfs() {
       }
       if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
           arc.timing_type == celllib::TimingType::HOLD_FALLING) {
-        double hr = caculate_hold_rise(arc, cell_library_, data_trans, clk_slew_ns);
-        double hf = caculate_hold_fall(arc, cell_library_, data_trans, clk_slew_ns);
+        double hr =
+            caculate_hold_rise(arc, cell_library_, data_trans, clk_slew_ns);
+        double hf =
+            caculate_hold_fall(arc, cell_library_, data_trans, clk_slew_ns);
         if (data_dir == TransitionDirection::RISING)
           hold_ps = hr * NS_TO_PS;
         else if (data_dir == TransitionDirection::FALLING)
@@ -460,15 +498,16 @@ void STAWorker::run_timing_analysis_dfs() {
 
     std::stack<StackFrame> stk;
     std::vector<PathFrame> path;
-    stk.push({start_id, 0.0, slew_ns, slew_ns, TransitionDirection::UNKNOWN, 0});
+    stk.push(
+        {start_id, 0.0, slew_ns, slew_ns, TransitionDirection::UNKNOWN, 0});
 
     while (!stk.empty()) {
       StackFrame f = stk.top();
       stk.pop();
 
       if (f.fanout_idx == 0) {
-        path.push_back({f.point_id, f.arrival, f.slew_rise_ns, f.slew_fall_ns,
-                        f.dir, 0});
+        path.push_back(
+            {f.point_id, f.arrival, f.slew_rise_ns, f.slew_fall_ns, f.dir, 0});
       }
 
       const TimingPointRef &cur = res.points[f.point_id];
@@ -476,7 +515,8 @@ void STAWorker::run_timing_analysis_dfs() {
       if (cur.type == REGD || cur.type == OUTPUT) {
         std::string fp;
         for (const auto &pf : path)
-          fp += std::to_string(pf.point_id) + ":" + std::to_string(pf.arrival) + "->";
+          fp += std::to_string(pf.point_id) + ":" + std::to_string(pf.arrival) +
+                "->";
         if (path_printed.insert(fp).second) {
           path_count++;
           TimingPathResult pr;
@@ -488,8 +528,9 @@ void STAWorker::run_timing_analysis_dfs() {
               cur.type);
 
           if (cur.type == REGD && cur.inst) {
-            auto [setup_ps, hold_ps] = compute_setup_hold(
-                cur.inst, cur.port_name, f.arrival, f.slew_rise_ns, f.slew_fall_ns, f.dir);
+            auto [setup_ps, hold_ps] =
+                compute_setup_hold(cur.inst, cur.port_name, f.arrival,
+                                   f.slew_rise_ns, f.slew_fall_ns, f.dir);
             pr.library_setup_time = setup_ps;
             pr.library_hold_time = hold_ps;
           }
@@ -502,13 +543,14 @@ void STAWorker::run_timing_analysis_dfs() {
             double slew =
                 std::max(path[i].slew_rise_ns, path[i].slew_fall_ns) * NS_TO_PS;
             TimingStep step{path[i - 1].point_id, path[i].point_id, incr, slew,
-                            path[i].arrival, path[i].dir};
+                            path[i].arrival,      path[i].dir};
             pr.steps.push_back(step);
           }
           res.paths.push_back(pr);
 
-          std::cout << "  [DEBUG] Path #" << path_count << " pt" << pr.startpoint
-                    << "->pt" << pr.endpoint << " arrival=" << f.arrival << "ps"
+          std::cout << "  [DEBUG] Path #" << path_count << " pt"
+                    << pr.startpoint << "->pt" << pr.endpoint
+                    << " arrival=" << f.arrival << "ps"
                     << ", steps=" << pr.steps.size() << "\n";
         }
       }
@@ -541,8 +583,8 @@ void STAWorker::run_timing_analysis_dfs() {
                     << e.target_point << " type "
                     << (e.type == COMB_ARC ? "COMB_ARC" : "SEQ_ARC") << "\n";
           // 不 pop_back：target 尚未加入 path，cur 仍应保留在 path 中
-        continue;
-      }
+          continue;
+        }
 
         double load_cap = 0.0;
         if (target.inst &&
@@ -567,17 +609,19 @@ void STAWorker::run_timing_analysis_dfs() {
             delay_ps = get_pessimistic_delay_from_lut(arc->cell_fall.value());
           if (delay_ps == 0 && arc->intrinsic_rise.has_value())
             delay_ps = std::max(arc->intrinsic_rise.value_or(0),
-                               arc->intrinsic_fall.value_or(0)) *
-                      NS_TO_PS;
+                                arc->intrinsic_fall.value_or(0)) *
+                       NS_TO_PS;
         } else {
-          double dr = caculate_delay_rise(*arc, cell_library_, in_slew_rise, load_cap);
-          double df = caculate_delay_fall(*arc, cell_library_, in_slew_fall, load_cap);
-          out_slew_rise_ns =
-              caculate_transition_rise(*arc, cell_library_, in_slew_rise, load_cap) /
-              NS_TO_PS;
-          out_slew_fall_ns =
-              caculate_transition_fall(*arc, cell_library_, in_slew_fall, load_cap) /
-              NS_TO_PS;
+          double dr =
+              caculate_delay_rise(*arc, cell_library_, in_slew_rise, load_cap);
+          double df =
+              caculate_delay_fall(*arc, cell_library_, in_slew_fall, load_cap);
+          out_slew_rise_ns = caculate_transition_rise(*arc, cell_library_,
+                                                      in_slew_rise, load_cap) /
+                             NS_TO_PS;
+          out_slew_fall_ns = caculate_transition_fall(*arc, cell_library_,
+                                                      in_slew_fall, load_cap) /
+                             NS_TO_PS;
           out_dir = speculate_transition_direction(is_ck2q, *arc, f.dir);
           if (out_dir == TransitionDirection::RISING)
             delay_ps = dr;
@@ -586,12 +630,14 @@ void STAWorker::run_timing_analysis_dfs() {
           else
             delay_ps = std::max(dr, df);
 
-          std::string cell_name = target.inst ? target.inst->instance_name : "?";
+          std::string cell_name =
+              target.inst ? target.inst->instance_name : "?";
           std::cout << "  [DEBUG] delay lut: " << cell_name << " "
                     << cur.port_name << "->" << target.port_name
-                    << " slew_rise=" << in_slew_rise << " slew_fall=" << in_slew_fall
-                    << " load_cap=" << load_cap << " delay_rise=" << dr
-                    << " delay_fall=" << df << " -> " << delay_ps << "ps\n";
+                    << " slew_rise=" << in_slew_rise
+                    << " slew_fall=" << in_slew_fall << " load_cap=" << load_cap
+                    << " delay_rise=" << dr << " delay_fall=" << df << " -> "
+                    << delay_ps << "ps\n";
         }
       }
 
@@ -604,4 +650,4 @@ void STAWorker::run_timing_analysis_dfs() {
   std::cout << "  [DEBUG] run_timing_analysis_dfs: " << path_count
             << " paths found, res.paths.size()=" << res.paths.size() << "\n";
 }
-} 
+} // namespace sta

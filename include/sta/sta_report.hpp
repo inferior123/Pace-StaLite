@@ -42,7 +42,8 @@ public:
   static void generate_report_pt_files(STAWorker &worker,
                                        const std::string &clock_name,
                                        const std::string &output_dir,
-                                       const std::string &design_name, size_t top_n);
+                                       const std::string &design_name,
+                                       size_t top_n);
 
 private:
   static void print_path_header(const TimingPathResult &path,
@@ -59,17 +60,18 @@ private:
                                   const STAWorker &worker, std::ostream &out,
                                   int time_decimals = 2);
 
-  /// required = clock - clock_uncertainty；若 setup 有效则再减 setup。slack = required - arrival。
-  static std::pair<double, double> compute_required_and_slack(
-      const TimingPathResult &path, const STAWorker &worker);
+  /// required = clock - clock_uncertainty；若 setup 有效则再减 setup。slack =
+  /// required - arrival。
+  static std::pair<double, double>
+  compute_required_and_slack(const TimingPathResult &path,
+                             const STAWorker &worker);
 
   /** 格式化时间：ps -> ns 字符串，小数位数可指定（默认2，PT 风格用10） */
   static std::string format_time(double ps, int decimals = 2);
 
   /** 路径起终点类型，用于 PT 报告分类 */
   enum class StartEndType { RegToReg, InToReg, RegToOut, InToOut };
-  static StartEndType classify_start_end_type(const TimingPathResult &path,
-                                              const std::string &clock_name);
+  static StartEndType classify_start_end_type(const TimingPathResult &path);
 
   /**
    * 获取信号显示名称

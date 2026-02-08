@@ -1,5 +1,4 @@
 #include "sta/sta_data_structures.hpp"
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <functional>
@@ -75,7 +74,8 @@ void STAWorker::build_candidate_graphy_dfs() {
     get_or_create_candidate_node(pt_id);
   }
 
-  // 终点：REGD、OUTPUT，以及 build_fanouts 中已建的 non-unate output、clk2q 等 candidate 点
+  // 终点：REGD、OUTPUT，以及 build_fanouts 中已建的 non-unate output、clk2q 等
+  // candidate 点
   for (const auto &pt : res.points) {
     if (pt.type == REGD || pt.type == OUTPUT)
       get_or_create_candidate_node(pt.id);
@@ -93,7 +93,7 @@ void STAWorker::build_candidate_graphy_dfs() {
 
   std::unordered_set<std::size_t> visited;
   std::function<void(std::size_t pt_id, std::size_t start_node_id,
-                    std::vector<std::size_t> path_edge_indices)>
+                     std::vector<std::size_t> path_edge_indices)>
       dfs = [&](std::size_t pt_id, std::size_t start_node_id,
                 std::vector<std::size_t> path_edge_indices) {
         if (pt_id >= res.points.size() || visited.count(pt_id))
@@ -113,12 +113,12 @@ void STAWorker::build_candidate_graphy_dfs() {
           path.next_path = std::nullopt;
           path.fanouts_edge = std::move(path_edge_indices);
           const std::size_t path_id = path.id;
-          candidate_graphy_.nodes[start_node_id].fanout_paths.push_back(path_id);
+          candidate_graphy_.nodes[start_node_id].fanout_paths.push_back(
+              path_id);
           candidate_graphy_.paths.push_back(std::move(path));
 
           const TimingPointRef &start_pt = res.points[start_pt_id];
-          bool is_startpoint =
-              (start_pt.type == INPUT || start_pt.type == CLK);
+          bool is_startpoint = (start_pt.type == INPUT || start_pt.type == CLK);
           if (is_startpoint)
             candidate_timing_queue.push_back(path_id);
 
@@ -167,8 +167,8 @@ void STAWorker::build_candidate_graphy_dfs() {
     if (is_startpoint)
       std::cout << "[START] ";
     if (node.point_idx >= res.points.size()) {
-      std::cout << "pt?" << node.point_idx << " | fanout_paths: "
-                << node.fanout_paths.size() << "\n";
+      std::cout << "pt?" << node.point_idx
+                << " | fanout_paths: " << node.fanout_paths.size() << "\n";
       continue;
     }
     const TimingPointRef &pt = res.points[node.point_idx];
@@ -221,10 +221,10 @@ void STAWorker::build_candidate_graphy_dfs() {
 // 若为 WIRE：delay=0，slew/方向透传；若为 COMB_ARC/SEQ_ARC：用 LUT 计算。
 static void segment_delay_slew(const TimingRunResult &res,
                                const celllib::CellLibrary *cell_library_,
-                               std::size_t from_pt,
-                               std::size_t to_pt, double prev_slew,
-                               TransitionDirection cur_dir, double &out_delay,
-                               double &out_slew, TransitionDirection &out_dir) {
+                               std::size_t from_pt, std::size_t to_pt,
+                               double prev_slew, TransitionDirection cur_dir,
+                               double &out_delay, double &out_slew,
+                               TransitionDirection &out_dir) {
   out_delay = 0.0;
   out_slew = prev_slew;
   out_dir = cur_dir;
@@ -255,7 +255,8 @@ static void segment_delay_slew(const TimingRunResult &res,
   double load_cap = 0.0;
   if (inst->load_capacitance.count(output_pin_name))
     load_cap = inst->load_capacitance.at(output_pin_name);
-  // SEQ_ARC (clk2q)：库里弧的 related_pin 是 cell 的时钟 pin 名（如 CK），不是顶层时钟端口名
+  // SEQ_ARC (clk2q)：库里弧的 related_pin 是 cell 的时钟 pin 名（如
+  // CK），不是顶层时钟端口名
   std::string related_pin = from_ref.port_name;
   if (edge->type == SEQ_ARC && cell->ff.has_value() &&
       cell->ff->clocked_on.has_value()) {
@@ -298,9 +299,10 @@ static void segment_delay_slew(const TimingRunResult &res,
   }
 }
 
-CandidatePathSegmentResult STAWorker::compute_candidate_path_with_input(
-    std::size_t path_id, TransitionDirection input_dir,
-    double input_slew_ns) const {
+CandidatePathSegmentResult
+STAWorker::compute_candidate_path_with_input(std::size_t path_id,
+                                             TransitionDirection input_dir,
+                                             double input_slew_ns) const {
   CandidatePathSegmentResult out;
   if (path_id >= candidate_graphy_.paths.size() || !cell_library_) {
     return out;
@@ -344,6 +346,25 @@ CandidatePathSegmentResult STAWorker::compute_candidate_path_with_input(
   return out;
 }
 
+const char *point_type_str(sta::PointType t) {
+  switch (t) {
+  case sta::CLK:
+    return "CLK";
+  case sta::INPUT:
+    return "INPUT";
+  case sta::OUTPUT:
+    return "OUTPUT";
+  case sta::REGD:
+    return "REGD";
+  case sta::REGQ:
+    return "REGQ";
+  case sta::COMB_PIN:
+    return "COMB_PIN";
+  }
+
+  return "?";
+}
+
 void STAWorker::display_result_path_detail(TimingPathResult &pr,
                                            std::size_t path_index) const {
   std::cout << "\n--- Result Path #" << path_index << " ---\n";
@@ -353,7 +374,7 @@ void STAWorker::display_result_path_detail(TimingPathResult &pr,
     std::cout << " ";
     if (p.inst)
       std::cout << p.inst->instance_name << "(" << p.inst->module_name << ")/";
-    std::cout << p.port_name << " type=" << static_cast<int>(p.type);
+    std::cout << p.port_name << " type=" << point_type_str(p.type);
   }
   std::cout << "\n  endpoint:   pt" << pr.endpoint;
   if (pr.endpoint < res.points.size()) {
@@ -361,7 +382,7 @@ void STAWorker::display_result_path_detail(TimingPathResult &pr,
     std::cout << " ";
     if (p.inst)
       std::cout << p.inst->instance_name << "(" << p.inst->module_name << ")/";
-    std::cout << p.port_name << " type=" << static_cast<int>(p.type);
+    std::cout << p.port_name << " type=" << point_type_str(p.type);
   }
   std::cout << "\n  data_arrival=" << pr.data_arrival_time << "ps\n";
 
@@ -398,22 +419,24 @@ void STAWorker::display_result_path_detail(TimingPathResult &pr,
               using TT = celllib::TimingType;
               if (arc.timing_type == TT::SETUP_RISING ||
                   arc.timing_type == TT::SETUP_FALLING) {
-                double s = (st.dir == TransitionDirection::RISING
-                                ? caculate_setup_rise(arc, cell_library_,
-                                                     data_trans_ns, clk_trans)
-                                : caculate_setup_fall(arc, cell_library_,
-                                                     data_trans_ns, clk_trans)) *
-                           1000.0;
+                double s =
+                    (st.dir == TransitionDirection::RISING
+                         ? caculate_setup_rise(arc, cell_library_,
+                                               data_trans_ns, clk_trans)
+                         : caculate_setup_fall(arc, cell_library_,
+                                               data_trans_ns, clk_trans)) *
+                    1000.0;
                 std::cout << " setup=" << s << "ps";
                 pr.library_setup_time = s;
               } else if (arc.timing_type == TT::HOLD_RISING ||
                          arc.timing_type == TT::HOLD_FALLING) {
-                double h = (st.dir == TransitionDirection::RISING
-                               ? caculate_hold_rise(arc, cell_library_,
-                                                    data_trans_ns, clk_trans)
-                               : caculate_hold_fall(arc, cell_library_,
-                                                    data_trans_ns, clk_trans)) *
-                           1000.0;
+                double h =
+                    (st.dir == TransitionDirection::RISING
+                         ? caculate_hold_rise(arc, cell_library_, data_trans_ns,
+                                              clk_trans)
+                         : caculate_hold_fall(arc, cell_library_, data_trans_ns,
+                                              clk_trans)) *
+                    1000.0;
                 std::cout << " hold=" << h << "ps";
                 pr.library_hold_time = h;
               }
@@ -441,7 +464,8 @@ static bool is_terminal_node(const TimingRunResult &res,
 
 void STAWorker::run_candidate_graphy_dfs() {
   res.paths.clear();
-  // 路径指纹去重：相同 (start,end,step 序列) 只保留一条，避免重复边或 reconvergence 产生大量重复
+  // 路径指纹去重：相同 (start,end,step 序列) 只保留一条，避免重复边或
+  // reconvergence 产生大量重复
   std::unordered_set<std::string> path_printed;
 
   // 收集所有起点：input 或 clk 节点
@@ -462,17 +486,16 @@ void STAWorker::run_candidate_graphy_dfs() {
         candidate_graphy_.nodes[start_node_id].point_idx;
 
     std::function<void(std::size_t cur_node_id, TransitionDirection cur_dir,
-                      double cur_slew_ns, std::vector<TimingStep> steps_so_far,
-                      double delay_so_far)>
+                       double cur_slew_ns, std::vector<TimingStep> steps_so_far,
+                       double delay_so_far)>
         emit_chains = [&](std::size_t cur_node_id, TransitionDirection cur_dir,
-                         double cur_slew_ns,
-                         std::vector<TimingStep> steps_so_far,
-                         double delay_so_far) {
-          const CandidateNode &cur_node =
-              candidate_graphy_.nodes[cur_node_id];
+                          double cur_slew_ns,
+                          std::vector<TimingStep> steps_so_far,
+                          double delay_so_far) {
+          const CandidateNode &cur_node = candidate_graphy_.nodes[cur_node_id];
           for (std::size_t path_id : cur_node.fanout_paths) {
-            CandidatePathSegmentResult seg =
-                compute_candidate_path_with_input(path_id, cur_dir, cur_slew_ns);
+            CandidatePathSegmentResult seg = compute_candidate_path_with_input(
+                path_id, cur_dir, cur_slew_ns);
 
             std::vector<TimingStep> new_steps = steps_so_far;
             for (TimingStep &s : seg.steps) {
@@ -483,13 +506,12 @@ void STAWorker::run_candidate_graphy_dfs() {
 
             const CandidatePath &path = candidate_graphy_.paths[path_id];
             std::size_t end_node_id = path.end_node;
-            std::size_t end_pt =
-                candidate_graphy_.nodes[end_node_id].point_idx;
+            std::size_t end_pt = candidate_graphy_.nodes[end_node_id].point_idx;
 
             if (is_terminal_node(res, candidate_graphy_, end_node_id)) {
               // 指纹：start_end + 各步 (from_pt->to_pt)，相同则视为重复 path
-              std::string fp = std::to_string(start_pt) + "_" +
-                               std::to_string(end_pt);
+              std::string fp =
+                  std::to_string(start_pt) + "_" + std::to_string(end_pt);
               for (const auto &st : new_steps)
                 fp += "_" + std::to_string(st.start_point) + "-" +
                       std::to_string(st.end_point);
@@ -497,7 +519,6 @@ void STAWorker::run_candidate_graphy_dfs() {
                 continue;
 
               TimingPathResult pr;
-              pr.mode = AnalysisMode::MAX;
               pr.startpoint = start_pt;
               pr.endpoint = end_pt;
               pr.data_arrival_time = new_delay;
@@ -516,8 +537,8 @@ void STAWorker::run_candidate_graphy_dfs() {
         };
 
     for (bool is_rise : {true, false}) {
-      TransitionDirection dir = is_rise ? TransitionDirection::RISING
-                                        : TransitionDirection::FALLING;
+      TransitionDirection dir =
+          is_rise ? TransitionDirection::RISING : TransitionDirection::FALLING;
       emit_chains(start_node_id, dir, initial_slew_ns, {}, 0.0);
     }
   }

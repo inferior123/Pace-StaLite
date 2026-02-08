@@ -125,20 +125,6 @@ public:
 struct Instance;
 
 /**
- * 扇出信息：表示一个信号到另一个信号的连接
- */
-struct Fanout {
-  SignalBit target_bit;  // 目标信号位
-  double delay;          // 延迟值
-  std::string port_name; // 端口名称
-  Instance *cell;        // 相关单元实例
-
-  Fanout(const SignalBit &target, int d, const std::string &port,
-         Instance *c = nullptr)
-      : target_bit(target), delay(d), port_name(port), cell(c) {}
-};
-
-/**
  * 单元实例：表示 Verilog 中的模块实例
  */
 struct Instance {
@@ -183,7 +169,6 @@ enum class PathGroup { REG2REG, IN2REG, REG2OUT, IN2OUT };
 
 enum PointType { COMB_PIN, INPUT, OUTPUT, CLK, REGQ, REGD };
 
-
 /// 按起终点 PointType 得到 PathGroup，建 path 时设好，报告层直接用
 inline PathGroup classify_path_group(PointType start_type, PointType end_type) {
   if (end_type == REGD)
@@ -192,8 +177,6 @@ inline PathGroup classify_path_group(PointType start_type, PointType end_type) {
     return (start_type == CLK) ? PathGroup::REG2OUT : PathGroup::IN2OUT;
   return PathGroup::IN2OUT;
 }
-
-
 
 /**
  * 时序点引用：用于强索引/可追溯
@@ -273,7 +256,6 @@ struct TimingStep {
  * 一条时序路径结果：summary + steps
  */
 struct TimingPathResult {
-  AnalysisMode mode = AnalysisMode::MAX;
   PathGroup group = PathGroup::REG2REG;
 
   size_t startpoint;
@@ -289,13 +271,15 @@ struct TimingPathResult {
 
 /**
  * 一次 STA/PBA run 的统一输出：只存 paths，不绑定“8 个报告文件”
- * - edges: 全局边表，按 (points[0].fanouts, points[1].fanouts, ...) 顺序排列，便于用 index 前后组合路径
+ * - edges: 全局边表，按 (points[0].fanouts, points[1].fanouts, ...)
+ * 顺序排列，便于用 index 前后组合路径
  */
 struct TimingRunResult {
   std::vector<TimingPathResult> paths;
   std::vector<TimingPointRef> points;
 
-  /// 全局边表，由 build_res_edges() 填充；edges[i].origin_point / target_point 与 type 有效
+  /// 全局边表，由 build_res_edges() 填充；edges[i].origin_point / target_point
+  /// 与 type 有效
   std::vector<TimingEdge> edges;
 
   std::unordered_map<TimingPointRefKey, std::size_t, TimingPointRefHash>
@@ -310,12 +294,11 @@ struct TimingRunResult {
   }
 };
 
-/// 用于 path group 分类的起点类型：虚拟时钟 __clk__ 或 build_fanouts 中已标为 CLK 的
-/// “连到 FF 时钟端的 input” 视为 CLK，其余顶层端口视为 INPUT
+/// 用于 path group 分类的起点类型：虚拟时钟 __clk__ 或 build_fanouts 中已标为
+/// CLK 的 “连到 FF 时钟端的 input” 视为 CLK，其余顶层端口视为 INPUT
 inline PointType effective_start_type_for_group(const TimingPointRef &p) {
   if (p.inst == nullptr) {
-    if (p.type == CLK ||
-        p.port_name == "__clk__" ||
+    if (p.type == CLK || p.port_name == "__clk__" ||
         (p.bit.has_value() && p.bit->wire_name == "__clk__"))
       return CLK;
     return INPUT;
@@ -324,42 +307,7 @@ inline PointType effective_start_type_for_group(const TimingPointRef &p) {
 }
 
 /**
- * 信号时序数据：存储每个信号位的时序相关信息
- */
-
-struct SignalTimingData {
-  // 驱动信息
-  Instance *driver;        // 驱动该信号的单元实例
-  std::string driver_port; // 驱动端口名称
-  std::string source_port; // 源端口名称（用于回溯）
-
-  // 扇出列表
-  std::vector<Fanout> fanouts;
-
-  // 回溯信息（用于关键路径追踪）
-  SignalBit backtrack;
-
-  // 转换时间（Transition Time/Slew）：信号从0到1或1到0的转换时间
-  // 单位：与时间单位一致（通常是ps或ns）
-  // 用于作为下一个时序弧的输入转换时间（input_slew）
-  // 在每一个时序弧之中同时计算上升和下降的值，然后对时序弧取一个最大值，但是同时记录上升和下降的transition
-  // time
-  std::optional<double>
-      rise_transition_time; // 根据 transition_direction 选择的转换时间
-  std::optional<double> fall_transition_time;
-
-  // 转换方向：用于选择使用哪个查找表（rise_transition/fall_transition 或
-  // cell_rise/cell_fall）
-  // 如果没有指定，使用默认值（UNKNOWN，在计算时取最大值或使用上升沿）
-  TransitionDirection transition_direction;
-
-  SignalTimingData()
-      : driver(nullptr), rise_transition_time(std::nullopt),
-        fall_transition_time(std::nullopt),
-        transition_direction(TransitionDirection::UNKNOWN) {}
-};
-
-/**
+ *
  * 时序端点：表示时序约束的端点（通常是寄存器的时钟/数据输入，或顶层输出）
  * 因 sigmap 合并，同一 canonical 可能既是顶层输出又是某 reg 的 D
  * 端，需同时保留。
@@ -385,7 +333,8 @@ struct TimingEndpoint {
 // 无知节点包含三种情况 clk2q、input、无单调cell的input
 /**
  * 无知图的边：从一个 CandidateNode 到下一个 CandidateNode 的压缩段
- * - fanouts_edge 存 res.edges 的 index，便于前后路径组合；先不记录时序，后续再组合计算
+ * - fanouts_edge 存 res.edges 的
+ * index，便于前后路径组合；先不记录时序，后续再组合计算
  */
 struct CandidatePath {
   std::size_t id;         // 在 CandidateGraphy::paths 中的下标
@@ -425,7 +374,8 @@ struct CandidatePathSegmentResult {
  *
  * 设计要点：
  * - 节点和边统一用下标（id）相互索引，便于 O(1) 访问和遍历
- * - 通过 point_to_node 实现 point_idx -> node_id 的 O(1) 查找，统一基于 Point 抽象
+ * - 通过 point_to_node 实现 point_idx -> node_id 的 O(1) 查找，统一基于 Point
+ * 抽象
  */
 struct CandidateGraphy {
   std::vector<CandidateNode> nodes;
@@ -446,7 +396,6 @@ class STAWorker {
 private:
   // 核心数据结构
   SignalMap sigmap;
-  std::unordered_map<SignalBit, SignalTimingData, SignalBitHash> timing_data;
   std::unordered_map<SignalBit, std::vector<TimingEndpoint>, SignalBitHash>
       endpoints;
   std::deque<SignalBit> timing_queue;
@@ -501,6 +450,7 @@ public:
 
 private:
   AnalysisGranularity analysis_granularity_ = AnalysisGranularity::MEDIUM;
+  AnalysisMode analysis_mode = AnalysisMode::MAX;
 
 public:
   STAWorker() : max_arrival_time(0) {}
@@ -515,6 +465,8 @@ public:
   void set_analysis_granularity(AnalysisGranularity granularity) {
     analysis_granularity_ = granularity;
   }
+  AnalysisMode get_analysis_mode() const { return analysis_mode; }
+  void set_analysis_mode(AnalysisMode mode) { analysis_mode = mode; }
 
   // 和verilog parser相耦合的函数
   void collect_net(verilog::Net &net);
@@ -524,7 +476,8 @@ public:
 
   // 核心工作函数
   void build_fanouts();
-  /// 根据 res.points 的 fanouts 填充 res.edges，供 CandidatePath 使用 edge index
+  /// 根据 res.points 的 fanouts 填充 res.edges，供 CandidatePath 使用 edge
+  /// index
   void build_res_edges();
   void calculate_load_capacitance();
   void calculate_timing_arcs();
@@ -540,10 +493,12 @@ public:
                                   std::optional<SignalBit> bit, PointType type);
 
   void build_candidate_graphy_dfs();
-  /// 给定输入 (transition_dir, input_slew_ns) 计算一条 candidate path，返回 delay/slew/dir/steps，便于链式算 result path
-  CandidatePathSegmentResult compute_candidate_path_with_input(
-      std::size_t path_id, TransitionDirection input_dir,
-      double input_slew_ns) const;
+  /// 给定输入 (transition_dir, input_slew_ns) 计算一条 candidate path，返回
+  /// delay/slew/dir/steps，便于链式算 result path
+  CandidatePathSegmentResult
+  compute_candidate_path_with_input(std::size_t path_id,
+                                    TransitionDirection input_dir,
+                                    double input_slew_ns) const;
   void run_candidate_graphy_dfs();
 
   // void print_all_timing_paths_bfs(); //
@@ -555,7 +510,8 @@ public:
   SignalSpec convert_to_signalspec(const verilog::RHS &rhs);
   SignalSpec convert_to_signalspec(const verilog::LHS &lhs);
 
-  /// 打印一条 result path 的完整信息（steps、dir、slew、arrival、终点 setup/hold），供计算流程中调用
+  /// 打印一条 result path 的完整信息（steps、dir、slew、arrival、终点
+  /// setup/hold），供计算流程中调用
   void display_result_path_detail(TimingPathResult &pr,
                                   std::size_t path_index) const;
 
@@ -630,10 +586,6 @@ public:
   const std::unordered_map<std::string, std::vector<SignalBit>> &
   get_signal_registry() const {
     return signal_registry;
-  }
-  const std::unordered_map<SignalBit, SignalTimingData, SignalBitHash> &
-  get_timing_data() const {
-    return timing_data;
   }
   const std::unordered_map<SignalBit, std::vector<TimingEndpoint>,
                            SignalBitHash> &

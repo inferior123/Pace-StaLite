@@ -156,7 +156,12 @@ int main(int argc, char *argv[]) {
   // return sta_main(argc, argv);
   // return candidate_test(argc, argv);
   // gcd_test();
+  //
 
-  auto_test(argc, argv);
+  if (argc > 1)
+    singal_test(argv[1]);
+  else
+    auto_test(argc, argv);
+
   return 0;
 }
