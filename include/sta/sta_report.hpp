@@ -26,10 +26,9 @@ public:
   /**
    * 生成单个路径的详细报告（标准格式）
    */
-  static void
-  generate_path_report(const STAWorker &worker, const SignalBit &endpoint_bit,
-                       const std::string &clock_name = "__clk__",
-                       const TimingEndpoint *endpoint_override = nullptr);
+  static void generate_path_report(const STAWorker &worker,
+                                   const SignalBit &endpoint_bit,
+                                   const std::string &clock_name = "__clk__");
 
   /**
    * 生成与 PT 格式一致的 8 个 timing 报告文件到指定目录

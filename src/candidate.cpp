@@ -331,6 +331,13 @@ STAWorker::compute_candidate_path_with_input(std::size_t path_id,
     step.end_point = to_pt;
     step.incr = seg_delay;
     step.slew = seg_slew_ns * 1000.0; // ns -> ps
+    step.cap_load = 0.0;
+    if (to_pt < res.points.size()) {
+      const auto &to_ref = res.points[to_pt];
+      if (to_ref.inst &&
+          to_ref.inst->load_capacitance.count(to_ref.port_name))
+        step.cap_load = to_ref.inst->load_capacitance.at(to_ref.port_name);
+    }
     step.arrival = total_delay;
     step.dir = seg_dir;
     out.steps.push_back(step);
@@ -365,9 +372,48 @@ const char *point_type_str(sta::PointType t) {
   return "?";
 }
 
-void STAWorker::display_result_path_detail(TimingPathResult &pr,
-                                           std::size_t path_index) const {
-  std::cout << "\n--- Result Path #" << path_index << " ---\n";
+void STAWorker::compute_path_setup_hold(TimingPathResult &pr) const {
+  if (pr.steps.empty() || pr.endpoint >= res.points.size() || !cell_library_)
+    return;
+  const auto &end_ref = res.points[pr.endpoint];
+  if (end_ref.type != REGD || !end_ref.inst)
+    return;
+  const auto *cell = cell_library_->get_cell(end_ref.inst->module_name);
+  if (!cell)
+    return;
+  const auto *d_pin = cell->get_pin(end_ref.port_name);
+  if (!d_pin)
+    return;
+  const TimingStep &st = pr.steps.back();
+  double data_trans_ns = st.slew / 1000.0;
+  double clk_trans = 0.0;
+  for (const auto &arc : d_pin->timing_arcs) {
+    using TT = celllib::TimingType;
+    if (arc.timing_type == TT::SETUP_RISING ||
+        arc.timing_type == TT::SETUP_FALLING) {
+      double s = (st.dir == TransitionDirection::RISING
+                      ? caculate_setup_rise(arc, cell_library_, data_trans_ns,
+                                            clk_trans)
+                      : caculate_setup_fall(arc, cell_library_, data_trans_ns,
+                                            clk_trans)) *
+                 1000.0;
+      pr.library_setup_time = s;
+    } else if (arc.timing_type == TT::HOLD_RISING ||
+               arc.timing_type == TT::HOLD_FALLING) {
+      double h = (st.dir == TransitionDirection::RISING
+                      ? caculate_hold_rise(arc, cell_library_, data_trans_ns,
+                                           clk_trans)
+                      : caculate_hold_fall(arc, cell_library_, data_trans_ns,
+                                           clk_trans)) *
+                 1000.0;
+      pr.library_hold_time = h;
+    }
+    // 其他 arc 类型（如 COMBINATIONAL 等）跳过，与原 display 内逻辑一致
+  }
+}
+
+void STAWorker::display_result_path_detail(TimingPathResult &pr) const {
+  std::cout << "\n--- Result Path #" << pr.index << " ---\n";
   std::cout << "  startpoint: pt" << pr.startpoint;
   if (pr.startpoint < res.points.size()) {
     const auto &p = res.points[pr.startpoint];
@@ -403,47 +449,14 @@ void STAWorker::display_result_path_detail(TimingPathResult &pr,
                  : (st.dir == TransitionDirection::FALLING ? 'f' : '?');
     std::cout << " dir=" << d << " incr=" << st.incr << "ps"
               << " slew=" << (st.slew / 1000.0) << "ns"
+              << " cap=" << st.cap_load << "pf"
               << " arrival=" << st.arrival << "ps";
-
     bool is_last = (i == pr.steps.size() - 1);
-    if (is_last && pr.endpoint < res.points.size() && cell_library_) {
-      const auto &end_ref = res.points[pr.endpoint];
-      if (end_ref.type == REGD && end_ref.inst) {
-        const auto *cell = cell_library_->get_cell(end_ref.inst->module_name);
-        if (cell) {
-          const auto *d_pin = cell->get_pin(end_ref.port_name);
-          if (d_pin) {
-            double data_trans_ns = st.slew / 1000.0;
-            double clk_trans = 0.0;
-            for (const auto &arc : d_pin->timing_arcs) {
-              using TT = celllib::TimingType;
-              if (arc.timing_type == TT::SETUP_RISING ||
-                  arc.timing_type == TT::SETUP_FALLING) {
-                double s =
-                    (st.dir == TransitionDirection::RISING
-                         ? caculate_setup_rise(arc, cell_library_,
-                                               data_trans_ns, clk_trans)
-                         : caculate_setup_fall(arc, cell_library_,
-                                               data_trans_ns, clk_trans)) *
-                    1000.0;
-                std::cout << " setup=" << s << "ps";
-                pr.library_setup_time = s;
-              } else if (arc.timing_type == TT::HOLD_RISING ||
-                         arc.timing_type == TT::HOLD_FALLING) {
-                double h =
-                    (st.dir == TransitionDirection::RISING
-                         ? caculate_hold_rise(arc, cell_library_, data_trans_ns,
-                                              clk_trans)
-                         : caculate_hold_fall(arc, cell_library_, data_trans_ns,
-                                              clk_trans)) *
-                    1000.0;
-                std::cout << " hold=" << h << "ps";
-                pr.library_hold_time = h;
-              }
-            }
-          }
-        }
-      }
+    if (is_last) {
+      if (pr.library_setup_time.has_value())
+        std::cout << " setup=" << pr.library_setup_time.value() << "ps";
+      if (pr.library_hold_time.has_value())
+        std::cout << " hold=" << pr.library_hold_time.value() << "ps";
     }
     std::cout << "\n";
   }
@@ -523,11 +536,13 @@ void STAWorker::run_candidate_graphy_dfs() {
               pr.endpoint = end_pt;
               pr.data_arrival_time = new_delay;
               pr.steps = std::move(new_steps);
+              pr.index = res.paths.size();
               if (start_pt < res.points.size() && end_pt < res.points.size())
                 pr.group = classify_path_group(
                     effective_start_type_for_group(res.points[start_pt]),
                     res.points[end_pt].type);
-              display_result_path_detail(pr, res.paths.size());
+              compute_path_setup_hold(pr);
+              display_result_path_detail(pr);
               res.paths.push_back(std::move(pr));
             } else {
               emit_chains(end_node_id, seg.output_dir, seg.output_slew_ns,

@@ -3,7 +3,6 @@
 // Liberty LUT 返回 ns，STA 内部统一用 ps
 static constexpr double NS_TO_PS = 1000.0;
 
-// 以下函数按头文件声明在全局命名空间实现
 double get_lut_avg(std::optional<celllib::LookupTable> lut) {
   if (lut.has_value() && !lut->index_1.empty()) {
     size_t mid = lut->index_1.size() / 2;
@@ -105,8 +104,8 @@ double caculate_transition_fall(const celllib::TimingArc arc,
 
 // 计算 setup_rise / setup_fall 约束（单位：ns，供 LUT 使用）
 double caculate_setup_rise(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double data_trans, double clk_trans) {
+                           const celllib::CellLibrary *lib, double data_trans,
+                           double clk_trans) {
   double setup_rise = 0.0;
   if (arc.rise_constraint.has_value() &&
       arc.rise_constraint->template_name.has_value()) {
@@ -115,16 +114,16 @@ double caculate_setup_rise(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
-      setup_rise = lib->caculate_lookuptable(
-          arc.rise_constraint.value(), data_trans, clk_trans, var1, var2);
+      setup_rise = lib->caculate_lookuptable(arc.rise_constraint.value(),
+                                             data_trans, clk_trans, var1, var2);
     }
   }
   return setup_rise;
 }
 
 double caculate_setup_fall(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double data_trans, double clk_trans) {
+                           const celllib::CellLibrary *lib, double data_trans,
+                           double clk_trans) {
   double setup_fall = 0.0;
   if (arc.fall_constraint.has_value() &&
       arc.fall_constraint->template_name.has_value()) {
@@ -133,16 +132,16 @@ double caculate_setup_fall(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
-      setup_fall = lib->caculate_lookuptable(
-          arc.fall_constraint.value(), data_trans, clk_trans, var1, var2);
+      setup_fall = lib->caculate_lookuptable(arc.fall_constraint.value(),
+                                             data_trans, clk_trans, var1, var2);
     }
   }
   return setup_fall;
 }
 
 double caculate_hold_rise(const celllib::TimingArc arc,
-                          const celllib::CellLibrary *lib,
-                          double data_trans, double clk_trans) {
+                          const celllib::CellLibrary *lib, double data_trans,
+                          double clk_trans) {
   double hold_rise = 0.0;
   if (arc.rise_constraint.has_value() &&
       arc.rise_constraint->template_name.has_value()) {
@@ -151,16 +150,16 @@ double caculate_hold_rise(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
-      hold_rise = lib->caculate_lookuptable(
-          arc.rise_constraint.value(), data_trans, clk_trans, var1, var2);
+      hold_rise = lib->caculate_lookuptable(arc.rise_constraint.value(),
+                                            data_trans, clk_trans, var1, var2);
     }
   }
   return hold_rise;
 }
 
 double caculate_hold_fall(const celllib::TimingArc arc,
-                          const celllib::CellLibrary *lib,
-                          double data_trans, double clk_trans) {
+                          const celllib::CellLibrary *lib, double data_trans,
+                          double clk_trans) {
   double hold_fall = 0.0;
   if (arc.fall_constraint.has_value() &&
       arc.fall_constraint->template_name.has_value()) {
@@ -169,8 +168,8 @@ double caculate_hold_fall(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
-      hold_fall = lib->caculate_lookuptable(
-          arc.fall_constraint.value(), data_trans, clk_trans, var1, var2);
+      hold_fall = lib->caculate_lookuptable(arc.fall_constraint.value(),
+                                            data_trans, clk_trans, var1, var2);
     }
   }
   return hold_fall;

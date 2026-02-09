@@ -235,6 +235,7 @@ STAReportGenerator::compute_required_and_slack(const TimingPathResult &path,
     double slack = required - path.data_arrival_time;
     return {required, slack};
   } else {
+    // MIN (hold)：与 utils compute_require_and_slack 一致，slack = required - arrival
     double required = path.library_hold_time.value_or(0.0);
     double slack = path.data_arrival_time + required;
     return {required, slack};
@@ -321,14 +322,10 @@ void STAReportGenerator::print_slack_summary(const TimingPathResult &path,
 }
 
 // 生成单个路径的详细报告（标准格式）
-void STAReportGenerator::generate_path_report(
-    const STAWorker &worker, const SignalBit &endpoint_bit,
-    const std::string &clock_name, const TimingEndpoint *endpoint_override) {
+void STAReportGenerator::generate_path_report(const STAWorker &worker,
+                                              const SignalBit &endpoint_bit,
+                                              const std::string &clock_name) {
 
-  (void)endpoint_bit;
-  (void)endpoint_override;
-
-  // FIXME: 目前简单打印第一条路径的详细信息；后续可根据 endpoint_bit 精确筛选
   TimingRunResult run = worker.get_sta_res();
   if (run.paths.empty()) {
     std::cout << "No timing paths found.\n";
@@ -507,78 +504,19 @@ void STAReportGenerator::generate_report_pt_files(
 
   // 统一中间结果：直接使用 STAWorker 内部构建好的 TimingRunResult
   const TimingRunResult run = worker.get_sta_res();
+  worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
   g_current_timing_run = &run;
-
-  struct PathEntry {
-    const TimingPathResult *path;
-  };
-  std::vector<PathEntry> reg2reg_max, in2reg_max, reg2out_max, in2out_max;
-  std::vector<PathEntry> reg2reg_min, in2reg_min, reg2out_min, in2out_min;
 
   // 按起终点 point 类型统一分类（与 effective_start_type_for_group + end type
   // 一致） CLK→REGD 即 reg2reg（时钟沿→launch FF Q→…→capture FF D）；INPUT→REGD
   // 为 in2reg
-  for (const auto &path : run.paths) {
-    PathGroup g = PathGroup::IN2OUT;
-    if (path.startpoint < run.points.size() &&
-        path.endpoint < run.points.size()) {
-      PointType start_type =
-          effective_start_type_for_group(run.points[path.startpoint]);
-      PointType end_type = run.points[path.endpoint].type;
-      g = classify_path_group(start_type, end_type);
-    }
-    PathEntry e{&path};
-    if (mode == AnalysisMode::MAX) {
-      switch (g) {
-      case PathGroup::REG2REG:
-        reg2reg_max.push_back(e);
-        break;
-      case PathGroup::IN2REG:
-        in2reg_max.push_back(e);
-        break;
-      case PathGroup::REG2OUT:
-        reg2out_max.push_back(e);
-        break;
-        ;
-      case PathGroup::IN2OUT:
-        in2out_max.push_back(e);
-        break;
-      }
-    } else {
-      switch (g) {
-      case PathGroup::REG2REG:
-        reg2reg_min.push_back(e);
-        break;
-      case PathGroup::IN2REG:
-        in2reg_min.push_back(e);
-        break;
-      case PathGroup::REG2OUT:
-        reg2out_min.push_back(e);
-        break;
-      case PathGroup::IN2OUT:
-        in2out_min.push_back(e);
-        break;
-      }
-    }
-  }
-
-  auto by_slack_worst_first = [&worker](const PathEntry &a,
-                                        const PathEntry &b) {
-    return compute_required_and_slack(*a.path, worker).second <
-           compute_required_and_slack(*b.path, worker).second;
-  };
-  auto by_slack_best_first = [&worker](const PathEntry &a, const PathEntry &b) {
-    return compute_required_and_slack(*a.path, worker).second >
-           compute_required_and_slack(*b.path, worker).second;
-  };
 
   auto write_file = [&](const std::string &filename, const char *delay_type,
                         const char *start_end_type,
-                        std::vector<PathEntry> entries, size_t n_top,
-                        bool use_max_order) {
-    if (use_max_order)
-      std::sort(entries.begin(), entries.end(), by_slack_worst_first);
+                        PathGroup group_type, size_t n_top) {
+    worker.respath_ascending(group_type, worker.get_analysis_mode());
+    auto entries = worker.get_path_entry(group_type, worker.get_analysis_mode());
 
     std::string path = output_dir + "/" + filename;
     std::ofstream f(path);
@@ -617,15 +555,15 @@ void STAReportGenerator::generate_report_pt_files(
 
   // clang-format off
   if (mode == AnalysisMode::MAX) {
-    write_file("timing_max_reg2reg.rpt", "max", "reg_to_reg", reg2reg_max, top_n, true);
-    write_file("timing_max_in2reg.rpt", "max", "in_to_reg", in2reg_max, top_n, true);
-    write_file("timing_max_reg2out.rpt", "max", "reg_to_out", reg2out_max, top_n, true);
-    write_file("timing_max_in2out.rpt", "max", "in_to_out", in2out_max, top_n, true);
+    write_file("timing_max_reg2reg.rpt", "max", "reg_to_reg", PathGroup::REG2REG, top_n);
+    write_file("timing_max_in2reg.rpt", "max", "in_to_reg", PathGroup::IN2REG, top_n);
+    write_file("timing_max_reg2out.rpt", "max", "reg_to_out", PathGroup::REG2OUT, top_n);
+    write_file("timing_max_in2out.rpt", "max", "in_to_out", PathGroup::IN2OUT, top_n);
   } else {
-    write_file("timing_min_reg2reg.rpt", "min", "reg_to_reg", reg2reg_min, top_n, false);
-    write_file("timing_min_in2reg.rpt", "min", "in_to_reg", in2reg_min, top_n, false);
-    write_file("timing_min_reg2out.rpt", "min", "reg_to_out", reg2out_min, top_n, false);
-    write_file("timing_min_in2out.rpt", "min", "in_to_out", in2out_min, top_n, false);
+    write_file("timing_min_reg2reg.rpt", "min", "reg_to_reg", PathGroup::REG2REG, top_n);
+    write_file("timing_min_in2reg.rpt", "min", "in_to_reg", PathGroup::IN2REG, top_n);
+    write_file("timing_min_reg2out.rpt", "min", "reg_to_out", PathGroup::REG2OUT, top_n);
+    write_file("timing_min_in2out.rpt", "min", "in_to_out", PathGroup::IN2OUT, top_n);
   }
   // clang-format on
   g_current_timing_run = nullptr;

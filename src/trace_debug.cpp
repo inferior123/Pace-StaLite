@@ -129,15 +129,33 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       std::string report_dir = "./result1/candidate/" + design_name;
 
       worker.get_config().clk_period = 10000;
-      worker.set_analysis_mode(AnalysisMode::MAX);
+      worker.set_analysis_mode(sta::AnalysisMode::MAX);
       sta::STAReportGenerator::generate_report_pt_files(
           worker, "__clk__", report_dir, design_name, 1);
 
       worker.get_config().clk_period = 0;
-      worker.set_analysis_mode(AnalysisMode::MIN);
+      worker.set_analysis_mode(sta::AnalysisMode::MIN);
       sta::STAReportGenerator::generate_report_pt_files(
           worker, "__clk__", report_dir, design_name, 1);
     }
+  }
+}
+
+void display_all_longest_path(sta::STAWorker &worker) {
+  worker.divide_path_entry();
+  const sta::AnalysisMode mode = worker.get_analysis_mode();
+  const sta::PathGroup groups[] = {sta::PathGroup::REG2REG, sta::PathGroup::IN2REG,
+                                   sta::PathGroup::REG2OUT, sta::PathGroup::IN2OUT};
+  const char *names[] = {"reg2reg", "in2reg", "reg2out", "in2out"};
+  for (int i = 0; i < 4; ++i) {
+    worker.respath_ascending(groups[i], mode);
+    auto entries = worker.get_path_entry(groups[i], mode);
+    if (entries.empty())
+      continue;
+    std::cout << "\n========== Longest path [" << names[i] << "] ==========\n";
+    sta::TimingPathResult &pr =
+        const_cast<sta::TimingPathResult &>(*entries[0].path);
+    worker.display_result_path_detail(pr);
   }
 }
 
@@ -186,17 +204,19 @@ void singal_test(char *file_name) {
     worker.build_candidate_graphy_dfs();
     worker.run_candidate_graphy_dfs();
 
+    display_all_longest_path(worker);
+
     std::string design_name =
         worker.top_moudle.empty() ? "design" : worker.top_moudle;
     std::string report_dir = "./result1/candidate/" + design_name;
 
     worker.get_config().clk_period = 10000;
-    worker.set_analysis_mode(AnalysisMode::MAX);
+    worker.set_analysis_mode(sta::AnalysisMode::MAX);
     sta::STAReportGenerator::generate_report_pt_files(
         worker, "__clk__", report_dir, design_name, 1);
 
     worker.get_config().clk_period = 0;
-    worker.set_analysis_mode(AnalysisMode::MIN);
+    worker.set_analysis_mode(sta::AnalysisMode::MIN);
     sta::STAReportGenerator::generate_report_pt_files(
         worker, "__clk__", report_dir, design_name, 1);
   }

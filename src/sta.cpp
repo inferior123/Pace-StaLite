@@ -123,14 +123,16 @@ void STAWorker::build_fanouts() {
           if (clk_pt < res.points.size())
             res.points[clk_pt].type = CLK;
         } else {
-          // 可能 port 的 bit 与 instance 连接的 canonical 表示不一致，先按端口名/bit 匹配已有顶层 port
+          // 可能 port 的 bit 与 instance 连接的 canonical
+          // 表示不一致，先按端口名/bit 匹配已有顶层 port
           bool found_port = false;
           for (std::size_t i = 0; i < res.points.size(); ++i) {
             const auto &pt = res.points[i];
             if (pt.inst != nullptr)
               continue;
             bool name_match = (pt.port_name == clock_canonical.wire_name) ||
-                (pt.bit.has_value() && pt.bit->wire_name == clock_canonical.wire_name);
+                              (pt.bit.has_value() &&
+                               pt.bit->wire_name == clock_canonical.wire_name);
             if (name_match) {
               clk_pt = i;
               bit_to_driver[clock_canonical] = clk_pt;
@@ -141,11 +143,12 @@ void STAWorker::build_fanouts() {
           }
           if (!found_port) {
             clk_pt = get_or_create_point(nullptr, clock_canonical.wire_name,
-                                        clock_canonical, CLK);
+                                         clock_canonical, CLK);
             if (res.points[clk_pt].type != CLK)
               res.points[clk_pt].type = CLK;
             bit_to_driver[clock_canonical] = clk_pt;
-            if (std::find(input_clk_point_ids.begin(), input_clk_point_ids.end(),
+            if (std::find(input_clk_point_ids.begin(),
+                          input_clk_point_ids.end(),
                           clk_pt) == input_clk_point_ids.end()) {
               input_clk_point_ids.push_back(clk_pt);
             }
@@ -244,8 +247,10 @@ void STAWorker::build_fanouts() {
         return true;
     return false;
   };
-  // 2.5b. 补充 REGQ（及任意 driver）到下游的 WIRE 边：若下游点先于 driver 被创建，
-  //       首遍时 bit_to_driver 尚无该 net，会漏掉 driver->consumer，这里按 bit 统一补上
+  // 2.5b. 补充 REGQ（及任意 driver）到下游的 WIRE 边：若下游点先于 driver
+  // 被创建，
+  //       首遍时 bit_to_driver 尚无该 net，会漏掉 driver->consumer，这里按 bit
+  //       统一补上
   for (const auto &pt : res.points) {
     if (!pt.bit.has_value())
       continue;
@@ -523,6 +528,7 @@ void STAWorker::run_timing_analysis_dfs() {
           pr.startpoint = path.front().point_id;
           pr.endpoint = path.back().point_id;
           pr.data_arrival_time = f.arrival;
+          pr.index = res.paths.size();
           pr.group = classify_path_group(
               effective_start_type_for_group(res.points[pr.startpoint]),
               cur.type);
@@ -542,8 +548,15 @@ void STAWorker::run_timing_analysis_dfs() {
             double incr = path[i].arrival - path[i - 1].arrival;
             double slew =
                 std::max(path[i].slew_rise_ns, path[i].slew_fall_ns) * NS_TO_PS;
-            TimingStep step{path[i - 1].point_id, path[i].point_id, incr, slew,
-                            path[i].arrival,      path[i].dir};
+            TimingStep step{
+                path[i - 1].point_id,
+                path[i].point_id,
+                incr,
+                slew,
+                res.points[path[i].point_id].inst->load_capacitance.at(
+                    res.points[path[i].point_id].port_name),
+                path[i].arrival,
+                path[i].dir};
             pr.steps.push_back(step);
           }
           res.paths.push_back(pr);

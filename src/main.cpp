@@ -1,5 +1,4 @@
 #include <cstdlib>
-#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -65,12 +64,6 @@ int sta_main(int argc, char *argv[]) {
   // calculate_timing_arcs
   std::cout << "✓ Build + load capacitance completed" << std::endl;
 
-  // fanout_debuger(worker);
-
-  // run_debuger(worker, true);
-  // worker.run();
-  // worker.run_dfs();
-  // worker.print_all_timing_paths_dfs();
   std::cout << "Step 4: run_timing_analysis_dfs()..." << std::endl;
   worker.run_timing_analysis_dfs();
 
@@ -79,7 +72,6 @@ int sta_main(int argc, char *argv[]) {
     std::cout << "no clk period specified, use 1000ps (1ns)" << std::endl;
     worker.get_config().clk_period = 100;
   }
-  worker.sta_check();
 
   // 生成与 PT 格式一致的 8 个 timing 报告文件，便于与 ref 对比
   std::string design_name =

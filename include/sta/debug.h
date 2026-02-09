@@ -1,5 +1,6 @@
 
-using namespace sta;
+#include "sta_data_structures.hpp"
+
 void fanout_debuger(sta::STAWorker &worker);
 void run_debuger(sta::STAWorker &worker, bool verbose);
 void compare_bfs_dfs(sta::STAWorker &worker_bfs, sta::STAWorker &worker_dfs);

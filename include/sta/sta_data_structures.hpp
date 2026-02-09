@@ -248,6 +248,7 @@ struct TimingStep {
   size_t end_point;
   double incr = 0.0;
   double slew = 0.0;
+  double cap_load = 0.0;
   double arrival = 0.0;
   TransitionDirection dir = TransitionDirection::UNKNOWN;
 };
@@ -257,6 +258,7 @@ struct TimingStep {
  */
 struct TimingPathResult {
   PathGroup group = PathGroup::REG2REG;
+  size_t index;
 
   size_t startpoint;
   size_t endpoint;
@@ -305,24 +307,6 @@ inline PointType effective_start_type_for_group(const TimingPointRef &p) {
   }
   return p.type;
 }
-
-/**
- *
- * 时序端点：表示时序约束的端点（通常是寄存器的时钟/数据输入，或顶层输出）
- * 因 sigmap 合并，同一 canonical 可能既是顶层输出又是某 reg 的 D
- * 端，需同时保留。
- */
-struct TimingEndpoint {
-  Instance *sink;   // 接收信号的单元实例, 若为none，则为top module的output
-  std::string port; // 端口名称（sink 的端口或顶层输出端口名）
-  std::optional<std::string>
-      primary_output_port; // 若该 net 同时为顶层输出，保留其端口名（如 "out"）
-  std::optional<int> Setup_req;
-  std::optional<int> Hold_req;
-
-  TimingEndpoint() : sink(nullptr) {}
-  TimingEndpoint(Instance *s, const std::string &p) : sink(s), port(p) {}
-};
 
 // ============================================================================
 // 5. 无知节点 (Candidate)
@@ -385,6 +369,20 @@ struct CandidateGraphy {
   std::unordered_map<std::size_t, std::size_t> point_to_node;
 };
 
+struct PathEntry {
+  const TimingPathResult *path;
+};
+
+enum class PathEntryType {
+  REG2REG_MAX,
+  IN2REG_MAX,
+  REG2OUT_MAX,
+  IN2OUT_MAX,
+  REG2REG_MIN,
+  IN2REG_MIN,
+  REG2OUT_MIN,
+  IN2OUT_MIN
+};
 // ============================================================================
 // 6. STA 工作器（STA Worker）
 // ============================================================================
@@ -396,8 +394,6 @@ class STAWorker {
 private:
   // 核心数据结构
   SignalMap sigmap;
-  std::unordered_map<SignalBit, std::vector<TimingEndpoint>, SignalBitHash>
-      endpoints;
   std::deque<SignalBit> timing_queue;
   // 从 startpoint（clk / 顶层 input）出发的 path 的 id，供 PBA 传播用
   std::deque<std::size_t> candidate_timing_queue;
@@ -451,6 +447,9 @@ public:
 private:
   AnalysisGranularity analysis_granularity_ = AnalysisGranularity::MEDIUM;
   AnalysisMode analysis_mode = AnalysisMode::MAX;
+
+  std::vector<PathEntry> reg2reg_max, in2reg_max, reg2out_max, in2out_max;
+  std::vector<PathEntry> reg2reg_min, in2reg_min, reg2out_min, in2out_min;
 
 public:
   STAWorker() : max_arrival_time(0) {}
@@ -512,8 +511,17 @@ public:
 
   /// 打印一条 result path 的完整信息（steps、dir、slew、arrival、终点
   /// setup/hold），供计算流程中调用
-  void display_result_path_detail(TimingPathResult &pr,
-                                  std::size_t path_index) const;
+  void display_result_path_detail(TimingPathResult &pr) const;
+
+  std::vector<PathEntry> get_path_entry(PathGroup group_type,
+                                        AnalysisMode mode);
+  std::vector<PathEntry> get_path_entry(PathEntryType type);
+  void respath_descending(PathGroup group_type, AnalysisMode mode);
+  void respath_ascending(PathGroup group_type, AnalysisMode mode);
+  void respath_ascending(PathEntryType type);
+  void respath_descending(PathEntryType type);
+
+  void divide_path_entry();
 
   // top module name
   std::string top_moudle;
@@ -587,11 +595,6 @@ public:
   get_signal_registry() const {
     return signal_registry;
   }
-  const std::unordered_map<SignalBit, std::vector<TimingEndpoint>,
-                           SignalBitHash> &
-  get_endpoints() const {
-    return endpoints;
-  }
   const std::unordered_set<SignalBit, SignalBitHash> &
   get_driven_signals() const {
     return driven_signals;
@@ -621,15 +624,20 @@ public:
 
 private:
   // 内部辅助函数
+  std::pair<double, double> compute_require_and_slack(size_t path_idx);
+  double compare_slack(size_t a, size_t b);
+  /// 根据 path 最后一步与 endpoint（REGD）计算并填充 library_setup_time /
+  /// library_hold_time
+  void compute_path_setup_hold(TimingPathResult &pr) const;
+  /// 返回指定 (group_type, mode) / type 对应的 path entry
+  /// 向量指针，用于原地排序
+  std::vector<PathEntry> *get_path_entry_ptr(PathGroup group_type,
+                                             AnalysisMode mode);
+  std::vector<PathEntry> *get_path_entry_ptr(PathEntryType type);
 
   SignalBit *get_virtual_clock();
   void propagate_timing(const SignalBit &bit);
   void trace_critical_path();
-
-  // 处理单个 endpoint 的 setup/hold 计算，返回 required_time
-  double
-  process_endpoint_timing(TimingEndpoint &ep, const SignalBit &dst_canonical,
-                          TransitionDirection input_transition_direction);
 
   void trace_path(const SignalBit &endpoint_bit); // 回溯并打印路径
   SignalBit create_signal_bit(const std::string &name, int offset);
