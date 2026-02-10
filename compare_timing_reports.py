@@ -5,6 +5,7 @@
   python3 compare_timing_reports.py --ref ./ref/simpel_pt --candidate ./result/candidate/simple
   python3 compare_timing_reports.py --ref ./ref/simpel_pt --candidate ./result/candidate/simple --tolerance 0.01
 """
+
 import argparse
 import re
 import sys
@@ -21,8 +22,14 @@ REPORT_NAMES = [
     "timing_min_reg2out",
 ]
 COL_LABELS = [
-    "max_in2out", "max_in2reg", "max_reg2reg", "max_reg2out",
-    "min_in2out", "min_in2reg", "min_reg2reg", "min_reg2out",
+    "max_in2out",
+    "max_in2reg",
+    "max_reg2reg",
+    "max_reg2out",
+    "min_in2out",
+    "min_in2reg",
+    "min_reg2reg",
+    "min_reg2out",
 ]
 # 仅一方有 path 时的符号：R=仅 PT 有，C=仅本工具有，-=双方无
 # 说明：reg2reg = 起点为 CLK、终点为 REGD（时钟→launch FF Q→…→capture FF D）；同一类型下
@@ -47,17 +54,11 @@ def parse_rpt(path: Path) -> list[dict]:
             continue
 
         # slack: "  slack (MET)    9.85..." 或 "  slack (VIOLATED)  -0.01..."
-        m_slack = re.search(
-            r"slack\s+\((?:MET|VIOLATED)\)\s*([-\d.]+)", block
-        )
+        m_slack = re.search(r"slack\s+\((?:MET|VIOLATED)\)\s*([-\d.]+)", block)
         # data arrival time: 取第一个带数字的（path 段内的 arrival）
-        m_arrival = re.search(
-            r"data arrival time\s+([-\d.]+)", block
-        )
+        m_arrival = re.search(r"data arrival time\s+([-\d.]+)", block)
         # data required time: 第一个出现即可（path 内和 summary 内数值相同）
-        m_required = re.search(
-            r"data required time\s+([-\d.]+)", block
-        )
+        m_required = re.search(r"data required time\s+([-\d.]+)", block)
 
         slack = float(m_slack.group(1)) if m_slack else None
         # 第一个 "data arrival time" 为 path 段内的到达时间
@@ -65,11 +66,13 @@ def parse_rpt(path: Path) -> list[dict]:
         data_required = float(m_required.group(1)) if m_required else None
 
         if slack is not None:
-            results.append({
-                "slack": slack,
-                "data_arrival": data_arrival,
-                "data_required": data_required,
-            })
+            results.append(
+                {
+                    "slack": slack,
+                    "data_arrival": data_arrival,
+                    "data_required": data_required,
+                }
+            )
     return results
 
 
@@ -93,11 +96,13 @@ def error_one(ref_paths: list[dict], cand_paths: list[dict]):
 def run_table(ref_root: Path, candidate_root: Path) -> None:
     """按 design 匹配 ref（ics55）与 result1/candidate，打印误差表格。"""
     ref_designs = {
-        d.name for d in ref_root.iterdir()
+        d.name
+        for d in ref_root.iterdir()
         if d.is_dir() and (d / "timing_max_in2reg.rpt").exists()
     }
     cand_designs = {
-        d.name for d in candidate_root.iterdir()
+        d.name
+        for d in candidate_root.iterdir()
         if d.is_dir() and (d / "timing_max_in2reg.rpt").exists()
     }
     designs = sorted(ref_designs & cand_designs)
@@ -119,7 +124,9 @@ def run_table(ref_root: Path, candidate_root: Path) -> None:
         return s.rjust(W_COL)
 
     print("# 误差大小（误差越小，数值越接近0）  R=仅PT有  C=仅我有  -=双方无")
-    header = "design".ljust(W_DESIGN) + SEP + SEP.join(c.ljust(W_COL) for c in COL_LABELS)
+    header = (
+        "design".ljust(W_DESIGN) + SEP + SEP.join(c.ljust(W_COL) for c in COL_LABELS)
+    )
     print(header)
 
     for design in designs:
@@ -170,13 +177,13 @@ def compare_one(
                 continue
             if rv is None or cv is None:
                 ok = False
-                msgs.append(f"    path{i+1} {key}: ref={rv} cand={cv} (缺失)")
+                msgs.append(f"    path{i + 1} {key}: ref={rv} cand={cv} (缺失)")
                 continue
             diff = abs(rv - cv)
             if diff > tolerance:
                 ok = False
                 msgs.append(
-                    f"    path{i+1} {key}: ref={rv} cand={cv} diff={diff:.6f} > {tolerance}"
+                    f"    path{i + 1} {key}: ref={rv} cand={cv} diff={diff:.6f} > {tolerance}"
                 )
     if ok and n > 0:
         msgs.append(f"  {name}: {n} 条路径数值在容差 {tolerance} 内一致")
@@ -201,7 +208,7 @@ def main():
     parser.add_argument(
         "--candidate-root",
         type=Path,
-        default=Path("result1/candidate"),
+        default=Path("result/candidate"),
         help="表格模式：candidate 根目录",
     )
     parser.add_argument(
@@ -229,7 +236,9 @@ def main():
             print(f"ERROR: ref 根目录不存在: {args.ref_root}", file=sys.stderr)
             sys.exit(1)
         if not args.candidate_root.is_dir():
-            print(f"ERROR: candidate 根目录不存在: {args.candidate_root}", file=sys.stderr)
+            print(
+                f"ERROR: candidate 根目录不存在: {args.candidate_root}", file=sys.stderr
+            )
             sys.exit(1)
         run_table(args.ref_root, args.candidate_root)
         return

@@ -71,7 +71,8 @@ static char dir_to_char(TransitionDirection d) {
 // 与 build_fanouts / effective_start_type_for_group 一致：用 type 或 __clk__
 // 识别时钟
 static bool is_clock_point_for_report(const TimingPointRef &p) {
-  return p.type == CLK || (!p.port_name.empty() && p.port_name == "__clk__") ||
+  return p.type == CLK_PIN ||
+         (!p.port_name.empty() && p.port_name == "__clk__") ||
          (p.bit.has_value() && p.bit->wire_name == "__clk__");
 }
 
@@ -235,7 +236,8 @@ STAReportGenerator::compute_required_and_slack(const TimingPathResult &path,
     double slack = required - path.data_arrival_time;
     return {required, slack};
   } else {
-    // MIN (hold)：与 utils compute_require_and_slack 一致，slack = required - arrival
+    // MIN (hold)：与 utils compute_require_and_slack 一致，slack = required -
+    // arrival
     double required = path.library_hold_time.value_or(0.0);
     double slack = path.data_arrival_time + required;
     return {required, slack};
@@ -512,11 +514,10 @@ void STAReportGenerator::generate_report_pt_files(
   // 一致） CLK→REGD 即 reg2reg（时钟沿→launch FF Q→…→capture FF D）；INPUT→REGD
   // 为 in2reg
 
-  auto write_file = [&](const std::string &filename, const char *delay_type,
-                        const char *start_end_type,
-                        PathGroup group_type, size_t n_top) {
-    worker.respath_ascending(group_type, worker.get_analysis_mode());
-    auto entries = worker.get_path_entry(group_type, worker.get_analysis_mode());
+  auto write_file = [&](const char *filename, const char *delay_type,
+                        const char *start_end_type, PathGroup group_type,
+                        size_t n_top) {
+    const AnalysisMode mode_local = worker.get_analysis_mode();
 
     std::string path = output_dir + "/" + filename;
     std::ofstream f(path);
@@ -536,15 +537,33 @@ void STAReportGenerator::generate_report_pt_files(
     f << "Version: candidate\n";
     f << "****************************************\n\n";
 
-    if (entries.empty()) {
+    // 计算该 group 下实际可用路径数量
+    std::size_t total_count = worker.get_entries_size(group_type, mode_local);
+
+    if (total_count == 0) {
       f << "No constrained paths.\n\n1\n";
       return;
     }
 
-    for (size_t i = 0; i < entries.size() && i < n_top; ++i) {
-      const auto e = entries[i];
+    std::cout << "[" << start_end_type << " " << delay_type
+              << " size=" << total_count << "]\n";
 
-      const TimingPathResult &path = *e.path;
+    // 调试输出前 top_n 条（最差在前），使用 get_top_k 懒排序
+    for (size_t i = 0; i < total_count && i < top_n; ++i) {
+      const PathEntry *e = worker.get_top_k(group_type, mode_local, i);
+      if (!e || !e->path)
+        break;
+      const auto *pr = e->path;
+      std::cout << i << ": arrival=" << pr->data_arrival_time << "\n";
+    }
+
+    // 正式写入前 n_top 条
+    for (size_t i = 0; i < total_count && i < n_top; ++i) {
+      const PathEntry *e = worker.get_top_k(group_type, mode_local, i);
+      if (!e || !e->path)
+        break;
+
+      const TimingPathResult &path = *e->path;
       print_path_header(path, clock_name, f);
       print_data_arrival(path, clock_name, f, 10);
       print_data_required(path, clock_name, worker, f, 10);

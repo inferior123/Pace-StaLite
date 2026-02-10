@@ -59,6 +59,10 @@ SignalBit *STAWorker::get_virtual_clock() {
 }
 
 void STAWorker::build_fanouts() {
+  if(has_clock == false) {
+    assert("must spec clock");
+  }
+
   if (!cell_library_) {
     assert(false && "CellLibrary is required, no hardcoded fallback");
     return;
@@ -77,7 +81,7 @@ void STAWorker::build_fanouts() {
   // 2. 确保虚拟时钟 CLK point 存在
   SignalBit virtual_clk = *get_virtual_clock();
   std::size_t virtual_clk_pt =
-      get_or_create_point(nullptr, "__clk__", virtual_clk, CLK);
+      get_or_create_point(nullptr, "__clk__", virtual_clk, CLK_SOURCE);
   if (std::find(input_clk_point_ids.begin(), input_clk_point_ids.end(),
                 virtual_clk_pt) == input_clk_point_ids.end()) {
     input_clk_point_ids.push_back(virtual_clk_pt);
@@ -105,6 +109,8 @@ void STAWorker::build_fanouts() {
       const auto &ff_def = cell->ff.value();
       std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
 
+      // 统一为每个寄存器创建一个“时钟端口”点 clk_pt（实例的 CLK pin），
+      // 后续 SEQ_ARC 以及 path group 都从该点出发，而不再直接从顶层时钟网驱动点出发。
       SignalBit clock_canonical = *get_virtual_clock();
       if (instance->connections.count(clock_pin_name)) {
         SignalSpec clock_signals = instance->connections[clock_pin_name];
@@ -112,49 +118,13 @@ void STAWorker::build_fanouts() {
           clock_canonical = sigmap.find(clock_signals[0]);
         }
       }
-
-      std::size_t clk_pt;
-      if (clock_canonical.wire_name == "__clk__") {
-        clk_pt = virtual_clk_pt;
-      } else {
-        auto it = bit_to_driver.find(clock_canonical);
-        if (it != bit_to_driver.end()) {
-          clk_pt = it->second;
-          if (clk_pt < res.points.size())
-            res.points[clk_pt].type = CLK;
-        } else {
-          // 可能 port 的 bit 与 instance 连接的 canonical
-          // 表示不一致，先按端口名/bit 匹配已有顶层 port
-          bool found_port = false;
-          for (std::size_t i = 0; i < res.points.size(); ++i) {
-            const auto &pt = res.points[i];
-            if (pt.inst != nullptr)
-              continue;
-            bool name_match = (pt.port_name == clock_canonical.wire_name) ||
-                              (pt.bit.has_value() &&
-                               pt.bit->wire_name == clock_canonical.wire_name);
-            if (name_match) {
-              clk_pt = i;
-              bit_to_driver[clock_canonical] = clk_pt;
-              res.points[clk_pt].type = CLK;
-              found_port = true;
-              break;
-            }
-          }
-          if (!found_port) {
-            clk_pt = get_or_create_point(nullptr, clock_canonical.wire_name,
-                                         clock_canonical, CLK);
-            if (res.points[clk_pt].type != CLK)
-              res.points[clk_pt].type = CLK;
-            bit_to_driver[clock_canonical] = clk_pt;
-            if (std::find(input_clk_point_ids.begin(),
-                          input_clk_point_ids.end(),
-                          clk_pt) == input_clk_point_ids.end()) {
-              input_clk_point_ids.push_back(clk_pt);
-            }
-          }
-        }
-      }
+      // 为该寄存器实例的 CLK pin 创建/获取专用 TimingPointRef，类型标为 CLK
+      std::size_t clk_pt =
+          get_or_create_point(instance.get(), clock_pin_name, clock_canonical,
+                              CLK_PIN);
+      if (clk_pt < res.points.size())
+        res.points[clk_pt].type = CLK_PIN;
+      input_clk_point_ids.push_back(clk_pt);
 
       for (const auto &output_pin_name : cell->get_output_pins()) {
         const auto *output_pin = cell->get_pin(output_pin_name);
@@ -166,13 +136,14 @@ void STAWorker::build_fanouts() {
           if ((arc.timing_type == celllib::TimingType::RISING_EDGE ||
                arc.timing_type == celllib::TimingType::FALLING_EDGE) &&
               arc.related_pin == clock_pin_name) {
-            if (analysis_granularity_ != AnalysisGranularity::COARSE) {
-              get_or_create_candidate_node(clk_pt);
-            }
+          if (analysis_granularity_ != AnalysisGranularity::COARSE) {
+            get_or_create_candidate_node(clk_pt);
+          }
             for (size_t i = 0; i < output_signals.size(); ++i) {
               SignalBit output_canonical = sigmap.find(output_signals[i]);
               std::size_t regq_pt = get_or_create_point(
                   instance.get(), output_pin_name, output_canonical, REGQ);
+              // SEQ_ARC：从该寄存器的 CLK pin 到 Q 输出
               pending_edges.push_back({clk_pt, regq_pt, SEQ_ARC});
               bit_to_driver[output_canonical] = regq_pt;
             }
@@ -324,7 +295,7 @@ void STAWorker::build_res_edges() {
   }
 }
 
-void STAWorker::calculate_load_capacitance() {
+void STAWorker::calculate_load_capacitance_dfs() {
   assert(cell_library_);
 
   // 初始化每个 instance 的 output pin 负载为 0
@@ -606,7 +577,7 @@ void STAWorker::run_timing_analysis_dfs() {
 
         double in_slew_rise = f.slew_rise_ns;
         double in_slew_fall = f.slew_fall_ns;
-        bool is_start = (cur.type == INPUT || cur.type == CLK);
+        bool is_start = (cur.type == INPUT || cur.type == CLK_PIN);
         if (is_start && in_slew_rise == 0)
           in_slew_rise = clk_slew_ns;
         if (is_start && in_slew_fall == 0)

@@ -233,8 +233,16 @@ void convert_arc(ista::LibArc *la, ista::LibPort *snk_port,
     }
   }
   Pin *pin = cell.get_pin(snk_port->get_port_name());
-  if (pin)
+  if (pin) {
+    for (auto &existing : pin->timing_arcs) {
+      if (existing.related_pin == arc.related_pin &&
+          existing.timing_type == arc.timing_type) {
+        existing = arc;
+        return;
+      }
+    }
     pin->timing_arcs.push_back(arc);
+  }
 }
 
 /** 从时序弧推断时序单元（ff 未解析时使用）：setup/hold 的

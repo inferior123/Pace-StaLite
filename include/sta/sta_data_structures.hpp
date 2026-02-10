@@ -137,6 +137,9 @@ struct Instance {
   // 输出端口负载电容：output_pin -> 该输出端口上看到的负载总电容(ff)，即所有
   // fanout 的 input pin 电容之和
   std::unordered_map<std::string, double> load_capacitance;
+  /// candidate 精确模式：按 output 上升/下降分别累加 fanout 的 rise/fall 电容
+  std::unordered_map<std::string, double> load_capacitance_rise;
+  std::unordered_map<std::string, double> load_capacitance_fall;
 
   Instance(const std::string &mod, const std::string &inst)
       : module_name(mod), instance_name(inst) {}
@@ -167,14 +170,14 @@ enum class AnalysisMode { MAX, MIN };
 
 enum class PathGroup { REG2REG, IN2REG, REG2OUT, IN2OUT };
 
-enum PointType { COMB_PIN, INPUT, OUTPUT, CLK, REGQ, REGD };
+enum PointType { COMB_PIN, INPUT, OUTPUT, CLK_PIN, CLK_SOURCE, REGQ, REGD, CLK };
 
 /// 按起终点 PointType 得到 PathGroup，建 path 时设好，报告层直接用
 inline PathGroup classify_path_group(PointType start_type, PointType end_type) {
   if (end_type == REGD)
-    return (start_type == CLK) ? PathGroup::REG2REG : PathGroup::IN2REG;
+    return (start_type == CLK_PIN) ? PathGroup::REG2REG : PathGroup::IN2REG;
   if (end_type == OUTPUT)
-    return (start_type == CLK) ? PathGroup::REG2OUT : PathGroup::IN2OUT;
+    return (start_type == CLK_PIN) ? PathGroup::REG2OUT : PathGroup::IN2OUT;
   return PathGroup::IN2OUT;
 }
 
@@ -300,9 +303,9 @@ struct TimingRunResult {
 /// CLK 的 “连到 FF 时钟端的 input” 视为 CLK，其余顶层端口视为 INPUT
 inline PointType effective_start_type_for_group(const TimingPointRef &p) {
   if (p.inst == nullptr) {
-    if (p.type == CLK || p.port_name == "__clk__" ||
+    if (p.type == CLK_PIN || p.port_name == "__clk__" ||
         (p.bit.has_value() && p.bit->wire_name == "__clk__"))
-      return CLK;
+      return CLK_PIN;
     return INPUT;
   }
   return p.type;
@@ -426,8 +429,10 @@ private:
     int clock_uncertain = 0;
     int clock_transit_raise = 0;
     int clock_transit_fall = 0;
+    std::string clk_name = "clk";
   };
   sta_config cfg;
+  bool has_clock = false;
 
   TimingRunResult res;
 
@@ -444,12 +449,26 @@ public:
     FINE    // 精确模式：后续版本再考虑实现，遇到直接assert
   };
 
+  bool get_has_clock() {return has_clock;}
+
 private:
   AnalysisGranularity analysis_granularity_ = AnalysisGranularity::MEDIUM;
   AnalysisMode analysis_mode = AnalysisMode::MAX;
 
   std::vector<PathEntry> reg2reg_max, in2reg_max, reg2out_max, in2out_max;
   std::vector<PathEntry> reg2reg_min, in2reg_min, reg2out_min, in2out_min;
+
+  // 每个分类是否已经按当前 analysis_mode 的语义完成排序：
+  // - MAX: 按 slack 升序（最差的在前）
+  // - MIN: 按 slack 降序（最差的在前）
+  bool reg2reg_max_sorted = false;
+  bool in2reg_max_sorted = false;
+  bool reg2out_max_sorted = false;
+  bool in2out_max_sorted = false;
+  bool reg2reg_min_sorted = false;
+  bool in2reg_min_sorted = false;
+  bool reg2out_min_sorted = false;
+  bool in2out_min_sorted = false;
 
 public:
   STAWorker() : max_arrival_time(0) {}
@@ -478,7 +497,9 @@ public:
   /// 根据 res.points 的 fanouts 填充 res.edges，供 CandidatePath 使用 edge
   /// index
   void build_res_edges();
-  void calculate_load_capacitance();
+  void calculate_load_capacitance_dfs();
+  /// candidate 精确模式：按 output 上升/下降分别累加 fanout 的 rise/fall 电容
+  void caculate_candidate_load_cap();
   void calculate_timing_arcs();
 
   /// DFS 时序分析：从 input_clk_point_ids 出发，沿 Point 图 DFS，产出 res.paths
@@ -511,15 +532,27 @@ public:
 
   /// 打印一条 result path 的完整信息（steps、dir、slew、arrival、终点
   /// setup/hold），供计算流程中调用
-  void display_result_path_detail(TimingPathResult &pr) const;
+  void display_result_path_detail(const TimingPathResult &pr) const;
+
+  /// 在 divide_path_entry 之后，按 group+mode 分类好的 path 上提供便捷访问：
+  /// - get_top_k : 取得“最差路径”序列中的第 k 条（0-based，下标 0 为最差）
+  /// - get_last_k: 取得“最好路径”序列中的倒数第 k 条（0-based，下标 0 为最后一条）
+  const PathEntry *get_top_k(PathGroup group_type, AnalysisMode mode,
+                             std::size_t k);
+  const PathEntry *get_last_k(PathGroup group_type, AnalysisMode mode,
+                              std::size_t k);
 
   std::vector<PathEntry> get_path_entry(PathGroup group_type,
                                         AnalysisMode mode);
   std::vector<PathEntry> get_path_entry(PathEntryType type);
+
   void respath_descending(PathGroup group_type, AnalysisMode mode);
   void respath_ascending(PathGroup group_type, AnalysisMode mode);
   void respath_ascending(PathEntryType type);
   void respath_descending(PathEntryType type);
+  std::size_t get_entries_size(PathEntryType type);
+  std::size_t get_entries_size(PathGroup group_type,
+                                        AnalysisMode mode);
 
   void divide_path_entry();
 
@@ -629,6 +662,11 @@ private:
   /// 根据 path 最后一步与 endpoint（REGD）计算并填充 library_setup_time /
   /// library_hold_time
   void compute_path_setup_hold(TimingPathResult &pr) const;
+
+  std::vector<PathEntry> *get_sorted_entries(PathGroup group_type,
+                                            AnalysisMode mode);
+
+
   /// 返回指定 (group_type, mode) / type 对应的 path entry
   /// 向量指针，用于原地排序
   std::vector<PathEntry> *get_path_entry_ptr(PathGroup group_type,

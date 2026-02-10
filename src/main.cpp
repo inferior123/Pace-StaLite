@@ -59,10 +59,7 @@ int sta_main(int argc, char *argv[]) {
   worker.build_fanouts();
   fanout_debuger(worker);
   std::cout << "Step 2: calculate_load_capacitance()..." << std::endl;
-  worker.calculate_load_capacitance();
-  // Step 3: run_timing_analysis_dfs 内部按需计算 delay，无需单独
-  // calculate_timing_arcs
-  std::cout << "✓ Build + load capacitance completed" << std::endl;
+  worker.calculate_load_capacitance_dfs();
 
   std::cout << "Step 4: run_timing_analysis_dfs()..." << std::endl;
   worker.run_timing_analysis_dfs();
@@ -129,7 +126,7 @@ int candidate_test(int argc, char *argv[]) {
   std::cout << "Step 1: build_fanouts()..." << std::endl;
   worker.build_fanouts();
   std::cout << "Step 2: calculate_load_capacitance()..." << std::endl;
-  worker.calculate_load_capacitance();
+  worker.caculate_candidate_load_cap();
   std::cout << "Step 3: build_candidate_graphy()..." << std::endl;
   worker.build_candidate_graphy_dfs();
 
@@ -150,10 +147,13 @@ int main(int argc, char *argv[]) {
   // gcd_test();
   //
 
-  if (argc > 1)
-    singal_test(argv[1]);
-  else
-    auto_test(argc, argv);
+  // if (argc > 1)
+  //   singal_test(argv[1]);
+  // else
+  //   auto_test(argc, argv);
+
+  spi_test();
+  // // test_lut();
 
   return 0;
 }

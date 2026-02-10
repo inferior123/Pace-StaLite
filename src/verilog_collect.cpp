@@ -162,11 +162,17 @@ void STAWorker::collect_port(verilog::Port &port) {
           pt.inst = nullptr;
           pt.port_name = sig_name;
           pt.bit = canonical;
-          pt.type = INPUT;
+          if(sig_name == cfg.clk_name) {
+            pt.type = CLK_SOURCE;
+            has_clock = true;
+          } else {
+            pt.type = INPUT;
+          }
           pt.fanouts = {};
           res.points.push_back(std::move(pt));
           res.point_index[key] = pt_id;
-          input_clk_point_ids.push_back(pt_id);
+          if(pt.type != CLK_SOURCE)
+            input_clk_point_ids.push_back(pt_id);
         }
         top_module_inputs.insert(canonical);
         driven_signals.insert(canonical);

@@ -96,6 +96,7 @@ public:
                     const std::vector<double> &waveform,
                     const sdc::SDCObjectCollection &objects) override {
     // period 单位：ps（1ns = 1000ps）
+    worker_.get_config().clk_name = name;
     worker_.get_config().clk_period = static_cast<int>(period);
   }
 
@@ -112,12 +113,10 @@ public:
 
   void set_input_delay(double delay_value, const std::string &clock_name,
                        const sdc::SDCObjectCollection &objects) override {
-    assert(false && "not implement");
   }
 
   void set_output_delay(double delay_value, const std::string &clock_name,
                         const sdc::SDCObjectCollection &objects) override {
-    assert(false && "not implement");
   }
 
   void read_verilog(const std::string &filename) override {
@@ -129,8 +128,6 @@ public:
   };
 
   void unknown_command(const sdc::SDCCommand &cmd) override {
-    std::cerr << "invalid command " << cmd.command_name << std::endl;
-    assert(false && "invalid sdc command");
   }
 };
 

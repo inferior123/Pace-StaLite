@@ -1,3 +1,4 @@
+#include "cell/cell_data_structure.hpp"
 #include "sta/sta_data_structures.hpp"
 
 // Liberty LUT 返回 ns，STA 内部统一用 ps
@@ -13,6 +14,31 @@ double get_lut_avg(std::optional<celllib::LookupTable> lut) {
     return 0.0;
   }
 }
+
+// 调试打印：给定具体的 LUT 表（而不是整条 arc），输出索引与所有表值，
+// 供 caculate_transition_* / caculate_setup_* 等调用处查看。
+static void debug_print_tb(const celllib::LookupTable &tb,
+                           const std::string &template_name,
+                           const std::string &var1, const std::string &var2) {
+  std::cout << "\n[DEBUG][LUT] template=" << template_name << " var1=" << var1
+            << " var2=" << var2 << "\n";
+  std::cout << "  index_1[" << tb.index_1.size() << "] =";
+  for (double v : tb.index_1)
+    std::cout << " " << v;
+  std::cout << "\n";
+  std::cout << "  index_2[" << tb.index_2.size() << "] =";
+  for (double v : tb.index_2)
+    std::cout << " " << v;
+  std::cout << "\n";
+  std::cout << "  values (rows=index_1, cols=index_2):\n";
+  for (size_t i = 0; i < tb.values.size(); ++i) {
+    std::cout << "    ";
+    for (size_t j = 0; j < tb.values[i].size(); ++j)
+      std::cout << " " << tb.values[i][j];
+    std::cout << "\n";
+  }
+}
+
 double caculate_delay_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib,
                            double input_slew_rise, double load_cap) {
@@ -25,6 +51,9 @@ double caculate_delay_rise(const celllib::TimingArc arc,
         templ->variable_2.has_value()) {
       std::string var1 = templ->variable_1.value();
       std::string var2 = templ->variable_2.value();
+
+      // debug_print_tb(*arc.cell_rise, template_name, var1, var2);
+
       delay_rise = lib->caculate_lookuptable(
           arc.cell_rise.value(), input_slew_rise, load_cap, var1, var2);
       delay_rise *= NS_TO_PS; // Liberty ns -> ps
@@ -72,6 +101,10 @@ double caculate_transition_rise(const celllib::TimingArc arc,
         templ->variable_2.has_value()) {
       std::string var1 = templ->variable_1.value();
       std::string var2 = templ->variable_2.value();
+
+      // 调试：打印当前 rise_transition 的 LUT 完整表
+      // debug_print_tb(*arc.rise_transition, template_name, var1, var2);
+
       rise_transition_time = lib->caculate_lookuptable(
           arc.rise_transition.value(), input_slew_rise, load_cap, var1, var2);
       rise_transition_time *= NS_TO_PS; // Liberty ns -> ps
@@ -114,6 +147,7 @@ double caculate_setup_rise(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
+
       setup_rise = lib->caculate_lookuptable(arc.rise_constraint.value(),
                                              data_trans, clk_trans, var1, var2);
     }
