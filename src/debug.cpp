@@ -105,27 +105,13 @@ void display_points_fanout(sta::STAWorker &worker, size_t pt_no) {
   if (pt_no >= res.points.size())
     return;
   const TimingPointRef &pt = res.points[pt_no];
-  bool is_input = (pt.inst == nullptr);
 
   if (pt.fanouts.empty())
     return;
 
-  double record_cap = 0.0;
-  double record_rise_cap = 0.0;
-  double record_fall_cap = 0.0;
-  if (!is_input) {
-    auto it = pt.inst->load_capacitance.find(pt.port_name);
-    if (it != pt.inst->load_capacitance.end())
-      record_cap = it->second;
-
-    auto it_r = pt.inst->load_capacitance_rise.find(pt.port_name);
-    if (it_r != pt.inst->load_capacitance_rise.end())
-      record_rise_cap = it_r->second;
-
-    auto it_f = pt.inst->load_capacitance_fall.find(pt.port_name);
-    if (it_f != pt.inst->load_capacitance_fall.end())
-      record_fall_cap = it_f->second;
-  }
+  double record_cap = pt.load_cap;
+  double record_rise_cap = pt.rise_cap;
+  double record_fall_cap = pt.rise_cap;
 
   std::cout << "pt" << pt_no;
   if (pt.inst) {
@@ -371,6 +357,17 @@ void debug_paths_through_instance(STAWorker &worker,
   worker.divide_path_entry();
   const AnalysisMode mode = AnalysisMode::MIN;
   const PathGroup group = PathGroup::IN2REG;
+
+  // 实现 print_point_group 辅助函数
+  // auto print_point_group = [](sta::PathGroup group) -> const char* {
+  //   switch (group) {
+  //     case sta::PathGroup::REG2REG: return "REG2REG";
+  //     case sta::PathGroup::IN2REG:  return "IN2REG";
+  //     case sta::PathGroup::REG2OUT: return "REG2OUT";
+  //     case sta::PathGroup::IN2OUT:  return "IN2OUT";
+  //     default:                      return "?";
+  //   }
+  // };
 
   size_t entries_size = worker.get_entries_size(group, mode);
 

@@ -59,7 +59,7 @@ SignalBit *STAWorker::get_virtual_clock() {
 }
 
 void STAWorker::build_fanouts() {
-  if(has_clock == false) {
+  if (has_clock == false) {
     assert("must spec clock");
   }
 
@@ -110,7 +110,8 @@ void STAWorker::build_fanouts() {
       std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
 
       // 统一为每个寄存器创建一个“时钟端口”点 clk_pt（实例的 CLK pin），
-      // 后续 SEQ_ARC 以及 path group 都从该点出发，而不再直接从顶层时钟网驱动点出发。
+      // 后续 SEQ_ARC 以及 path group
+      // 都从该点出发，而不再直接从顶层时钟网驱动点出发。
       SignalBit clock_canonical = *get_virtual_clock();
       if (instance->connections.count(clock_pin_name)) {
         SignalSpec clock_signals = instance->connections[clock_pin_name];
@@ -119,9 +120,8 @@ void STAWorker::build_fanouts() {
         }
       }
       // 为该寄存器实例的 CLK pin 创建/获取专用 TimingPointRef，类型标为 CLK
-      std::size_t clk_pt =
-          get_or_create_point(instance.get(), clock_pin_name, clock_canonical,
-                              CLK_PIN);
+      std::size_t clk_pt = get_or_create_point(instance.get(), clock_pin_name,
+                                               clock_canonical, CLK_PIN);
       if (clk_pt < res.points.size())
         res.points[clk_pt].type = CLK_PIN;
       input_clk_point_ids.push_back(clk_pt);
@@ -136,9 +136,9 @@ void STAWorker::build_fanouts() {
           if ((arc.timing_type == celllib::TimingType::RISING_EDGE ||
                arc.timing_type == celllib::TimingType::FALLING_EDGE) &&
               arc.related_pin == clock_pin_name) {
-          if (analysis_granularity_ != AnalysisGranularity::COARSE) {
-            get_or_create_candidate_node(clk_pt);
-          }
+            if (analysis_granularity_ != AnalysisGranularity::COARSE) {
+              get_or_create_candidate_node(clk_pt);
+            }
             for (size_t i = 0; i < output_signals.size(); ++i) {
               SignalBit output_canonical = sigmap.find(output_signals[i]);
               std::size_t regq_pt = get_or_create_point(
@@ -298,19 +298,6 @@ void STAWorker::build_res_edges() {
 void STAWorker::calculate_load_capacitance_dfs() {
   assert(cell_library_);
 
-  // 初始化每个 instance 的 output pin 负载为 0
-  for (auto &instance : instances) {
-    const auto *cell = cell_library_->get_cell(instance->module_name);
-    if (!cell) {
-      std::cerr << "could not find the standard cell " << instance->module_name
-                << std::endl;
-      assert(false);
-    }
-    for (const auto &out_pin : cell->get_output_pins()) {
-      instance->load_capacitance[out_pin] = 0.0;
-    }
-  }
-
   // 从 input_clk_point_ids 出发，拓扑遍历
   std::deque<std::size_t> queue(input_clk_point_ids.begin(),
                                 input_clk_point_ids.end());
@@ -323,13 +310,14 @@ void STAWorker::calculate_load_capacitance_dfs() {
       continue;
     visited.insert(pt_id);
 
-    const TimingPointRef &pt = res.points[pt_id];
+    TimingPointRef &pt = res.points[pt_id];
 
     // 若为 cell 输出点（COMB_PIN 或 REGQ），将该输出端口的所有 fanout 的 input
     // pin 电容累加
-    if (pt.inst && (pt.type == COMB_PIN || pt.type == REGQ)) {
+    if (pt.type == COMB_PIN || pt.type == REGQ || pt.type == INPUT) {
       for (const TimingEdge &e : pt.fanouts) {
         const TimingPointRef &target = res.points[e.target_point];
+
         if (!target.inst)
           continue; // 顶层端口，无电容
         const auto *fanout_cell =
@@ -339,9 +327,9 @@ void STAWorker::calculate_load_capacitance_dfs() {
           assert(false);
         }
         const auto *input_pin = fanout_cell->get_pin(target.port_name);
+
         if (input_pin && input_pin->capacitance.has_value()) {
-          pt.inst->load_capacitance[pt.port_name] +=
-              input_pin->capacitance.value();
+          pt.load_cap += input_pin->capacitance.value();
         }
       }
     }
@@ -524,8 +512,7 @@ void STAWorker::run_timing_analysis_dfs() {
                 path[i].point_id,
                 incr,
                 slew,
-                res.points[path[i].point_id].inst->load_capacitance.at(
-                    res.points[path[i].point_id].port_name),
+                res.points[path[i - 1].point_id].load_cap,
                 path[i].arrival,
                 path[i].dir};
             pr.steps.push_back(step);
@@ -570,10 +557,7 @@ void STAWorker::run_timing_analysis_dfs() {
           continue;
         }
 
-        double load_cap = 0.0;
-        if (target.inst &&
-            target.inst->load_capacitance.count(target.port_name))
-          load_cap = target.inst->load_capacitance.at(target.port_name);
+        double load_cap = target.load_cap;
 
         double in_slew_rise = f.slew_rise_ns;
         double in_slew_fall = f.slew_fall_ns;

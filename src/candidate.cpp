@@ -118,7 +118,8 @@ void STAWorker::build_candidate_graphy_dfs() {
           candidate_graphy_.paths.push_back(std::move(path));
 
           const TimingPointRef &start_pt = res.points[start_pt_id];
-          bool is_startpoint = (start_pt.type == INPUT || start_pt.type == CLK_PIN);
+          bool is_startpoint =
+              (start_pt.type == INPUT || start_pt.type == CLK_PIN);
           if (is_startpoint)
             candidate_timing_queue.push_back(path_id);
 
@@ -284,16 +285,13 @@ static void segment_delay_slew(const TimingRunResult &res,
   }
   // candidate 精确模式：按 output 上升/下降选用预计算好的 rise/fall 负载
   double load_cap = 0.0;
-  if (out_dir == TransitionDirection::RISING &&
-      inst->load_capacitance_rise.count(output_pin_name))
-    load_cap = inst->load_capacitance_rise.at(output_pin_name);
-  else if (out_dir == TransitionDirection::FALLING &&
-           inst->load_capacitance_fall.count(output_pin_name))
-    load_cap = inst->load_capacitance_fall.at(output_pin_name);
-  else if (inst->load_capacitance.count(output_pin_name))
-    load_cap = inst->load_capacitance.at(output_pin_name);
+  if (out_dir == TransitionDirection::RISING)
+    load_cap = to_ref.rise_cap;
+  else if (out_dir == TransitionDirection::FALLING)
+    load_cap = to_ref.fall_cap;
+  else 
+    load_cap = to_ref.load_cap;
 
-  
   if (out_dir == TransitionDirection::RISING) {
     out_delay = caculate_delay_rise(arc, cell_library_, prev_slew, load_cap);
     out_slew =
@@ -311,17 +309,7 @@ static void segment_delay_slew(const TimingRunResult &res,
 void STAWorker::caculate_candidate_load_cap() {
   if (!cell_library_)
     return;
-  // 初始化每个 instance 的 output pin 的 rise/fall 负载为 0
-  for (auto &instance : instances) {
-    const auto *cell = cell_library_->get_cell(instance->module_name);
-    if (!cell)
-      continue;
-    for (const auto &out_pin : cell->get_output_pins()) {
-      instance->load_capacitance_rise[out_pin] = 0.0;
-      instance->load_capacitance_fall[out_pin] = 0.0;
-    }
-  }
-  // 从 input_clk_point_ids 出发拓扑遍历，对每个 output 点按 fanout 的 rise/fall 电容累加
+  
   std::deque<std::size_t> queue(input_clk_point_ids.begin(),
                                 input_clk_point_ids.end());
   std::unordered_set<std::size_t> visited;
@@ -331,13 +319,13 @@ void STAWorker::caculate_candidate_load_cap() {
     if (visited.count(pt_id))
       continue;
     visited.insert(pt_id);
-    const TimingPointRef &pt = res.points[pt_id];
-    if (pt.inst && (pt.type == COMB_PIN || pt.type == REGQ)) {
+    TimingPointRef &pt = res.points[pt_id];
+    if (pt.type == COMB_PIN || pt.type == REGQ || pt.type == INPUT) {
       for (const TimingEdge &e : pt.fanouts) {
         if (e.target_point >= res.points.size())
           continue;
         const TimingPointRef &target = res.points[e.target_point];
-        if (!target.inst)
+        if (!target.inst) // 输出是output
           continue;
         const auto *fanout_cell =
             cell_library_->get_cell(target.inst->module_name);
@@ -348,17 +336,17 @@ void STAWorker::caculate_candidate_load_cap() {
           continue;
         // 上升/下降指 driver output 的沿，对应 fanout input 的 rise/fall 电容
         if (input_pin->rise_capacitance.has_value())
-          pt.inst->load_capacitance_rise[pt.port_name] +=
-              input_pin->rise_capacitance.value();
+          pt.rise_cap += input_pin->rise_capacitance.value();
+        else if (input_pin->capacitance.has_value()) {
+          std::cerr << "[warning] input do not have rise cap laod" << std::endl;
+          pt.rise_cap += input_pin->capacitance.value();
+        }
+
         if (input_pin->fall_capacitance.has_value())
-          pt.inst->load_capacitance_fall[pt.port_name] +=
-              input_pin->fall_capacitance.value();
-        if (!input_pin->rise_capacitance.has_value() &&
-            !input_pin->fall_capacitance.has_value() &&
-            input_pin->capacitance.has_value()) {
-          double c = input_pin->capacitance.value();
-          pt.inst->load_capacitance_rise[pt.port_name] += c;
-          pt.inst->load_capacitance_fall[pt.port_name] += c;
+          pt.fall_cap += input_pin->fall_capacitance.value();
+        else if (input_pin->capacitance.has_value()) {
+          std::cerr << "[warning] input do not have fall cap laod" << std::endl;
+          pt.fall_cap += input_pin->capacitance.value();
         }
       }
     }
@@ -405,16 +393,14 @@ STAWorker::compute_candidate_path_with_input(std::size_t path_id,
     if (to_pt < res.points.size()) {
       const auto &to_ref = res.points[to_pt];
       if (to_ref.inst) {
-        if (seg_dir == TransitionDirection::RISING &&
-            to_ref.inst->load_capacitance_rise.count(to_ref.port_name))
-          step.cap_load =
-              to_ref.inst->load_capacitance_rise.at(to_ref.port_name);
-        else if (seg_dir == TransitionDirection::FALLING &&
-                 to_ref.inst->load_capacitance_fall.count(to_ref.port_name))
-          step.cap_load =
-              to_ref.inst->load_capacitance_fall.at(to_ref.port_name);
-        else if (to_ref.inst->load_capacitance.count(to_ref.port_name))
-          step.cap_load = to_ref.inst->load_capacitance.at(to_ref.port_name);
+        if (seg_dir == TransitionDirection::RISING)
+          step.cap_load = to_ref.rise_cap;
+        else if (seg_dir == TransitionDirection::FALLING)
+          step.cap_load = to_ref.fall_cap;
+        else {
+          std::cerr << "[Warning] use the fall back, should not reach here" << std::endl; 
+          step.cap_load = to_ref.load_cap;
+        }
       }
     }
     step.arrival = total_delay;
@@ -603,15 +589,17 @@ void STAWorker::run_candidate_graphy_dfs() {
             std::size_t end_pt = candidate_graphy_.nodes[end_node_id].point_idx;
 
             if (is_terminal_node(res, candidate_graphy_, end_node_id)) {
-              // 指纹：start_end + 各步 (from_pt->to_pt) + 每步方向，同拓扑同方向才视为重复
+              // 指纹：start_end + 各步 (from_pt->to_pt) +
+              // 每步方向，同拓扑同方向才视为重复
               std::string fp =
                   std::to_string(start_pt) + "_" + std::to_string(end_pt);
               for (const auto &st : new_steps) {
                 fp += "_" + std::to_string(st.start_point) + "-" +
                       std::to_string(st.end_point);
-                fp += (st.dir == TransitionDirection::RISING)
-                          ? "r"
-                          : (st.dir == TransitionDirection::FALLING ? "f" : "?");
+                fp +=
+                    (st.dir == TransitionDirection::RISING)
+                        ? "r"
+                        : (st.dir == TransitionDirection::FALLING ? "f" : "?");
               }
               if (!path_printed.insert(fp).second)
                 continue;

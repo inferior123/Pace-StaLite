@@ -349,7 +349,7 @@ void spi_test() {
     worker.run_candidate_graphy_dfs(); // 填充 worker.res
 
     debug_paths_through_instance(worker, "state_1__reg_p");
-    // display_points_fanout(worker, 33);
+    display_points_fanout(worker, 6);
   }
 }
 
