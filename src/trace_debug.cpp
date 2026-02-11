@@ -130,7 +130,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
 
       MySDCParser sdc_interface(worker);
       sdc::SDCParser sdc_parser(&sdc_interface);
-      std::string sdc_file = vpath.string();
+      std::string sdc_file = vfile;
       size_t pos = sdc_file.find_last_of('.');
       if (pos != std::string::npos && sdc_file.substr(pos) == ".v") {
         sdc_file.replace(pos, std::string::npos, ".sdc");
@@ -143,30 +143,64 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       MyVerilogParser verilog_parser(worker);
 
       verilog_parser.read(vfile.c_str());
-
-      if (worker.get_has_clock() == false) {
-        assert(false && "clock not found");
-      }
-
-      std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-      worker.build_fanouts();
-      std::cout << "  [PBA] Step 2: calculate_load_capacitance()...\n";
-      worker.caculate_candidate_load_cap();
-      std::cout << "  [PBA] Step 3: build_candidate_graphy()...\n";
-      worker.build_candidate_graphy_dfs();
-      worker.run_candidate_graphy_dfs(); // 填充 worker.res
+      worker.set_analysis_mode(sta::AnalysisMode::MAX);
 
       std::string design_name =
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
       std::string report_dir = "./result/candidate/" + design_name;
 
+      std::cout << "  [PBA] Step 1: build_fanouts()...\n";
+      worker.build_fanouts();
+
+      std::cout << "  [PBA-MAX] Step 2: calculate_load_capacitance()...\n";
+      worker.caculate_candidate_load_cap();
+      std::cout << "  [PBA-MAX] Step 3: build_candidate_graphy()...\n";
+      worker.build_candidate_graphy_dfs();
+      worker.run_candidate_graphy_dfs();
+
+      // display_all_longest_path(worker);
+
       worker.get_config().clk_period = 10000;
-      worker.set_analysis_mode(sta::AnalysisMode::MAX);
       sta::STAReportGenerator::generate_report_pt_files(
           worker, "__clk__", report_dir, design_name, 1);
+    }
+
+    {
+      sta::STAWorker worker;
+
+      MySDCParser sdc_interface(worker);
+      sdc::SDCParser sdc_parser(&sdc_interface);
+      std::string sdc_file = vfile;
+      size_t pos = sdc_file.find_last_of('.');
+      if (pos != std::string::npos && sdc_file.substr(pos) == ".v") {
+        sdc_file.replace(pos, std::string::npos, ".sdc");
+      }
+      std::cout << "Parsing SDC file: " << sdc_file << std::endl;
+      sdc_parser.parse_file(sdc_file);
+      std::cout << "finish parse SDC file" << std::endl;
+
+      worker.set_cell_library(cell_lib);
+      MyVerilogParser verilog_parser(worker);
+
+      verilog_parser.read(vfile.c_str());
+      worker.set_analysis_mode(sta::AnalysisMode::MIN);
+
+      std::string design_name =
+          worker.top_moudle.empty() ? "design" : worker.top_moudle;
+      std::string report_dir = "./result/candidate/" + design_name;
+
+      std::cout << "  [PBA] Step 1: build_fanouts()...\n";
+      worker.build_fanouts();
+
+      std::cout << "  [PBA-MIN] Step 2: calculate_load_capacitance()...\n";
+      worker.caculate_candidate_load_cap();
+      std::cout << "  [PBA-MIN] Step 3: build_candidate_graphy()...\n";
+      worker.build_candidate_graphy_dfs();
+      worker.run_candidate_graphy_dfs();
+
+      debug_paths_through_instance(worker, "state_1__reg_p");
 
       worker.get_config().clk_period = 0;
-      worker.set_analysis_mode(sta::AnalysisMode::MIN);
       sta::STAReportGenerator::generate_report_pt_files(
           worker, "__clk__", report_dir, design_name, 1);
     }
@@ -246,28 +280,64 @@ void singal_test(char *file_name) {
     MyVerilogParser verilog_parser(worker);
 
     verilog_parser.read(vfile.c_str());
-
-    std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-    worker.build_fanouts();
-    std::cout << "  [PBA] Step 2: calculate_load_capacitance()...\n";
-    worker.caculate_candidate_load_cap();
-    std::cout << "  [PBA] Step 3: build_candidate_graphy()...\n";
-    worker.build_candidate_graphy_dfs();
-    worker.run_candidate_graphy_dfs();
-
-    // display_all_longest_path(worker);
+    worker.set_analysis_mode(sta::AnalysisMode::MAX);
 
     std::string design_name =
         worker.top_moudle.empty() ? "design" : worker.top_moudle;
     std::string report_dir = "./result1/candidate/" + design_name;
 
+    std::cout << "  [PBA] Step 1: build_fanouts()...\n";
+    worker.build_fanouts();
+
+    std::cout << "  [PBA-MAX] Step 2: calculate_load_capacitance()...\n";
+    worker.caculate_candidate_load_cap();
+    std::cout << "  [PBA-MAX] Step 3: build_candidate_graphy()...\n";
+    worker.build_candidate_graphy_dfs();
+    worker.run_candidate_graphy_dfs();
+
+    // display_all_longest_path(worker);
+
     worker.get_config().clk_period = 10000;
-    worker.set_analysis_mode(sta::AnalysisMode::MAX);
     sta::STAReportGenerator::generate_report_pt_files(
         worker, "__clk__", report_dir, design_name, 1);
+  }
+
+  {
+    sta::STAWorker worker;
+
+    MySDCParser sdc_interface(worker);
+    sdc::SDCParser sdc_parser(&sdc_interface);
+    std::string sdc_file = vfile;
+    size_t pos = sdc_file.find_last_of('.');
+    if (pos != std::string::npos && sdc_file.substr(pos) == ".v") {
+      sdc_file.replace(pos, std::string::npos, ".sdc");
+    }
+    std::cout << "Parsing SDC file: " << sdc_file << std::endl;
+    sdc_parser.parse_file(sdc_file);
+    std::cout << "finish parse SDC file" << std::endl;
+
+    worker.set_cell_library(cell_lib);
+    MyVerilogParser verilog_parser(worker);
+
+    verilog_parser.read(vfile.c_str());
+    worker.set_analysis_mode(sta::AnalysisMode::MIN);
+
+    std::string design_name =
+        worker.top_moudle.empty() ? "design" : worker.top_moudle;
+    std::string report_dir = "./result1/candidate/" + design_name;
+
+    std::cout << "  [PBA] Step 1: build_fanouts()...\n";
+    worker.build_fanouts();
+
+    std::cout << "  [PBA-MIN] Step 2: calculate_load_capacitance()...\n";
+    worker.caculate_candidate_load_cap();
+    std::cout << "  [PBA-MIN] Step 3: build_candidate_graphy()...\n";
+    worker.build_candidate_graphy_dfs();
+    worker.run_candidate_graphy_dfs();
+
+    debug_paths_through_instance(worker, "state_1__reg_p");
 
     worker.get_config().clk_period = 0;
-    worker.set_analysis_mode(sta::AnalysisMode::MIN);
     sta::STAReportGenerator::generate_report_pt_files(
         worker, "__clk__", report_dir, design_name, 1);
   }
@@ -340,6 +410,7 @@ void spi_test() {
     MyVerilogParser verilog_parser(worker);
 
     verilog_parser.read(vfile.c_str());
+    worker.set_analysis_mode(sta::AnalysisMode::MIN);
 
     std::cout << "  [PBA] Step 1: build_fanouts()...\n";
     worker.build_fanouts();

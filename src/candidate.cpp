@@ -60,6 +60,73 @@ std::size_t STAWorker::get_or_create_point(Instance *inst,
   return id;
 }
 
+namespace {
+
+void print_candidate_nodes(
+    const sta::CandidateGraphy &cg, const sta::TimingRunResult &res,
+    const std::unordered_set<std::size_t> &startpoint_nodes) {
+  std::cout << "\n=== NODES ===\n";
+  for (const auto &node : cg.nodes) {
+    bool is_startpoint = startpoint_nodes.count(node.id) > 0;
+    std::cout << "  [" << std::setw(3) << node.id << "] ";
+    if (is_startpoint)
+      std::cout << "[START] ";
+    if (node.point_idx >= res.points.size()) {
+      std::cout << "pt?" << node.point_idx
+                << " | fanout_paths: " << node.fanout_paths.size() << "\n";
+      continue;
+    }
+    const sta::TimingPointRef &pt = res.points[node.point_idx];
+    if (pt.inst == nullptr)
+      std::cout << "PORT: ";
+    else
+      std::cout << "INST: " << pt.inst->instance_name << " ("
+                << pt.inst->module_name << ") ";
+    std::cout << "port:\"" << pt.port_name << "\"";
+    std::cout << " | fanout_paths: " << node.fanout_paths.size();
+    if (!node.fanout_paths.empty()) {
+      std::cout << " -> [";
+      for (size_t i = 0; i < node.fanout_paths.size() && i < 5; ++i) {
+        if (i > 0)
+          std::cout << ", ";
+        std::cout << node.fanout_paths[i];
+      }
+      if (node.fanout_paths.size() > 5)
+        std::cout << ", ...";
+      std::cout << "]";
+    }
+    std::cout << "\n";
+  }
+}
+
+void print_candidate_paths(
+    const sta::CandidateGraphy &cg,
+    const std::unordered_set<std::size_t> &startpoint_nodes) {
+  std::cout << "\n=== PATHS ===\n";
+  for (const auto &path : cg.paths) {
+    bool is_startpath = startpoint_nodes.count(path.start_node) > 0;
+    std::cout << "  [" << std::setw(3) << path.id << "] ";
+    if (is_startpath)
+      std::cout << "[START] ";
+    std::cout << "Node[" << path.start_node << "] -> Node[" << path.end_node
+              << "]";
+    if (path.next_path.has_value())
+      std::cout << " -> Path[" << path.next_path.value() << "]";
+    else
+      std::cout << " [END]";
+    std::cout << " | fanouts_edge: " << path.fanouts_edge.size();
+    if (!path.fanouts_edge.empty()) {
+      std::cout << " | eid";
+      for (size_t i = 0; i < path.fanouts_edge.size() && i < 5; ++i)
+        std::cout << " " << path.fanouts_edge[i];
+      if (path.fanouts_edge.size() > 5)
+        std::cout << " ...";
+    }
+    std::cout << "\n";
+  }
+}
+} // namespace
+
 void STAWorker::build_candidate_graphy_dfs() {
   build_res_edges();
 
@@ -161,61 +228,8 @@ void STAWorker::build_candidate_graphy_dfs() {
       startpoint_nodes.insert(node.id);
   }
 
-  std::cout << "\n=== NODES ===\n";
-  for (const auto &node : candidate_graphy_.nodes) {
-    bool is_startpoint = startpoint_nodes.count(node.id) > 0;
-    std::cout << "  [" << std::setw(3) << node.id << "] ";
-    if (is_startpoint)
-      std::cout << "[START] ";
-    if (node.point_idx >= res.points.size()) {
-      std::cout << "pt?" << node.point_idx
-                << " | fanout_paths: " << node.fanout_paths.size() << "\n";
-      continue;
-    }
-    const TimingPointRef &pt = res.points[node.point_idx];
-    if (pt.inst == nullptr)
-      std::cout << "PORT: ";
-    else
-      std::cout << "INST: " << pt.inst->instance_name << " ("
-                << pt.inst->module_name << ") ";
-    std::cout << "port:\"" << pt.port_name << "\"";
-    std::cout << " | fanout_paths: " << node.fanout_paths.size();
-    if (!node.fanout_paths.empty()) {
-      std::cout << " -> [";
-      for (size_t i = 0; i < node.fanout_paths.size() && i < 5; ++i) {
-        if (i > 0)
-          std::cout << ", ";
-        std::cout << node.fanout_paths[i];
-      }
-      if (node.fanout_paths.size() > 5)
-        std::cout << ", ...";
-      std::cout << "]";
-    }
-    std::cout << "\n";
-  }
-
-  std::cout << "\n=== PATHS ===\n";
-  for (const auto &path : candidate_graphy_.paths) {
-    bool is_startpath = startpoint_nodes.count(path.start_node) > 0;
-    std::cout << "  [" << std::setw(3) << path.id << "] ";
-    if (is_startpath)
-      std::cout << "[START] ";
-    std::cout << "Node[" << path.start_node << "] -> Node[" << path.end_node
-              << "]";
-    if (path.next_path.has_value())
-      std::cout << " -> Path[" << path.next_path.value() << "]";
-    else
-      std::cout << " [END]";
-    std::cout << " | fanouts_edge: " << path.fanouts_edge.size();
-    if (!path.fanouts_edge.empty()) {
-      std::cout << " | eid";
-      for (size_t i = 0; i < path.fanouts_edge.size() && i < 5; ++i)
-        std::cout << " " << path.fanouts_edge[i];
-      if (path.fanouts_edge.size() > 5)
-        std::cout << " ...";
-    }
-    std::cout << "\n";
-  }
+  // print_candidate_nodes(candidate_graphy_, res, startpoint_nodes);
+  // print_candidate_paths(candidate_graphy_, startpoint_nodes);
 }
 
 // 沿 path 的一段边 (from_pt -> to_pt) 计算延迟与输出方向。
@@ -289,7 +303,7 @@ static void segment_delay_slew(const TimingRunResult &res,
     load_cap = to_ref.rise_cap;
   else if (out_dir == TransitionDirection::FALLING)
     load_cap = to_ref.fall_cap;
-  else 
+  else
     load_cap = to_ref.load_cap;
 
   if (out_dir == TransitionDirection::RISING) {
@@ -309,7 +323,7 @@ static void segment_delay_slew(const TimingRunResult &res,
 void STAWorker::caculate_candidate_load_cap() {
   if (!cell_library_)
     return;
-  
+
   std::deque<std::size_t> queue(input_clk_point_ids.begin(),
                                 input_clk_point_ids.end());
   std::unordered_set<std::size_t> visited;
@@ -334,19 +348,35 @@ void STAWorker::caculate_candidate_load_cap() {
         const auto *input_pin = fanout_cell->get_pin(target.port_name);
         if (!input_pin)
           continue;
-        // 上升/下降指 driver output 的沿，对应 fanout input 的 rise/fall 电容
-        if (input_pin->rise_capacitance.has_value())
-          pt.rise_cap += input_pin->rise_capacitance.value();
-        else if (input_pin->capacitance.has_value()) {
-          std::cerr << "[warning] input do not have rise cap laod" << std::endl;
-          pt.rise_cap += input_pin->capacitance.value();
+        const bool use_max = (get_analysis_mode() == AnalysisMode::MAX);
+
+        if (use_max) {
+          if (input_pin->rise_capacitance_max.has_value())
+            pt.rise_cap += input_pin->rise_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.rise_cap += input_pin->capacitance.value();
+        } else {
+          // min 模式：优先 min，若 min 无值则用 max
+          if (input_pin->rise_capacitance_min.has_value())
+            pt.rise_cap += input_pin->rise_capacitance_min.value();
+          else if (input_pin->rise_capacitance_max.has_value())
+            pt.rise_cap += input_pin->rise_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.rise_cap += input_pin->capacitance.value();
         }
 
-        if (input_pin->fall_capacitance.has_value())
-          pt.fall_cap += input_pin->fall_capacitance.value();
-        else if (input_pin->capacitance.has_value()) {
-          std::cerr << "[warning] input do not have fall cap laod" << std::endl;
-          pt.fall_cap += input_pin->capacitance.value();
+        if (use_max) {
+          if (input_pin->fall_capacitance_max.has_value())
+            pt.fall_cap += input_pin->fall_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.fall_cap += input_pin->capacitance.value();
+        } else {
+          if (input_pin->fall_capacitance_min.has_value())
+            pt.fall_cap += input_pin->fall_capacitance_min.value();
+          else if (input_pin->fall_capacitance_max.has_value())
+            pt.fall_cap += input_pin->fall_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.fall_cap += input_pin->capacitance.value();
         }
       }
     }
@@ -398,7 +428,8 @@ STAWorker::compute_candidate_path_with_input(std::size_t path_id,
         else if (seg_dir == TransitionDirection::FALLING)
           step.cap_load = to_ref.fall_cap;
         else {
-          std::cerr << "[Warning] use the fall back, should not reach here" << std::endl; 
+          std::cerr << "[Warning] use the fall back, should not reach here"
+                    << std::endl;
           step.cap_load = to_ref.load_cap;
         }
       }
@@ -526,6 +557,21 @@ void STAWorker::display_result_path_detail(const TimingPathResult &pr) const {
         std::cout << " hold=" << pr.library_hold_time.value() << "ps";
     }
     std::cout << "\n";
+  }
+  
+  AnalysisMode mode = get_analysis_mode();
+  if (mode == AnalysisMode::MAX) {
+    double required =
+        static_cast<double>(get_effective_clock_period());
+    double setup_ps = pr.library_setup_time.value_or(0.0);
+    if (setup_ps > 0.0)
+      required -= setup_ps;
+    double slack = required - pr.data_arrival_time;
+    std::cout << "  required=" << required << "ps  slack=" << slack << "ps\n";
+  } else {
+    double required = pr.library_hold_time.value_or(0.0);
+    double slack = pr.data_arrival_time - required;
+    std::cout << "  required=" << required << "ps  slack=" << slack << "ps\n";
   }
   std::cout << "  ---\n";
 }

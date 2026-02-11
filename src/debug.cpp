@@ -160,16 +160,17 @@ void display_points_fanout(sta::STAWorker &worker, size_t pt_no) {
       std::cout << pin->capacitance.value() << "pf";
     else
       std::cout << "(no_cap)";
-    std::cout << " rise_cap=";
-    if (pin->rise_capacitance.has_value())
-      std::cout << pin->rise_capacitance.value() << "pf";
-    else
-      std::cout << "(no_cap)";
-    std::cout << " fall_cap=";
-    if (pin->fall_capacitance.has_value())
-      std::cout << pin->fall_capacitance.value() << "pf";
-    else
-      std::cout << "(no_cap)";
+
+    auto cap_str = [](std::optional<double> v) {
+      return v.has_value() ? (std::to_string(v.value()) + "pf")
+                           : std::string("no_cap");
+    };
+
+    std::cout << " rise_cap=(" << cap_str(pin->rise_capacitance_max) << ","
+              << cap_str(pin->rise_capacitance_min) << ")";
+    std::cout << " fall_cap=(" << cap_str(pin->fall_capacitance_max) << ","
+              << cap_str(pin->fall_capacitance_min) << ")";
+
     std::cout << "]";
 
     std::cout << std::endl;
@@ -299,16 +300,17 @@ void show_lib_details(char *cell_name, celllib::CellLibrary lib) {
       std::cout << pin.capacitance.value() << "pf";
     else
       std::cout << "(none)";
-    std::cout << " rise_cap=";
-    if (pin.rise_capacitance.has_value())
-      std::cout << pin.rise_capacitance.value() << "pf";
-    else
-      std::cout << "(none)";
-    std::cout << " fall_cap=";
-    if (pin.fall_capacitance.has_value())
-      std::cout << pin.fall_capacitance.value() << "pf";
-    else
-      std::cout << "(none)";
+
+    auto cap_str = [](const std::optional<double> &v) {
+      return v.has_value() ? (std::to_string(v.value()) + "pf")
+                           : std::string("none");
+    };
+
+    std::cout << " rise_cap=(" << cap_str(pin.rise_capacitance_max) << ","
+              << cap_str(pin.rise_capacitance_min) << ")";
+    std::cout << " fall_cap=(" << cap_str(pin.fall_capacitance_max) << ","
+              << cap_str(pin.fall_capacitance_min) << ")";
+
     std::cout << " max_cap=";
     if (pin.max_capacitance.has_value())
       std::cout << pin.max_capacitance.value() << "pf";
@@ -355,7 +357,7 @@ void show_lib_details(char *cell_name, celllib::CellLibrary lib) {
 void debug_paths_through_instance(STAWorker &worker,
                                   const std::string &inst_substr) {
   worker.divide_path_entry();
-  const AnalysisMode mode = AnalysisMode::MIN;
+  const AnalysisMode mode = worker.get_analysis_mode();
   const PathGroup group = PathGroup::IN2REG;
 
   // 实现 print_point_group 辅助函数
@@ -374,7 +376,7 @@ void debug_paths_through_instance(STAWorker &worker,
   // 这里以 IN2OUT 组为例，查看最差的前 3 条路径
   std::cout << "[in2reg " << (mode == AnalysisMode::MAX ? "max" : "min")
             << "entries size: " << entries_size << "]\n";
-  for (std::size_t i = 0; i < entries_size; ++i) {
+  for (std::size_t i = 0; i < entries_size && i < 5; ++i) {
     const PathEntry *e = worker.get_top_k(group, mode, i); // 最差若干条
     if (!e || !e->path)
       break;

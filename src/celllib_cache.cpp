@@ -130,9 +130,11 @@ static void to_json(json &j, const Pin &p) {
   j["direction"] = static_cast<int>(p.direction);
   j["is_clock"] = p.is_clock;
   if (p.capacitance.has_value()) j["capacitance"] = *p.capacitance;
-  if (p.rise_capacitance.has_value()) j["rise_capacitance"] = *p.rise_capacitance;
-  if (p.fall_capacitance.has_value()) j["fall_capacitance"] = *p.fall_capacitance;
   if (p.max_capacitance.has_value()) j["max_capacitance"] = *p.max_capacitance;
+  if (p.rise_capacitance_min.has_value()) j["rise_capacitance_min"] = *p.rise_capacitance_min;
+  if (p.rise_capacitance_max.has_value()) j["rise_capacitance_max"] = *p.rise_capacitance_max;
+  if (p.fall_capacitance_min.has_value()) j["fall_capacitance_min"] = *p.fall_capacitance_min;
+  if (p.fall_capacitance_max.has_value()) j["fall_capacitance_max"] = *p.fall_capacitance_max;
   if (p.function.has_value()) j["function"] = *p.function;
   if (p.related_power_pin.has_value()) j["related_power_pin"] = *p.related_power_pin;
   if (p.related_ground_pin.has_value()) j["related_ground_pin"] = *p.related_ground_pin;
@@ -152,12 +154,16 @@ static void from_json(const json &j, Pin &p) {
   p.is_clock = j.value("is_clock", false);
   if (j.contains("capacitance") && !j["capacitance"].is_null())
     p.capacitance = j["capacitance"].get<double>();
-  if (j.contains("rise_capacitance") && !j["rise_capacitance"].is_null())
-    p.rise_capacitance = j["rise_capacitance"].get<double>();
-  if (j.contains("fall_capacitance") && !j["fall_capacitance"].is_null())
-    p.fall_capacitance = j["fall_capacitance"].get<double>();
   if (j.contains("max_capacitance") && !j["max_capacitance"].is_null())
     p.max_capacitance = j["max_capacitance"].get<double>();
+  if (j.contains("rise_capacitance_min") && !j["rise_capacitance_min"].is_null())
+    p.rise_capacitance_min = j["rise_capacitance_min"].get<double>();
+  if (j.contains("rise_capacitance_max") && !j["rise_capacitance_max"].is_null())
+    p.rise_capacitance_max = j["rise_capacitance_max"].get<double>();
+  if (j.contains("fall_capacitance_min") && !j["fall_capacitance_min"].is_null())
+    p.fall_capacitance_min = j["fall_capacitance_min"].get<double>();
+  if (j.contains("fall_capacitance_max") && !j["fall_capacitance_max"].is_null())
+    p.fall_capacitance_max = j["fall_capacitance_max"].get<double>();
   if (j.contains("function") && !j["function"].is_null())
     p.function = j["function"].get<std::string>();
   if (j.contains("related_power_pin") && !j["related_power_pin"].is_null())

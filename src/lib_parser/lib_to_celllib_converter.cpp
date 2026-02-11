@@ -162,11 +162,19 @@ void convert_port(ista::LibPort *lp, Pin &out) {
   out.is_clock = (lp->isClock() != 0);
   auto cap_opt =
       lp->get_port_cap(ista::AnalysisMode::kMax, ista::TransType::kRise);
+  if (cap_opt) {
+    out.rise_capacitance_max = *cap_opt;
+  }
+  cap_opt = lp->get_port_cap(ista::AnalysisMode::kMin, ista::TransType::kRise);
   if (cap_opt)
-    out.rise_capacitance = *cap_opt;
+    out.rise_capacitance_min = *cap_opt;
   cap_opt = lp->get_port_cap(ista::AnalysisMode::kMax, ista::TransType::kFall);
+  if (cap_opt) {
+    out.fall_capacitance_max = *cap_opt;
+  }
+  cap_opt = lp->get_port_cap(ista::AnalysisMode::kMin, ista::TransType::kFall);
   if (cap_opt)
-    out.fall_capacitance = *cap_opt;
+    out.fall_capacitance_min = *cap_opt;
   auto max_cap = lp->get_port_cap_limit(ista::AnalysisMode::kMax);
   if (max_cap)
     out.max_capacitance = *max_cap;

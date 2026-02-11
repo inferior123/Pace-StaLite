@@ -121,9 +121,12 @@ struct Pin {
 
   // 电容信息
   std::optional<double> capacitance;      // 总电容
-  std::optional<double> rise_capacitance; // 上升电容
-  std::optional<double> fall_capacitance; // 下降电容
+  std::optional<double> rise_capacitance_min;   // kMinRise
+  std::optional<double> rise_capacitance_max;   // kMaxRise
+  std::optional<double> fall_capacitance_min;   // kMinFall
+  std::optional<double> fall_capacitance_max;   // kMaxFall
   std::optional<double> max_capacitance;  // 最大电容
+  
 
   // 功能描述
   std::optional<std::string> function; // 逻辑功能表达式

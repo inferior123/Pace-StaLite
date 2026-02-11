@@ -20,9 +20,9 @@ STAWorker::compute_require_and_slack(size_t path_idx) {
     double slack = required - p.data_arrival_time;
     return {required, slack};
   } else {
-    // MIN(hold)：required = hold_time，slack = arrival + required
+    // MIN(hold)：与 sta_report / display 一致，slack = arrival - required
     double required = p.library_hold_time.value_or(0.0);
-    double slack = p.data_arrival_time + required;
+    double slack = p.data_arrival_time - required;
     return {required, slack};
   }
 }

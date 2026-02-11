@@ -47,7 +47,7 @@ public:
 private:
   static void print_path_header(const TimingPathResult &path,
                                 const std::string &clock_name,
-                                std::ostream &out);
+                                const std::string &mode, std::ostream &out);
   static void print_data_arrival(const TimingPathResult &path,
                                  const std::string &clock_name,
                                  std::ostream &out, int time_decimals = 2);

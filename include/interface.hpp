@@ -112,12 +112,10 @@ public:
   }
 
   void set_input_delay(double delay_value, const std::string &clock_name,
-                       const sdc::SDCObjectCollection &objects) override {
-  }
+                       const sdc::SDCObjectCollection &objects) override {}
 
   void set_output_delay(double delay_value, const std::string &clock_name,
-                        const sdc::SDCObjectCollection &objects) override {
-  }
+                        const sdc::SDCObjectCollection &objects) override {}
 
   void read_verilog(const std::string &filename) override {
     verilog_file_name = filename;
@@ -127,8 +125,7 @@ public:
     celllib_file_name.push_back(filename);
   };
 
-  void unknown_command(const sdc::SDCCommand &cmd) override {
-  }
+  void unknown_command(const sdc::SDCCommand &cmd) override {}
 };
 
 /**
@@ -437,14 +434,16 @@ public:
               std::cout << " (capacitance: " << pin->capacitance.value()
                         << " ff)";
             }
-            if (pin->rise_capacitance.has_value()) {
-              std::cout << ", rise_cap: " << pin->rise_capacitance.value()
-                        << " ff";
-            }
-            if (pin->fall_capacitance.has_value()) {
-              std::cout << ", fall_cap: " << pin->fall_capacitance.value()
-                        << " ff";
-            }
+
+            auto cap_str = [](const std::optional<double> &v) {
+              return v.has_value() ? (std::to_string(v.value()) + " ff")
+                                   : std::string("none");
+            };
+            std::cout << ", rise_cap: (" << cap_str(pin->rise_capacitance_max)
+                      << "," << cap_str(pin->rise_capacitance_min) << ")";
+            std::cout << ", fall_cap: (" << cap_str(pin->fall_capacitance_max)
+                      << "," << cap_str(pin->fall_capacitance_min) << ")";
+
             if (pin->max_capacitance.has_value()) {
               std::cout << ", max_cap: " << pin->max_capacitance.value()
                         << " ff";

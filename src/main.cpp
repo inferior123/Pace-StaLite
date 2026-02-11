@@ -147,12 +147,12 @@ int main(int argc, char *argv[]) {
   // gcd_test();
   //
 
-  // if (argc > 1)
-  //   singal_test(argv[1]);
-  // else
-  //   auto_test(argc, argv);
+  if (argc > 1)
+    singal_test(argv[1]);
+  else
+    auto_test(argc, argv);
 
-  spi_test();
+  // spi_test();
   // // test_lut();
 
   return 0;

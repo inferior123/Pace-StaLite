@@ -123,6 +123,7 @@ STAReportGenerator::get_point_name_for_report(const TimingPointRef &p,
 // 打印路径头部信息
 void STAReportGenerator::print_path_header(const TimingPathResult &path,
                                            const std::string &clock_name,
+                                           const std::string &mode,
                                            std::ostream &out) {
   const TimingPointRef *start_p = nullptr;
   const TimingPointRef *end_p = nullptr;
@@ -182,7 +183,7 @@ void STAReportGenerator::print_path_header(const TimingPathResult &path,
   }
 
   out << "  Path Group: " << clock_name << "\n";
-  out << "  Path Type: max\n";
+  out << "  Path Type: " << mode << "\n";
   out << "\n";
   out << "  Point                                    Incr       Path\n";
   out << "  "
@@ -239,7 +240,7 @@ STAReportGenerator::compute_required_and_slack(const TimingPathResult &path,
     // MIN (hold)：与 utils compute_require_and_slack 一致，slack = required -
     // arrival
     double required = path.library_hold_time.value_or(0.0);
-    double slack = path.data_arrival_time + required;
+    double slack = path.data_arrival_time - required;
     return {required, slack};
   }
 }
@@ -314,7 +315,7 @@ void STAReportGenerator::print_slack_summary(const TimingPathResult &path,
       << format_time(data_required_time, time_decimals) << "\n";
   out << "  " << std::left << std::setw(38) << "data arrival time";
   out << std::right << std::setw(24)
-      << format_time(path.data_arrival_time, time_decimals) << "\n";
+      << format_time(-path.data_arrival_time, time_decimals) << "\n";
   out << "  "
          "---------------------------------------------------------------\n";
   out << "  " << std::left << std::setw(38) << "slack";
@@ -337,7 +338,7 @@ void STAReportGenerator::generate_path_report(const STAWorker &worker,
   g_current_timing_run = &run;
   const TimingPathResult &path = run.paths.front();
 
-  print_path_header(path, clock_name, std::cout);
+  print_path_header(path, clock_name, "max", std::cout);
   print_data_arrival(path, clock_name, std::cout, 2);
   print_data_required(path, clock_name, worker, std::cout, 2);
   print_slack_summary(path, worker, std::cout, 2);
@@ -404,7 +405,7 @@ void STAReportGenerator::generate_report(const STAWorker &worker,
     const TimingPathResult &path = *all_paths[i].path;
     std::cout << "\n--- Path #" << (i + 1)
               << " (total time: " << all_paths[i].total_time << "ps) ---\n";
-    print_path_header(path, clock_name, std::cout);
+    print_path_header(path, clock_name, "max", std::cout);
     print_data_arrival(path, clock_name, std::cout, 2);
     print_data_required(path, clock_name, worker, std::cout, 2);
     print_slack_summary(path, worker, std::cout, 2);
@@ -445,7 +446,7 @@ void STAReportGenerator::generate_report(const STAWorker &worker,
          ++i) {
       const TimingPathResult &path = *violations[i];
       std::cout << "Violation #" << (i + 1) << ":\n";
-      print_path_header(path, clock_name, std::cout);
+      print_path_header(path, clock_name, "max", std::cout);
       print_data_arrival(path, clock_name, std::cout, 2);
       print_data_required(path, clock_name, worker, std::cout, 2);
       print_slack_summary(path, worker, std::cout, 2);
@@ -564,7 +565,7 @@ void STAReportGenerator::generate_report_pt_files(
         break;
 
       const TimingPathResult &path = *e->path;
-      print_path_header(path, clock_name, f);
+      print_path_header(path, clock_name, delay_type, f);
       print_data_arrival(path, clock_name, f, 10);
       print_data_required(path, clock_name, worker, f, 10);
       print_slack_summary(path, worker, f, 10);
