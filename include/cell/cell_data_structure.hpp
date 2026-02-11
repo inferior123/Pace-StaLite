@@ -79,6 +79,9 @@ struct TimingArc {
   TimingType timing_type;   // 时序类型
   TimingSense timing_sense; // 时序方向
 
+  // 条件（例如来自 liberty timing() 的 sdf_cond）
+  std::optional<std::string> sdf_cond;
+
   // 固定延迟值（简化版，当没有查找表时使用）
   std::optional<double> intrinsic_rise; // 固有上升延迟
   std::optional<double> intrinsic_fall; // 固有下降延迟

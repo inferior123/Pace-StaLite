@@ -446,6 +446,16 @@ unsigned RustLibertyReader::visitSimpleAttri(RustLibertySimpleAttrStmt* attri) {
          lib_arc->set_timing_type(timing_type);
          rust_free_string_value(rust_attri_value);
        }},
+      {"sdf_cond",
+       [=]() {
+         // Only meaningful for timing arc in timing() group.
+         if (own_port_type == LibBuilder::LibertyOwnPortType::kTimingArc && lib_arc) {
+           auto* rust_attri_value = rust_convert_string_value(attri_value);
+           const char* cond = rust_attri_value->value;
+           lib_arc->set_sdf_cond(cond);
+           rust_free_string_value(rust_attri_value);
+         }
+       }},
       {"variable_1",
        [=]() {
          auto* rust_attri_value = rust_convert_string_value(attri_value);

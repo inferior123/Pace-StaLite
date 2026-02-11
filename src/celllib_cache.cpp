@@ -68,6 +68,8 @@ static void to_json(json &j, const TimingArc &a) {
   j["related_pin"] = a.related_pin;
   j["timing_type"] = static_cast<int>(a.timing_type);
   j["timing_sense"] = static_cast<int>(a.timing_sense);
+  if (a.sdf_cond.has_value())
+    j["sdf_cond"] = *a.sdf_cond;
   if (a.intrinsic_rise.has_value()) j["intrinsic_rise"] = *a.intrinsic_rise;
   if (a.intrinsic_fall.has_value()) j["intrinsic_fall"] = *a.intrinsic_fall;
   if (a.cell_rise.has_value()) { json j_lt; to_json(j_lt, *a.cell_rise); j["cell_rise"] = j_lt; }
@@ -82,6 +84,8 @@ static void from_json(const json &j, TimingArc &a) {
   j.at("related_pin").get_to(a.related_pin);
   a.timing_type = static_cast<TimingType>(j.at("timing_type").get<int>());
   a.timing_sense = static_cast<TimingSense>(j.at("timing_sense").get<int>());
+  if (j.contains("sdf_cond") && !j["sdf_cond"].is_null())
+    a.sdf_cond = j["sdf_cond"].get<std::string>();
   if (j.contains("intrinsic_rise") && !j["intrinsic_rise"].is_null())
     a.intrinsic_rise = j["intrinsic_rise"].get<double>();
   if (j.contains("intrinsic_fall") && !j["intrinsic_fall"].is_null())

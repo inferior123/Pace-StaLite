@@ -386,6 +386,13 @@ void STAWorker::run_timing_analysis_dfs() {
       return nullptr;
 
     if (edge_type == COMB_ARC) {
+      // 优先选择 sdf_cond 为空的默认组合弧
+      for (const auto &a : out_pin->timing_arcs) {
+        if (a.timing_type == celllib::TimingType::COMBINATIONAL &&
+            a.related_pin == origin.port_name && !a.sdf_cond.has_value())
+          return &a;
+      }
+      // 若没有无条件弧，则退回到原始逻辑（任意匹配弧）
       for (const auto &a : out_pin->timing_arcs) {
         if (a.timing_type == celllib::TimingType::COMBINATIONAL &&
             a.related_pin == origin.port_name)
@@ -395,6 +402,15 @@ void STAWorker::run_timing_analysis_dfs() {
       std::string clk_pin = "CK";
       if (cell->ff.has_value() && cell->ff->clocked_on.has_value())
         clk_pin = cell->ff->clocked_on.value();
+
+      // 优先选择 sdf_cond 为空的 C2Q 弧
+      for (const auto &a : out_pin->timing_arcs) {
+        if ((a.timing_type == celllib::TimingType::RISING_EDGE ||
+             a.timing_type == celllib::TimingType::FALLING_EDGE) &&
+            a.related_pin == clk_pin && !a.sdf_cond.has_value())
+          return &a;
+      }
+      // 若没有无条件弧，则退回到原始逻辑
       for (const auto &a : out_pin->timing_arcs) {
         if ((a.timing_type == celllib::TimingType::RISING_EDGE ||
              a.timing_type == celllib::TimingType::FALLING_EDGE) &&

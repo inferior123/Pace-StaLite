@@ -153,7 +153,9 @@ int main(int argc, char *argv[]) {
     auto_test(argc, argv);
 
   // spi_test();
-  // // test_lut();
+  test_lut();
+
+  // debug_lib_cell();
 
   return 0;
 }

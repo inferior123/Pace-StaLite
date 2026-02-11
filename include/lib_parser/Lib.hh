@@ -871,6 +871,10 @@ class LibArc : public LibObject
 
   double getDriveResistance() { return _table_model->driveResistance(); }
 
+  void set_sdf_cond(const char* cond) { _sdf_cond = cond ? cond : ""; }
+  bool has_sdf_cond() const { return !_sdf_cond.empty(); }
+  const std::string& get_sdf_cond() const { return _sdf_cond; }
+
  private:
   std::string _src_port;                           //!< The liberty timing arc source port, for liberty
                                                    //!< file port may be behind the arc, so we use port
@@ -885,6 +889,7 @@ class LibArc : public LibObject
   static BTreeMap<std::string, TimingType> _str_to_type;
 
   unsigned _is_disable_arc = 0; //!< Forbidden arc.
+  std::string _sdf_cond;
 
   FORBIDDEN_COPY(LibArc);
 };

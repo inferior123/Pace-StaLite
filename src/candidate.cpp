@@ -275,17 +275,8 @@ static void segment_delay_slew(const TimingRunResult &res,
     related_pin = cell->ff->clocked_on.value();
   }
   bool is_clock_to_q = (edge->type == SEQ_ARC);
-  const celllib::TimingArc *arc_ptr = nullptr;
-  for (const auto &arc : output_pin->timing_arcs) {
-    bool is_combinational =
-        (arc.timing_type == celllib::TimingType::COMBINATIONAL);
-    bool is_c2q = (arc.timing_type == celllib::TimingType::RISING_EDGE ||
-                   arc.timing_type == celllib::TimingType::FALLING_EDGE);
-    if ((!is_combinational && !is_c2q) || arc.related_pin != related_pin)
-      continue;
-    arc_ptr = &arc;
-    break;
-  }
+  const celllib::TimingArc *arc_ptr =
+      find_default_arc(*const_cast<celllib::Pin *>(output_pin), related_pin);
   if (!arc_ptr) {
     return;
   }

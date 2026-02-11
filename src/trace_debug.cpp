@@ -3,6 +3,7 @@
 #include "sta/sta_data_structures.hpp"
 #include "sta/sta_report.hpp"
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -295,7 +296,7 @@ void singal_test(char *file_name) {
     worker.build_candidate_graphy_dfs();
     worker.run_candidate_graphy_dfs();
 
-    // display_all_longest_path(worker);
+    debug_paths_through_instance(worker, "state_1__reg_p");
 
     worker.get_config().clk_period = 10000;
     sta::STAReportGenerator::generate_report_pt_files(
@@ -370,7 +371,7 @@ void debug_lib_cell() {
     celllib::save_celllib_cache(libs, cell_lib);
   }
 
-  sta::show_lib_details("OA31X3H7L", cell_lib);
+  sta::show_lib_details("AOI32X0P5H7R", cell_lib);
 }
 
 void spi_test() {
@@ -401,7 +402,7 @@ void spi_test() {
   }
 
   std::string vfile =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55/simple/simple.v";
+      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55/s44/s44.v";
 
   {
     sta::STAWorker worker;
@@ -410,7 +411,7 @@ void spi_test() {
     MyVerilogParser verilog_parser(worker);
 
     verilog_parser.read(vfile.c_str());
-    worker.set_analysis_mode(sta::AnalysisMode::MIN);
+    worker.set_analysis_mode(sta::AnalysisMode::MAX);
 
     std::cout << "  [PBA] Step 1: build_fanouts()...\n";
     worker.build_fanouts();
@@ -451,20 +452,28 @@ void test_lut() {
     celllib::save_celllib_cache(libs, cell_lib);
   }
 
-  auto cell = cell_lib.get_cell("NAND2BX0P5H7R");
-  double cap = 0.0009657960;
-  double slew = 0.2139875889;
+  auto cell = cell_lib.get_cell("OAOI211X0P5H7R");
+  double cap = 0.0007042090;
+  double slew = 0.0000000000;
 
   auto pin = cell->get_pin("Y");
-  std::string related_pin = "AN";
+  std::string related_pin = "C0";
   for (const auto &arc : pin->timing_arcs) {
+
     if (arc.related_pin != related_pin) {
       continue;
     }
-    double res = caculate_transition_rise(arc, &cell_lib, slew, cap);
+
+    std::cout << ((arc.sdf_cond.has_value()) ? arc.sdf_cond.value()
+                                             : "sdf_cond none")
+              << "\n";
+
+    double res = caculate_transition_fall(arc, &cell_lib, slew, cap);
     std::cout << "res is " << res << std::endl;
 
-    res = caculate_delay_rise(arc, &cell_lib, slew, cap);
+    res = caculate_delay_fall(arc, &cell_lib, slew, cap);
     std::cout << "res is " << res << std::endl;
+
+    std::cout << std::endl;
   }
 }

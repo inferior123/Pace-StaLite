@@ -328,7 +328,12 @@ void show_lib_details(char *cell_name, celllib::CellLibrary lib) {
         const celllib::TimingArc &arc = pin.timing_arcs[i];
         std::cout << "      [" << i << "] related_pin=" << arc.related_pin
                   << " type=" << timing_type_str(arc.timing_type)
-                  << " sense=" << timing_sense_str(arc.timing_sense) << "\n";
+                  << " sense=" << timing_sense_str(arc.timing_sense)
+                  << " sdf_cond="
+                  << (arc.sdf_cond.has_value()
+                          ? ("\"" + arc.sdf_cond.value() + "\"")
+                          : std::string("none"))
+                  << "\n";
         if (arc.intrinsic_rise.has_value())
           std::cout << "        intrinsic_rise=" << arc.intrinsic_rise.value()
                     << "ns\n";
@@ -359,6 +364,10 @@ void debug_paths_through_instance(STAWorker &worker,
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
   const PathGroup group = PathGroup::IN2REG;
+  const AnalysisMode target_mode = AnalysisMode::MIN;
+
+  if (mode != target_mode)
+    return;
 
   // 实现 print_point_group 辅助函数
   // auto print_point_group = [](sta::PathGroup group) -> const char* {
@@ -376,7 +385,7 @@ void debug_paths_through_instance(STAWorker &worker,
   // 这里以 IN2OUT 组为例，查看最差的前 3 条路径
   std::cout << "[in2reg " << (mode == AnalysisMode::MAX ? "max" : "min")
             << "entries size: " << entries_size << "]\n";
-  for (std::size_t i = 0; i < entries_size && i < 5; ++i) {
+  for (std::size_t i = 0; i < entries_size && i < 3; ++i) {
     const PathEntry *e = worker.get_top_k(group, mode, i); // 最差若干条
     if (!e || !e->path)
       break;

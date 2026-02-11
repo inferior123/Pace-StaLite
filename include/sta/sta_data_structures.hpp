@@ -718,5 +718,7 @@ double caculate_setup_rise(const celllib::TimingArc arc,
 double caculate_hold_fall(const celllib::TimingArc arc,
                           const celllib::CellLibrary *lib, double data_trans,
                           double clk_trans);
+const celllib::TimingArc *find_default_arc(celllib::Pin &pin,
+                                           const std::string &related_pin);
 
 #endif // STA_DATA_STRUCTURES_HPP

@@ -39,6 +39,27 @@ static void debug_print_tb(const celllib::LookupTable &tb,
   }
 }
 
+// 在一个 pin 的 timing_arcs 中，按 candidate.cpp 的逻辑筛选：
+// - 只考虑组合弧或 C2Q 弧（RISING_EDGE/FALLING_EDGE）
+// - related_pin 匹配给定的输入 pin 名
+// - 且 sdf_cond 为空（即无条件 arc），返回第一条匹配的弧
+const celllib::TimingArc *find_default_arc(celllib::Pin &pin,
+                                           const std::string &related_pin) {
+  for (const auto &arc : pin.timing_arcs) {
+    bool is_combinational =
+        (arc.timing_type == celllib::TimingType::COMBINATIONAL);
+    bool is_c2q = (arc.timing_type == celllib::TimingType::RISING_EDGE ||
+                   arc.timing_type == celllib::TimingType::FALLING_EDGE);
+    if ((!is_combinational && !is_c2q) || arc.related_pin != related_pin)
+      continue;
+    // 只要 sdf_cond 为空（没有条件）才认为是默认 arc
+    if (arc.sdf_cond.has_value())
+      continue;
+    return &arc;
+  }
+  return nullptr;
+}
+
 double caculate_delay_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib,
                            double input_slew_rise, double load_cap) {

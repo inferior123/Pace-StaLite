@@ -196,6 +196,9 @@ void convert_arc(ista::LibArc *la, ista::LibPort *snk_port,
   arc.related_pin = la->get_src_port();
   arc.timing_type = arc_type_to_celllib(la->get_timing_type());
   arc.timing_sense = arc_sense_to_celllib(la->get_timing_sense());
+  if (la->has_sdf_cond()) {
+    arc.sdf_cond = la->get_sdf_cond();
+  }
   if (la->isDisableArc())
     return;
   ista::LibTableModel *model = la->get_table_model();
@@ -244,8 +247,8 @@ void convert_arc(ista::LibArc *la, ista::LibPort *snk_port,
   if (pin) {
     for (auto &existing : pin->timing_arcs) {
       if (existing.related_pin == arc.related_pin &&
-          existing.timing_type == arc.timing_type) {
-        existing = arc;
+          existing.timing_type == arc.timing_type &&
+          existing.sdf_cond == arc.sdf_cond) {
         return;
       }
     }

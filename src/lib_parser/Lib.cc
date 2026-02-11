@@ -1858,6 +1858,13 @@ void LibLibrary::printLibertyLibraryJson(const char* json_file_name)
   auto create_timing_arc = [](LibArc* lib_arc) {
     nlohmann::json timing_arc = nlohmann::json::object();
     timing_arc["source_sink"] = {lib_arc->get_src_port(), lib_arc->get_snk_port()};
+    timing_arc["timing_type"] = static_cast<int>(lib_arc->get_timing_type());
+    timing_arc["timing_sense"] = static_cast<int>(lib_arc->get_timing_sense());
+    if (lib_arc->has_sdf_cond()) {
+      timing_arc["sdf_cond"] = lib_arc->get_sdf_cond();
+    } else {
+      timing_arc["sdf_cond"] = nullptr;
+    }
     LibTableModel* table_model = lib_arc->get_table_model();
     LibDelayTableModel* delay_model = dynamic_cast<LibDelayTableModel*>(table_model);
 
