@@ -97,8 +97,11 @@ double caculate_delay_fall(const celllib::TimingArc arc,
     const auto *templ = lib->get_table_template(template_name);
     if (templ && templ->variable_1.has_value() &&
         templ->variable_2.has_value()) {
-      std::string var1 = templ->variable_1.value();
-      std::string var2 = templ->variable_2.value();
+      std::string var1 = "input_net_transition";
+      std::string var2 = "total_output_net_capacitance";
+
+      // debug_print_tb(*arc.cell_fall, template_name, var1, var2);
+
       delay_fall = lib->caculate_lookuptable(
           arc.cell_fall.value(), input_slew_fall, load_cap, var1, var2);
       delay_fall *= NS_TO_PS; // Liberty ns -> ps
@@ -145,8 +148,11 @@ double caculate_transition_fall(const celllib::TimingArc arc,
     const auto *templ = lib->get_table_template(template_name);
     if (templ && templ->variable_1.has_value() &&
         templ->variable_2.has_value()) {
-      std::string var1 = templ->variable_1.value();
-      std::string var2 = templ->variable_2.value();
+      std::string var1 = "input_net_transition";
+      std::string var2 = "total_output_net_capacitance";
+
+      // debug_print_tb(*arc.fall_transition, template_name, var1, var2);
+
       fall_transition_time = lib->caculate_lookuptable(
           arc.fall_transition.value(), input_slew_fall, load_cap, var1, var2);
       fall_transition_time *= NS_TO_PS; // Liberty ns -> ps

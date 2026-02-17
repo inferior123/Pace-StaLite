@@ -303,45 +303,45 @@ void singal_test(char *file_name) {
         worker, "__clk__", report_dir, design_name, 1);
   }
 
-  {
-    sta::STAWorker worker;
+  // {
+  //   sta::STAWorker worker;
 
-    MySDCParser sdc_interface(worker);
-    sdc::SDCParser sdc_parser(&sdc_interface);
-    std::string sdc_file = vfile;
-    size_t pos = sdc_file.find_last_of('.');
-    if (pos != std::string::npos && sdc_file.substr(pos) == ".v") {
-      sdc_file.replace(pos, std::string::npos, ".sdc");
-    }
-    std::cout << "Parsing SDC file: " << sdc_file << std::endl;
-    sdc_parser.parse_file(sdc_file);
-    std::cout << "finish parse SDC file" << std::endl;
+  //   MySDCParser sdc_interface(worker);
+  //   sdc::SDCParser sdc_parser(&sdc_interface);
+  //   std::string sdc_file = vfile;
+  //   size_t pos = sdc_file.find_last_of('.');
+  //   if (pos != std::string::npos && sdc_file.substr(pos) == ".v") {
+  //     sdc_file.replace(pos, std::string::npos, ".sdc");
+  //   }
+  //   std::cout << "Parsing SDC file: " << sdc_file << std::endl;
+  //   sdc_parser.parse_file(sdc_file);
+  //   std::cout << "finish parse SDC file" << std::endl;
 
-    worker.set_cell_library(cell_lib);
-    MyVerilogParser verilog_parser(worker);
+  //   worker.set_cell_library(cell_lib);
+  //   MyVerilogParser verilog_parser(worker);
 
-    verilog_parser.read(vfile.c_str());
-    worker.set_analysis_mode(sta::AnalysisMode::MIN);
+  //   verilog_parser.read(vfile.c_str());
+  //   worker.set_analysis_mode(sta::AnalysisMode::MIN);
 
-    std::string design_name =
-        worker.top_moudle.empty() ? "design" : worker.top_moudle;
-    std::string report_dir = "./result1/candidate/" + design_name;
+  //   std::string design_name =
+  //       worker.top_moudle.empty() ? "design" : worker.top_moudle;
+  //   std::string report_dir = "./result1/candidate/" + design_name;
 
-    std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-    worker.build_fanouts();
+  //   std::cout << "  [PBA] Step 1: build_fanouts()...\n";
+  //   worker.build_fanouts();
 
-    std::cout << "  [PBA-MIN] Step 2: calculate_load_capacitance()...\n";
-    worker.caculate_candidate_load_cap();
-    std::cout << "  [PBA-MIN] Step 3: build_candidate_graphy()...\n";
-    worker.build_candidate_graphy_dfs();
-    worker.run_candidate_graphy_dfs();
+  //   std::cout << "  [PBA-MIN] Step 2: calculate_load_capacitance()...\n";
+  //   worker.caculate_candidate_load_cap();
+  //   std::cout << "  [PBA-MIN] Step 3: build_candidate_graphy()...\n";
+  //   worker.build_candidate_graphy_dfs();
+  //   worker.run_candidate_graphy_dfs();
 
-    debug_paths_through_instance(worker, "state_1__reg_p");
+  //   debug_paths_through_instance(worker, "state_1__reg_p");
 
-    worker.get_config().clk_period = 0;
-    sta::STAReportGenerator::generate_report_pt_files(
-        worker, "__clk__", report_dir, design_name, 1);
-  }
+  //   worker.get_config().clk_period = 0;
+  //   sta::STAReportGenerator::generate_report_pt_files(
+  //       worker, "__clk__", report_dir, design_name, 1);
+  // }
 }
 
 void debug_lib_cell() {
@@ -425,7 +425,8 @@ void spi_test() {
   }
 }
 
-void test_lut() {
+void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
+              double slew) {
   std::vector<std::string> libs;
 
   libs.push_back(
@@ -452,12 +453,9 @@ void test_lut() {
     celllib::save_celllib_cache(libs, cell_lib);
   }
 
-  auto cell = cell_lib.get_cell("OAOI211X0P5H7R");
-  double cap = 0.0007042090;
-  double slew = 0.0000000000;
+  auto cell = cell_lib.get_cell(cell_name);
 
-  auto pin = cell->get_pin("Y");
-  std::string related_pin = "C0";
+  auto pin = cell->get_pin(pin_name);
   for (const auto &arc : pin->timing_arcs) {
 
     if (arc.related_pin != related_pin) {
@@ -469,10 +467,16 @@ void test_lut() {
               << "\n";
 
     double res = caculate_transition_fall(arc, &cell_lib, slew, cap);
-    std::cout << "res is " << res << std::endl;
+    std::cout << "transition fall is " << res << std::endl;
+
+    res = caculate_transition_rise(arc, &cell_lib, slew, cap);
+    std::cout << "transition rise is " << res << std::endl;
 
     res = caculate_delay_fall(arc, &cell_lib, slew, cap);
-    std::cout << "res is " << res << std::endl;
+    std::cout << "delay fall is " << res << std::endl;
+
+    res = caculate_delay_rise(arc, &cell_lib, slew, cap);
+    std::cout << "delay rise is " << res << std::endl;
 
     std::cout << std::endl;
   }

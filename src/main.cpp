@@ -147,13 +147,17 @@ int main(int argc, char *argv[]) {
   // gcd_test();
   //
 
-  if (argc > 1)
+  if(argc > 6) {
+    test_lut(argv[2], argv[3], argv[4], std::stod(argv[5]), std::stod(argv[6]));
+  } else if(argc > 2) {
+    std::cerr << "unknow argv num" << std::endl;
+  } else if (argc > 1)
     singal_test(argv[1]);
   else
     auto_test(argc, argv);
 
   // spi_test();
-  test_lut();
+  // test_lut();
 
   // debug_lib_cell();
 

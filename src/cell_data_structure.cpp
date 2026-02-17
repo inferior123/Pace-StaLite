@@ -211,6 +211,19 @@ double CellLibrary::caculate_lookuptable(const LookupTable &tb, double x0,
   // Determine which variable maps to which index (axis mapping only; indices
   // already chosen above)
   double mapped_x0, mapped_y0;
+
+  // Debug print: show template name/variables and provided variable names
+  // std::cout << "    [LUT] Template name: " << templ->name << std::endl;
+  // std::cout << "      Template variables: "
+  //           << (templ->variable_1.has_value() ? templ->variable_1.value()
+  //                                             : std::string("<null>"))
+  //           << ", "
+  //           << (templ->variable_2.has_value() ? templ->variable_2.value()
+  //                                             : std::string("<null>"))
+  //           << std::endl;
+  // std::cout << "      Provided variable names: " << va_name_1 << ", "
+  //           << va_name_2 << std::endl;
+
   if (templ->variable_1.has_value() && templ->variable_2.has_value()) {
     if (templ->variable_1.value() == va_name_1 &&
         templ->variable_2.value() == va_name_2) {
@@ -305,17 +318,23 @@ double CellLibrary::caculate_lookuptable(const LookupTable &tb, double x0,
   double y1 = (*y_indices)[y_idx1];
   double y2 = (*y_indices)[y_idx2];
 
+  // clang-format off
+  //
   // 调试输出：显示查找表插值计算的详细信息
   // std::cout << "    [LUT] Lookup table interpolation:" << std::endl;
-  // std::cout << "      Input: x0=" << x0 << " (" << va_name_1 << "), y0=" <<
-  // y0 << " (" << va_name_2 << ")" << std::endl; std::cout << "      Mapped:
-  // mapped_x0=" << mapped_x0 << ", mapped_y0=" << mapped_y0 << std::endl;
-  // std::cout << "      X indices: [" << x1 << ", " << x2 << "] (indices: " <<
-  // x_idx1 << ", " << x_idx2 << ")" << std::endl; std::cout << "      Y
-  // indices: [" << y1 << ", " << y2 << "] (indices: " << y_idx1 << ", " <<
-  // y_idx2 << ")" << std::endl; std::cout << "      Corner values: T11=" << T11
-  // << ", T12=" << T12 << ", T21=" << T21 << ", T22=" << T22 << std::endl;
+  // std::cout << "      Input: x0=" << x0 << " (" << va_name_1 << "), y0=" << y0
+  //           << " (" << va_name_2 << ")" << std::endl;
+  // std::cout << "      Mapped:mapped_x0=" << mapped_x0
+  //           << ", mapped_y0=" << mapped_y0 << std::endl;
+  // std::cout << "      X indices: [" << x1 << ", " << x2
+  //           << "] (indices: " << x_idx1 << ", " << x_idx2 << ")" << std::endl;
+  // std::cout << "      Y indices: [" << y1 << ", " << y2
+  //           << "] (indices: " << y_idx1 << ", " << y_idx2 << ")" << std::endl;
+  // std::cout << "      Corner values: T11=" << T11 << ", T12=" << T12
+  //           << ", T21=" << T21 << ", T22=" << T22 << std::endl;
   //
+  // clang-format on 
+
   double result =
       insert_caculate(mapped_x0, x1, x2, mapped_y0, y1, y2, T11, T12, T21, T22);
 
@@ -325,12 +344,12 @@ double CellLibrary::caculate_lookuptable(const LookupTable &tb, double x0,
   // double y01 = (mapped_y0 - y1) / (y2 - y1);
   // double y20 = (y2 - mapped_y0) / (y2 - y1);
   // std::cout << "      Interpolation weights: x01=" << x01 << ", x20=" << x20
-  // << ", y01=" << y01 << ", y20=" << y20 << std::endl; std::cout << "
-  // Calculation: " << x20 << "*" << y20 << "*" << T11 << " + "
-  //           << x20 << "*" << y01 << "*" << T12 << " + "
-  //           << x01 << "*" << y20 << "*" << T21 << " + "
-  //           << x01 << "*" << y01 << "*" << T22 << std::endl;
-  // std::cout << "      Result: " << result << std::edl;
+  //           << ", y01=" << y01 << ", y20=" << y20 << std::endl;
+  // std::cout << "Calculation: " << x20 << "*" << y20 << "*" << T11 << " + "
+  //           << x20 << "*" << y01 << "*" << T12 << " + " << x01 << "*" << y20
+  //           << "*" << T21 << " + " << x01 << "*" << y01 << "*" << T22
+  //           << std::endl;
+  // std::cout << "      Result: " << result << std::endl;
 
   return result;
 }
