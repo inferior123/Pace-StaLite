@@ -4,7 +4,6 @@
 #include <vector>
 
 namespace sta {
-
 std::pair<double, double>
 STAWorker::compute_require_and_slack(size_t path_idx) {
   const auto &p = res.paths[path_idx];
@@ -324,3 +323,69 @@ void STAWorker::respath_descending(PathGroup group_type, AnalysisMode mode) {
 }
 
 } // namespace sta
+
+#include "iomanip"
+
+void print_candidate_nodes(
+    const sta::CandidateGraphy &cg, const sta::TimingRunResult &res,
+    const std::unordered_set<std::size_t> &startpoint_nodes) {
+  std::cout << "\n=== NODES ===\n";
+  for (const auto &node : cg.nodes) {
+    bool is_startpoint = startpoint_nodes.count(node.id) > 0;
+    std::cout << "  [" << std::setw(3) << node.id << "] ";
+    if (is_startpoint)
+      std::cout << "[START] ";
+    if (node.point_idx >= res.points.size()) {
+      std::cout << "pt?" << node.point_idx << " | related point num: "
+                << node.relate_candidate_point.size() << "\n";
+      continue;
+    }
+    const sta::TimingPointRef &pt = res.points[node.point_idx];
+    if (pt.inst == nullptr)
+      std::cout << "PORT: ";
+    else
+      std::cout << "INST: " << pt.inst->instance_name << " ("
+                << pt.inst->module_name << ") ";
+    std::cout << "port:\"" << pt.port_name << "\"";
+    std::cout << " | fanout_paths: " << node.fanout_paths.size();
+    if (!node.fanout_paths.empty()) {
+      std::cout << " -> [";
+      for (size_t i = 0; i < node.fanout_paths.size() && i < 5; ++i) {
+        if (i > 0)
+          std::cout << ", ";
+        std::cout << node.fanout_paths[i];
+      }
+      if (node.fanout_paths.size() > 5)
+        std::cout << ", ...";
+      std::cout << "]";
+    }
+    std::cout << "\n";
+  }
+}
+
+void print_candidate_paths(
+    const sta::CandidateGraphy &cg,
+    const std::unordered_set<std::size_t> &startpoint_nodes) {
+  std::cout << "\n=== PATHS ===\n";
+  for (const auto &path : cg.paths) {
+    bool is_startpath = startpoint_nodes.count(path.start_node) > 0;
+    std::cout << "  [" << std::setw(3) << path.id << "] ";
+    if (is_startpath)
+      std::cout << "[START] ";
+    std::cout << "Node[" << path.start_node << "] -> Node[" << path.end_node
+              << "]";
+    if (path.next_path.has_value())
+      std::cout << " -> Path[" << path.next_path.value() << "]";
+    else
+      std::cout << " [END]";
+    std::cout << " | fanouts_edge: " << path.fanouts_edge.size();
+    if (!path.fanouts_edge.empty()) {
+      std::cout << " | eid";
+      for (size_t i = 0; i < path.fanouts_edge.size() && i < 5; ++i)
+        std::cout << " " << path.fanouts_edge[i];
+      if (path.fanouts_edge.size() > 5)
+        std::cout << " ...";
+    }
+    std::cout << "\n";
+  }
+}

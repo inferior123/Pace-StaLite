@@ -58,19 +58,22 @@ SignalBit *STAWorker::get_virtual_clock() {
   return &global_clk;
 }
 
+static inline void check_cell_lib(const celllib::CellLibrary *lib) {
+  if(!lib) {
+    assert(false && "CellLibrary is required, no hardcoded fallback");
+  }
+  return;
+}
+
 void STAWorker::build_fanouts() {
   if (has_clock == false) {
     assert("must spec clock");
   }
 
-  if (!cell_library_) {
-    assert(false && "CellLibrary is required, no hardcoded fallback");
-    return;
-  }
+  check_cell_lib(cell_library_);
 
   // bit -> driver point id（用于建立 WIRE 边）
   std::unordered_map<SignalBit, std::size_t, SignalBitHash> bit_to_driver;
-
   // 1. 预填 bit_to_driver：来自 collect_port 的 INPUT points
   for (std::size_t pt_id : input_clk_point_ids) {
     if (pt_id < res.points.size() && res.points[pt_id].bit.has_value()) {
@@ -270,10 +273,12 @@ void STAWorker::build_fanouts() {
   }
 
   // 3. 添加 WIRE 边：驱动顶层 OUTPUT 端口的 net 的 driver -> OUTPUT point
+  // 注意：pt.bit 在 collect_port 时设置，可能在 collect_assign 之前，故需用
+  // sigmap.find() 获取合并后的当前 canonical 才能与 bit_to_driver 的 key 匹配
   for (const auto &pt : res.points) {
     if (pt.type != OUTPUT || !pt.bit.has_value())
       continue;
-    const SignalBit &out_bit = pt.bit.value();
+    SignalBit out_bit = sigmap.find(pt.bit.value());
     auto it = bit_to_driver.find(out_bit);
     if (it != bit_to_driver.end())
       pending_edges.push_back({it->second, pt.id, WIRE});

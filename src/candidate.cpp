@@ -2,7 +2,6 @@
 #include <cassert>
 #include <cstddef>
 #include <functional>
-#include <iomanip>
 #include <limits>
 #include <string>
 #include <unordered_set>
@@ -63,73 +62,6 @@ std::size_t STAWorker::get_or_create_point(Instance *inst,
   res.points.push_back(std::move(point));
   return id;
 }
-
-namespace {
-
-void print_candidate_nodes(
-    const sta::CandidateGraphy &cg, const sta::TimingRunResult &res,
-    const std::unordered_set<std::size_t> &startpoint_nodes) {
-  std::cout << "\n=== NODES ===\n";
-  for (const auto &node : cg.nodes) {
-    bool is_startpoint = startpoint_nodes.count(node.id) > 0;
-    std::cout << "  [" << std::setw(3) << node.id << "] ";
-    if (is_startpoint)
-      std::cout << "[START] ";
-    if (node.point_idx >= res.points.size()) {
-      std::cout << "pt?" << node.point_idx << " | related point num: "
-                << node.relate_candidate_point.size() << "\n";
-      continue;
-    }
-    const sta::TimingPointRef &pt = res.points[node.point_idx];
-    if (pt.inst == nullptr)
-      std::cout << "PORT: ";
-    else
-      std::cout << "INST: " << pt.inst->instance_name << " ("
-                << pt.inst->module_name << ") ";
-    std::cout << "port:\"" << pt.port_name << "\"";
-    std::cout << " | fanout_paths: " << node.fanout_paths.size();
-    if (!node.fanout_paths.empty()) {
-      std::cout << " -> [";
-      for (size_t i = 0; i < node.fanout_paths.size() && i < 5; ++i) {
-        if (i > 0)
-          std::cout << ", ";
-        std::cout << node.fanout_paths[i];
-      }
-      if (node.fanout_paths.size() > 5)
-        std::cout << ", ...";
-      std::cout << "]";
-    }
-    std::cout << "\n";
-  }
-}
-
-void print_candidate_paths(
-    const sta::CandidateGraphy &cg,
-    const std::unordered_set<std::size_t> &startpoint_nodes) {
-  std::cout << "\n=== PATHS ===\n";
-  for (const auto &path : cg.paths) {
-    bool is_startpath = startpoint_nodes.count(path.start_node) > 0;
-    std::cout << "  [" << std::setw(3) << path.id << "] ";
-    if (is_startpath)
-      std::cout << "[START] ";
-    std::cout << "Node[" << path.start_node << "] -> Node[" << path.end_node
-              << "]";
-    if (path.next_path.has_value())
-      std::cout << " -> Path[" << path.next_path.value() << "]";
-    else
-      std::cout << " [END]";
-    std::cout << " | fanouts_edge: " << path.fanouts_edge.size();
-    if (!path.fanouts_edge.empty()) {
-      std::cout << " | eid";
-      for (size_t i = 0; i < path.fanouts_edge.size() && i < 5; ++i)
-        std::cout << " " << path.fanouts_edge[i];
-      if (path.fanouts_edge.size() > 5)
-        std::cout << " ...";
-    }
-    std::cout << "\n";
-  }
-}
-} // namespace
 
 void STAWorker::build_candidate_graphy_dfs() {
   build_res_edges();
@@ -309,6 +241,7 @@ static void segment_delay_slew(const TimingRunResult &res,
   const auto *output_pin = cell->get_pin(output_pin_name);
   if (!output_pin)
     return;
+
   // SEQ_ARC (clk2q)：库里弧的 related_pin 是 cell 的时钟 pin 名（如
   // CK），不是顶层时钟端口名
   std::string related_pin = from_ref.port_name;
@@ -554,26 +487,14 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
                           : std::numeric_limits<double>::infinity());
   double unate_delay = 0.0;
   double unate_transition = 0.0;
-  // if (from_pt == 192) {
-  //   std::cerr << "[non_unate_debug] from_pt=" << from_pt << " to_pt=" << to_pt
-  //             << " inst=" << (to_ref.inst ? to_ref.inst->instance_name : "?")
-  //             << "(" << (to_ref.inst ? to_ref.inst->module_name : "?") << ")"
-  //             << " output_pin=" << to_ref.port_name
-  //             << " input_pin=" << from_ref.port_name
-  //             << " output_dir=" << (output_dir == TransitionDirection::RISING
-  //                                       ? "R"
-  //                                       : (output_dir == TransitionDirection::FALLING ? "F"
-  //                                                                                     : "?"))
-  //             << " input_slew_ns=" << input_slew_ns
-  //             << " rise_cap=" << to_ref.rise_cap
-  //             << " fall_cap=" << to_ref.fall_cap
-  //             << " mode=" << (analysis_mode == AnalysisMode::MAX ? "MAX" : "MIN")
-  //             << "\n";
-  // }
 
-  // if(from_pt == 192) {
-  //   std::cout << "TIMING ARC SIZE: " << pin_mut->timing_arcs.size() << std::endl;
-  // }
+  if constexpr (kDebugNonUnateSegment) {
+    if (kDebugNonUnateFilterPt == static_cast<std::size_t>(-1) ||
+        from_pt == kDebugNonUnateFilterPt) {
+      debug_non_unate_entry(from_pt, to_pt, from_ref, to_ref, output_dir,
+                            input_slew_ns, analysis_mode);
+    }
+  }
 
   for (const auto &arc : pin_mut->timing_arcs) {
     bool is_combinational =
@@ -608,23 +529,19 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
                  1000;
     }
 
-    if(arc.sdf_cond->empty()) {
+    if (!arc.sdf_cond.has_value() || arc.sdf_cond->empty()) {
       has_unate = true;
       unate_delay = delay_tmp;
       unate_transition = slew_tmp;
     }
 
-    // if (from_pt == 192) {
-    //   std::cerr << "  [non_unate_debug] arc related_pin=" << arc.related_pin
-    //             << " sdf_cond="
-    //             << (arc.sdf_cond.has_value() ? arc.sdf_cond.value()
-    //                                          : std::string("none"))
-    //             << " is_comb=" << (is_combinational ? "Y" : "N")
-    //             << " is_c2q=" << (is_c2q ? "Y" : "N")
-    //             << " load_cap=" << load_cap
-    //             << " delay_tmp=" << delay_tmp
-    //             << " slew_tmp_ns=" << slew_tmp << "\n";
-    // }
+    if constexpr (kDebugNonUnateSegment) {
+      if (kDebugNonUnateFilterPt == static_cast<std::size_t>(-1) ||
+          from_pt == kDebugNonUnateFilterPt) {
+        debug_non_unate_arc(arc, is_combinational, is_c2q, load_cap,
+                           delay_tmp, slew_tmp);
+      }
+    }
 
     if (!has_candidate) {
       has_candidate = true;
@@ -642,15 +559,23 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
       }
     }
   }
-  
-  if(!has_candidate) {
+
+  if (!has_candidate) {
     show_lib_details(to_ref.inst->module_name.c_str(), *cell_library_);
     assert(false);
   }
 
-  if(has_unate) {
+  if (has_unate) {
     best_delay = unate_delay;
     best_slew = unate_transition;
+  }
+
+  if constexpr (kDebugNonUnateSegment) {
+    if (kDebugNonUnateFilterPt == static_cast<std::size_t>(-1) ||
+        from_pt == kDebugNonUnateFilterPt) {
+      debug_non_unate_summary(from_pt, to_pt, has_unate, best_delay, best_slew,
+                              unate_delay, unate_transition);
+    }
   }
 
   out.total_delay_ps = best_delay;
@@ -667,27 +592,6 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
                                                               : to_ref.fall_cap;
   out.steps.push_back(std::move(step));
   return out;
-}
-
-const char *point_type_str(sta::PointType t) {
-  switch (t) {
-  case sta::CLK_PIN:
-    return "CLK_PIN";
-  case sta::INPUT:
-    return "INPUT";
-  case sta::OUTPUT:
-    return "OUTPUT";
-  case sta::REGD:
-    return "REGD";
-  case sta::REGQ:
-    return "REGQ";
-  case sta::COMB_PIN:
-    return "COMB_PIN";
-  case sta::CLK_SOURCE:
-    return "CLK_COURCE";
-  }
-
-  return "?";
 }
 
 void STAWorker::compute_path_setup_hold(TimingPathResult &pr) const {
@@ -730,164 +634,6 @@ void STAWorker::compute_path_setup_hold(TimingPathResult &pr) const {
   }
 }
 
-void STAWorker::display_result_path_detail(const TimingPathResult &pr) const {
-  std::cout << "\n--- Result Path #" << pr.index << " ---" << std::endl;
-  std::cout << "  startpoint: pt" << pr.startpoint;
-  if (pr.startpoint < res.points.size()) {
-    const auto &p = res.points[pr.startpoint];
-    std::cout << " ";
-    if (p.inst)
-      std::cout << p.inst->instance_name << "(" << p.inst->module_name << ")/";
-    std::cout << p.port_name << " type=" << point_type_str(p.type);
-  }
-  std::cout << "\n  endpoint:   pt" << pr.endpoint;
-  std::cout << "\n  path id:    #" << pr.index;
-  if (pr.endpoint < res.points.size()) {
-    const auto &p = res.points[pr.endpoint];
-    std::cout << " ";
-    if (p.inst)
-      std::cout << p.inst->instance_name << "(" << p.inst->module_name << ")/";
-    std::cout << p.port_name << " type=" << point_type_str(p.type);
-  }
-  std::cout << "\n  data_arrival=" << pr.data_arrival_time << "ps\n";
-
-  for (std::size_t i = 0; i < pr.steps.size(); ++i) {
-    const TimingStep &st = pr.steps[i];
-    std::cout << "  [" << i << "] pt" << st.start_point << " -> pt"
-              << st.end_point;
-    if (st.end_point < res.points.size()) {
-      const auto &to_ref = res.points[st.end_point];
-      std::cout << " ";
-      if (to_ref.inst)
-        std::cout << to_ref.inst->instance_name << "("
-                  << to_ref.inst->module_name << ")/";
-      std::cout << to_ref.port_name;
-    }
-    char d = (st.dir == TransitionDirection::RISING)
-                 ? 'r'
-                 : (st.dir == TransitionDirection::FALLING ? 'f' : '?');
-    std::cout << " dir=" << d << " incr=" << st.incr << "ps"
-              << " slew=" << (st.slew / 1000.0) << "ns"
-              << " cap=" << st.cap_load << "pf"
-              << " arrival=" << st.arrival << "ps";
-    bool is_last = (i == pr.steps.size() - 1);
-    if (is_last) {
-      if (pr.library_setup_time.has_value())
-        std::cout << " setup=" << pr.library_setup_time.value() << "ps";
-      if (pr.library_hold_time.has_value())
-        std::cout << " hold=" << pr.library_hold_time.value() << "ps";
-    }
-    std::cout << "\n";
-
-    // Extra debug: print arc details (including timing_sense) for this step
-    if (cell_library_ && st.start_point < res.points.size() &&
-        st.end_point < res.points.size()) {
-      const auto &from_ref = res.points[st.start_point];
-      const auto &to_ref = res.points[st.end_point];
-
-      if (to_ref.inst) {
-        const auto *cell = cell_library_->get_cell(to_ref.inst->module_name);
-        if (cell) {
-          const auto *out_pin = cell->get_pin(to_ref.port_name);
-          if (out_pin) {
-            // Find edge type and related_pin (with clk2q remap)
-            const TimingEdge *edge = nullptr;
-            for (const auto &e : from_ref.fanouts) {
-              if (e.target_point == st.end_point) {
-                edge = &e;
-                break;
-              }
-            }
-
-            std::string related_pin = from_ref.port_name;
-            if (edge && edge->type == SEQ_ARC && cell->ff.has_value() &&
-                cell->ff->clocked_on.has_value()) {
-              related_pin = cell->ff->clocked_on.value();
-            }
-
-            auto timing_type_str_local = [](celllib::TimingType t) {
-              using T = celllib::TimingType;
-              switch (t) {
-              case T::COMBINATIONAL:
-                return "COMBINATIONAL";
-              case T::SETUP_RISING:
-                return "SETUP_RISING";
-              case T::SETUP_FALLING:
-                return "SETUP_FALLING";
-              case T::HOLD_RISING:
-                return "HOLD_RISING";
-              case T::HOLD_FALLING:
-                return "HOLD_FALLING";
-              case T::RISING_EDGE:
-                return "RISING_EDGE";
-              case T::FALLING_EDGE:
-                return "FALLING_EDGE";
-              case T::CLEAR:
-                return "CLEAR";
-              case T::PRESET:
-                return "PRESET";
-              case T::MIN_PULSE_WIDTH:
-                return "MIN_PULSE_WIDTH";
-              }
-              return "?";
-            };
-
-            auto timing_sense_str_local = [](celllib::TimingSense s) {
-              using S = celllib::TimingSense;
-              switch (s) {
-              case S::POSITIVE_UNATE:
-                return "POSITIVE_UNATE";
-              case S::NEGATIVE_UNATE:
-                return "NEGATIVE_UNATE";
-              case S::NON_UNATE:
-                return "NON_UNATE";
-              }
-              return "?";
-            };
-
-            // Print all matching arcs for this from->to step
-            for (const auto &arc : out_pin->timing_arcs) {
-              bool is_combinational =
-                  (arc.timing_type == celllib::TimingType::COMBINATIONAL);
-              bool is_c2q =
-                  (arc.timing_type == celllib::TimingType::RISING_EDGE ||
-                   arc.timing_type == celllib::TimingType::FALLING_EDGE);
-              if ((!is_combinational && !is_c2q) ||
-                  arc.related_pin != related_pin)
-                continue;
-
-              std::cout << "      arc: related_pin=" << arc.related_pin
-                        << " type=" << timing_type_str_local(arc.timing_type)
-                        << " sense=" << timing_sense_str_local(arc.timing_sense)
-                        << " sdf_cond=";
-              if (arc.sdf_cond.has_value())
-                std::cout << "\"" << arc.sdf_cond.value() << "\"";
-              else
-                std::cout << "none";
-              std::cout << "\n";
-            }
-          }
-        }
-      }
-    }
-  }
-
-  AnalysisMode mode = get_analysis_mode();
-  if (mode == AnalysisMode::MAX) {
-    double required = static_cast<double>(get_effective_clock_period());
-    double setup_ps = pr.library_setup_time.value_or(0.0);
-    if (setup_ps > 0.0)
-      required -= setup_ps;
-    double slack = required - pr.data_arrival_time;
-    std::cout << "  required=" << required << "ps  slack=" << slack << "ps\n";
-  } else {
-    double required = pr.library_hold_time.value_or(0.0);
-    double slack = pr.data_arrival_time - required;
-    std::cout << "  required=" << required << "ps  slack=" << slack << "ps\n";
-  }
-  std::cout << "  ---\n";
-}
-
 // 判断节点是否为终点（D 端或 OUTPUT），非则多为 non-unate 等，需继续链下去
 static bool is_terminal_node(const TimingRunResult &res,
                              const CandidateGraphy &cg, std::size_t node_id) {
@@ -908,17 +654,15 @@ void STAWorker::run_candidate_graphy_dfs() {
 
   static const bool run_dfs_debug = false; // 调试时置 true，调完可改 false
 
-  // 收集所有起点：input 或 clk 节点
+  // 收集所有起点:通过 point_to_node 得到 node_id
   std::vector<std::size_t> start_node_ids;
-  for (std::size_t i = 0; i < candidate_graphy_.nodes.size(); ++i) {
-    const auto &node = candidate_graphy_.nodes[i];
-    if (node.point_idx >= res.points.size())
-      continue;
-    PointType t = res.points[node.point_idx].type;
-    if (t == INPUT || t == CLK_PIN)
-      start_node_ids.push_back(i);
+  for (std::size_t pt_id : input_clk_point_ids) {
+    auto it = candidate_graphy_.point_to_node.find(pt_id);
+    if (it != candidate_graphy_.point_to_node.end())
+      start_node_ids.push_back(it->second);
   }
-  if (run_dfs_debug) {
+
+  if constexpr (run_dfs_debug) {
     std::cerr << "[run_candidate_dfs] start_node_ids(" << start_node_ids.size()
               << "):";
     for (std::size_t nid : start_node_ids)
@@ -932,9 +676,11 @@ void STAWorker::run_candidate_graphy_dfs() {
   for (std::size_t start_node_id : start_node_ids) {
     const std::size_t start_pt =
         candidate_graphy_.nodes[start_node_id].point_idx;
-    if (run_dfs_debug)
+
+    if constexpr (run_dfs_debug) {
       std::cerr << "[run_candidate_dfs] === start_node n" << start_node_id
                 << " pt" << start_pt << " ===\n";
+    }
 
     using EmitChainsFn =
         std::function<void(std::size_t, TransitionDirection, double,
@@ -947,7 +693,8 @@ void STAWorker::run_candidate_graphy_dfs() {
                                 double new_delay) {
       std::size_t end_pt = candidate_graphy_.nodes[end_node_id].point_idx;
       bool terminal = is_terminal_node(res, candidate_graphy_, end_node_id);
-      if (run_dfs_debug)
+
+      if constexpr (run_dfs_debug)
         std::cerr << "[run_candidate_dfs]   push_or_continue end_n"
                   << end_node_id << " pt" << end_pt << " delay=" << new_delay
                   << " " << (terminal ? "-> PUSH" : "-> recurse") << " dir="
@@ -957,6 +704,7 @@ void STAWorker::run_candidate_graphy_dfs() {
                                  ? "F"
                                  : "?"))
                   << "\n";
+                  
       if (terminal) {
         std::string fp =
             std::to_string(start_pt) + "_" + std::to_string(end_pt);
@@ -968,7 +716,7 @@ void STAWorker::run_candidate_graphy_dfs() {
                     : (st.dir == TransitionDirection::FALLING ? "f" : "?");
         }
         if (!path_printed.insert(fp).second) {
-          if (run_dfs_debug)
+          if constexpr (run_dfs_debug)
             std::cerr << "[run_candidate_dfs]   (dup fp, skip)\n";
           return;
         }
@@ -983,7 +731,7 @@ void STAWorker::run_candidate_graphy_dfs() {
               effective_start_type_for_group(res.points[start_pt]),
               res.points[end_pt].type);
         compute_path_setup_hold(pr);
-        if (run_dfs_debug)
+        if constexpr (run_dfs_debug)
           std::cerr << "[run_candidate_dfs]   PUSH path #" << res.paths.size()
                     << " start_pt" << pr.startpoint << " -> end_pt"
                     << pr.endpoint << " arr=" << pr.data_arrival_time << "\n";
@@ -999,7 +747,7 @@ void STAWorker::run_candidate_graphy_dfs() {
                       double delay_so_far) {
       const CandidateNode &cur_node = candidate_graphy_.nodes[cur_node_id];
       const std::size_t cur_pt = cur_node.point_idx;
-      if (run_dfs_debug)
+      if constexpr (run_dfs_debug)
         std::cerr << "[run_candidate_dfs] emit_chains cur_n" << cur_node_id
                   << " pt" << cur_pt << " dir="
                   << (cur_dir == TransitionDirection::RISING ? "R" : "F")
@@ -1012,7 +760,7 @@ void STAWorker::run_candidate_graphy_dfs() {
       for (std::size_t path_id : cur_node.fanout_paths) {
         const CandidatePath &path = candidate_graphy_.paths[path_id];
         std::size_t end_node_id = path.end_node;
-        if (run_dfs_debug)
+        if constexpr (run_dfs_debug)
           std::cerr << "[run_candidate_dfs]   path" << path_id << " -> end_n"
                     << end_node_id << " pt"
                     << candidate_graphy_.nodes[end_node_id].point_idx
@@ -1035,7 +783,7 @@ void STAWorker::run_candidate_graphy_dfs() {
         if (to_node_id >= candidate_graphy_.nodes.size())
           continue;
         std::size_t to_pt = candidate_graphy_.nodes[to_node_id].point_idx;
-        if (run_dfs_debug)
+        if constexpr (run_dfs_debug)
           std::cerr << "[run_candidate_dfs]   relate -> end_n" << to_node_id
                     << " pt" << to_pt << " (rise+fall)\n";
         for (TransitionDirection dir :
@@ -1057,14 +805,14 @@ void STAWorker::run_candidate_graphy_dfs() {
     for (bool is_rise : {true, false}) {
       TransitionDirection dir =
           is_rise ? TransitionDirection::RISING : TransitionDirection::FALLING;
-      if (run_dfs_debug)
+      if constexpr (run_dfs_debug)
         std::cerr << "[run_candidate_dfs] --- branch "
                   << (is_rise ? "rise" : "fall") << " from n" << start_node_id
                   << " ---\n";
       emit_chains(start_node_id, dir, initial_slew_ns, {}, 0.0);
     }
   }
-  if (run_dfs_debug)
+  if constexpr (run_dfs_debug)
     std::cerr << "[run_candidate_dfs] total paths=" << res.paths.size() << "\n";
 }
 

@@ -4,29 +4,265 @@
 #include <cstddef>
 #include <iostream>
 #include <ostream>
+#include <string>
 
 namespace sta {
 
-static const char *point_type_str(PointType t) {
-  switch (t) {
-  case CLK_PIN:
-    return "CLK_PIN";
-  case CLK:
-    return "CLK";
-  case INPUT:
-    return "INPUT";
-  case OUTPUT:
-    return "OUTPUT";
-  case REGD:
-    return "REGD";
-  case REGQ:
-    return "REGQ";
-  case COMB_PIN:
-    return "COMB_PIN";
-  case CLK_SOURCE:
-    return "CLK_SOURCE";
+void debug_non_unate_entry(std::size_t from_pt, std::size_t to_pt,
+                           const TimingPointRef &from_ref,
+                           const TimingPointRef &to_ref,
+                           TransitionDirection output_dir, double input_slew_ns,
+                           AnalysisMode mode) {
+  std::cerr << "[non_unate_debug] from_pt=" << from_pt << " to_pt=" << to_pt
+            << " inst=" << (to_ref.inst ? to_ref.inst->instance_name : "?")
+            << "(" << (to_ref.inst ? to_ref.inst->module_name : "?") << ")"
+            << " output_pin=" << to_ref.port_name
+            << " input_pin=" << from_ref.port_name
+            << " output_dir="
+            << (output_dir == TransitionDirection::RISING
+                    ? "R"
+                    : (output_dir == TransitionDirection::FALLING ? "F" : "?"))
+            << " input_slew_ns=" << input_slew_ns
+            << " rise_cap=" << to_ref.rise_cap
+            << " fall_cap=" << to_ref.fall_cap
+            << " mode=" << (mode == AnalysisMode::MAX ? "MAX" : "MIN") << "\n";
+}
+
+void debug_non_unate_arc(const celllib::TimingArc &arc, bool is_comb,
+                         bool is_c2q, double load_cap, double delay_tmp,
+                         double slew_tmp) {
+  std::cerr << "  [non_unate_debug] arc related_pin=" << arc.related_pin
+            << " sdf_cond="
+            << (arc.sdf_cond.has_value() ? arc.sdf_cond.value()
+                                         : std::string("none"))
+            << " is_comb=" << (is_comb ? "Y" : "N")
+            << " is_c2q=" << (is_c2q ? "Y" : "N") << " load_cap=" << load_cap
+            << " delay_tmp=" << delay_tmp << " slew_tmp_ns=" << slew_tmp
+            << "\n";
+}
+
+void debug_non_unate_summary(std::size_t from_pt, std::size_t to_pt,
+                             bool has_unate, double best_delay, double best_slew,
+                             double unate_delay, double unate_slew) {
+  std::cerr << "[non_unate_debug_summary] from_pt=" << from_pt
+            << " to_pt=" << to_pt << " has_unate=" << (has_unate ? "Y" : "N")
+            << " best_delay=" << best_delay << " best_slew_ns=" << best_slew
+            << " unate_delay=" << unate_delay
+            << " unate_slew_ns=" << unate_slew << std::endl;
+}
+
+} // namespace sta
+
+std::string group_type_str(sta::PathGroup group) {
+  switch (group) {
+  case sta::PathGroup::REG2REG:
+    return "REG2REG";
+  case sta::PathGroup::IN2REG:
+    return "IN2REG";
+  case sta::PathGroup::REG2OUT:
+    return "REG2OUT";
+  case sta::PathGroup::IN2OUT:
+    return "IN2OUT";
+  default:
+    return "?";
+  }
+}
+
+auto timing_type_str(celllib::TimingType type) {
+  using T = celllib::TimingType;
+  switch (type) {
+  case T::COMBINATIONAL:
+    return "COMBINATIONAL";
+  case T::SETUP_RISING:
+    return "SETUP_RISING";
+  case T::SETUP_FALLING:
+    return "SETUP_FALLING";
+  case T::HOLD_RISING:
+    return "HOLD_RISING";
+  case T::HOLD_FALLING:
+    return "HOLD_FALLING";
+  case T::RISING_EDGE:
+    return "RISING_EDGE";
+  case T::FALLING_EDGE:
+    return "FALLING_EDGE";
+  case T::CLEAR:
+    return "CLEAR";
+  case T::PRESET:
+    return "PRESET";
+  case T::MIN_PULSE_WIDTH:
+    return "MIN_PULSE_WIDTH";
   }
   return "?";
+}
+
+auto timing_sense_str(celllib::TimingSense sense) {
+  using S = celllib::TimingSense;
+  switch (sense) {
+  case S::POSITIVE_UNATE:
+    return "POSITIVE_UNATE";
+  case S::NEGATIVE_UNATE:
+    return "NEGATIVE_UNATE";
+  case S::NON_UNATE:
+    return "NON_UNATE";
+  }
+  return "?";
+}
+
+auto pin_dir_str(celllib::PinDirection dir) {
+  switch (dir) {
+  case celllib::PinDirection::INPUT:
+    return "INPUT";
+  case celllib::PinDirection::OUTPUT:
+    return "OUTPUT";
+  case celllib::PinDirection::INOUT:
+    return "INOUT";
+  case celllib::PinDirection::INTERNAL:
+    return "INTERNAL";
+  }
+  return "?";
+}
+
+std::string point_type_str(sta::PointType type) {
+  switch (type) {
+  case sta::CLK:
+    return "CLK";
+  case sta::CLK_PIN:
+    return "CLK_PIN";
+  case sta::INPUT:
+    return "INPUT";
+  case sta::OUTPUT:
+    return "OUTPUT";
+  case sta::REGD:
+    return "REGD";
+  case sta::REGQ:
+    return "REGQ";
+  case sta::COMB_PIN:
+    return "COMB_PIN";
+  case sta::CLK_SOURCE:
+    return "CLK_COURCE";
+  }
+
+  return "?";
+}
+
+namespace sta {
+
+void STAWorker::display_result_path_detail(const TimingPathResult &pr) const {
+  std::cout << "\n--- Result Path #" << pr.index << " ---" << std::endl;
+  std::cout << "  startpoint: pt" << pr.startpoint;
+  if (pr.startpoint < res.points.size()) {
+    const auto &p = res.points[pr.startpoint];
+    std::cout << " ";
+    if (p.inst)
+      std::cout << p.inst->instance_name << "(" << p.inst->module_name << ")/";
+    std::cout << p.port_name << " type=" << point_type_str(p.type);
+  }
+  std::cout << "\n  endpoint:   pt" << pr.endpoint;
+  std::cout << "\n  path id:    #" << pr.index;
+  if (pr.endpoint < res.points.size()) {
+    const auto &p = res.points[pr.endpoint];
+    std::cout << " ";
+    if (p.inst)
+      std::cout << p.inst->instance_name << "(" << p.inst->module_name << ")/";
+    std::cout << p.port_name << " type=" << point_type_str(p.type);
+  }
+  std::cout << "\n  data_arrival=" << pr.data_arrival_time << "ps\n";
+
+  for (std::size_t i = 0; i < pr.steps.size(); ++i) {
+    const TimingStep &st = pr.steps[i];
+    std::cout << "  [" << i << "] pt" << st.start_point << " -> pt"
+              << st.end_point;
+    if (st.end_point < res.points.size()) {
+      const auto &to_ref = res.points[st.end_point];
+      std::cout << " ";
+      if (to_ref.inst)
+        std::cout << to_ref.inst->instance_name << "("
+                  << to_ref.inst->module_name << ")/";
+      std::cout << to_ref.port_name;
+    }
+    char d = (st.dir == TransitionDirection::RISING)
+                 ? 'r'
+                 : (st.dir == TransitionDirection::FALLING ? 'f' : '?');
+    std::cout << " dir=" << d << " incr=" << st.incr << "ps"
+              << " slew=" << (st.slew / 1000.0) << "ns"
+              << " cap=" << st.cap_load << "pf"
+              << " arrival=" << st.arrival << "ps";
+    bool is_last = (i == pr.steps.size() - 1);
+    if (is_last) {
+      if (pr.library_setup_time.has_value())
+        std::cout << " setup=" << pr.library_setup_time.value() << "ps";
+      if (pr.library_hold_time.has_value())
+        std::cout << " hold=" << pr.library_hold_time.value() << "ps";
+    }
+    std::cout << "\n";
+
+    // Extra debug: print arc details (including timing_sense) for this step
+    if (cell_library_ && st.start_point < res.points.size() &&
+        st.end_point < res.points.size()) {
+      const auto &from_ref = res.points[st.start_point];
+      const auto &to_ref = res.points[st.end_point];
+
+      if (to_ref.inst) {
+        const auto *cell = cell_library_->get_cell(to_ref.inst->module_name);
+        if (cell) {
+          const auto *out_pin = cell->get_pin(to_ref.port_name);
+          if (out_pin) {
+            // Find edge type and related_pin (with clk2q remap)
+            const TimingEdge *edge = nullptr;
+            for (const auto &e : from_ref.fanouts) {
+              if (e.target_point == st.end_point) {
+                edge = &e;
+                break;
+              }
+            }
+
+            std::string related_pin = from_ref.port_name;
+            if (edge && edge->type == SEQ_ARC && cell->ff.has_value() &&
+                cell->ff->clocked_on.has_value()) {
+              related_pin = cell->ff->clocked_on.value();
+            }
+
+            // Print all matching arcs for this from->to step
+            for (const auto &arc : out_pin->timing_arcs) {
+              bool is_combinational =
+                  (arc.timing_type == celllib::TimingType::COMBINATIONAL);
+              bool is_c2q =
+                  (arc.timing_type == celllib::TimingType::RISING_EDGE ||
+                   arc.timing_type == celllib::TimingType::FALLING_EDGE);
+              if ((!is_combinational && !is_c2q) ||
+                  arc.related_pin != related_pin)
+                continue;
+
+              std::cout << "      arc: related_pin=" << arc.related_pin
+                        << " type=" << timing_type_str(arc.timing_type)
+                        << " sense=" << timing_sense_str(arc.timing_sense)
+                        << " sdf_cond=";
+              if (arc.sdf_cond.has_value())
+                std::cout << "\"" << arc.sdf_cond.value() << "\"";
+              else
+                std::cout << "none";
+              std::cout << "\n";
+            }
+          }
+        }
+      }
+    }
+  }
+
+  AnalysisMode mode = get_analysis_mode();
+  if (mode == AnalysisMode::MAX) {
+    double required = static_cast<double>(get_effective_clock_period());
+    double setup_ps = pr.library_setup_time.value_or(0.0);
+    if (setup_ps > 0.0)
+      required -= setup_ps;
+    double slack = required - pr.data_arrival_time;
+    std::cout << "  required=" << required << "ps  slack=" << slack << "ps\n";
+  } else {
+    double required = pr.library_hold_time.value_or(0.0);
+    double slack = pr.data_arrival_time - required;
+    std::cout << "  required=" << required << "ps  slack=" << slack << "ps\n";
+  }
+  std::cout << "  ---\n";
 }
 
 static void print_point_ref(const TimingPointRef &p) {
@@ -196,60 +432,6 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
     return;
   }
 
-  auto pin_dir_str = [](celllib::PinDirection d) {
-    switch (d) {
-    case celllib::PinDirection::INPUT:
-      return "INPUT";
-    case celllib::PinDirection::OUTPUT:
-      return "OUTPUT";
-    case celllib::PinDirection::INOUT:
-      return "INOUT";
-    case celllib::PinDirection::INTERNAL:
-      return "INTERNAL";
-    }
-    return "?";
-  };
-
-  auto timing_type_str = [](celllib::TimingType t) {
-    using T = celllib::TimingType;
-    switch (t) {
-    case T::COMBINATIONAL:
-      return "COMBINATIONAL";
-    case T::SETUP_RISING:
-      return "SETUP_RISING";
-    case T::SETUP_FALLING:
-      return "SETUP_FALLING";
-    case T::HOLD_RISING:
-      return "HOLD_RISING";
-    case T::HOLD_FALLING:
-      return "HOLD_FALLING";
-    case T::RISING_EDGE:
-      return "RISING_EDGE";
-    case T::FALLING_EDGE:
-      return "FALLING_EDGE";
-    case T::CLEAR:
-      return "CLEAR";
-    case T::PRESET:
-      return "PRESET";
-    case T::MIN_PULSE_WIDTH:
-      return "MIN_PULSE_WIDTH";
-    }
-    return "?";
-  };
-
-  auto timing_sense_str = [](celllib::TimingSense s) {
-    using S = celllib::TimingSense;
-    switch (s) {
-    case S::POSITIVE_UNATE:
-      return "POSITIVE_UNATE";
-    case S::NEGATIVE_UNATE:
-      return "NEGATIVE_UNATE";
-    case S::NON_UNATE:
-      return "NON_UNATE";
-    }
-    return "?";
-  };
-
   auto print_lut = [&lib](const char *label, const celllib::LookupTable &tb) {
     std::cout << "      LUT " << label;
     if (tb.template_name.has_value())
@@ -363,36 +545,26 @@ void debug_paths_through_instance(STAWorker &worker,
                                   const std::string &inst_substr) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
-  const PathGroup group = PathGroup::REG2OUT;
-  const AnalysisMode target_mode = AnalysisMode::MAX;
+  const PathGroup group = PathGroup::IN2OUT;
+  const AnalysisMode target_mode = AnalysisMode::MIN;
 
   if (mode != target_mode)
     return;
 
-  // 实现 print_point_group 辅助函数
-  auto print_point_group = [](sta::PathGroup group) -> const char * {
-    switch (group) {
-    case sta::PathGroup::REG2REG:
-      return "REG2REG";
-    case sta::PathGroup::IN2REG:
-      return "IN2REG";
-    case sta::PathGroup::REG2OUT:
-      return "REG2OUT";
-    case sta::PathGroup::IN2OUT:
-      return "IN2OUT";
-    default:
-      return "?";
-    }
-  };
-
   size_t entries_size = worker.get_entries_size(group, mode);
 
   // 这里以 IN2OUT 组为例，查看最差的前 3 条路径
-  std::cout << "[" << print_point_group(group) << " "
+  std::cout << "[" << group_type_str(group) << " "
             << (mode == AnalysisMode::MAX ? "max" : "min")
             << "entries size: " << entries_size << "]\n";
-  for (std::size_t i = 0; i < entries_size && i < 3; ++i) {
-    const PathEntry *e = worker.get_top_k(group, mode, i); // 最差若干条
+  for (std::size_t i = 0; i < entries_size && i < 1; ++i) {
+    const PathEntry *e = nullptr;
+    if (mode == AnalysisMode::MAX) {
+      e = worker.get_top_k(group, mode, i); // MAX：从前往后取最差若干条
+    } else {
+      e = worker.get_last_k(group, mode, i); // MIN：从后往前取最差若干条
+    }
+
     if (!e || !e->path)
       break;
     worker.display_result_path_detail(*e->path);
