@@ -150,14 +150,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
       std::string report_dir = "./result/candidate/" + design_name;
 
-      std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-      worker.build_fanouts();
-
-      std::cout << "  [PBA-MAX] Step 2: calculate_load_capacitance()...\n";
-      worker.caculate_candidate_load_cap();
-      std::cout << "  [PBA-MAX] Step 3: build_candidate_graphy()...\n";
-      worker.build_candidate_graphy_dfs();
-      worker.run_candidate_graphy_dfs();
+      run_candidate(worker);
 
       // display_all_longest_path(worker);
 
@@ -190,14 +183,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
       std::string report_dir = "./result/candidate/" + design_name;
 
-      std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-      worker.build_fanouts();
-
-      std::cout << "  [PBA-MIN] Step 2: calculate_load_capacitance()...\n";
-      worker.caculate_candidate_load_cap();
-      std::cout << "  [PBA-MIN] Step 3: build_candidate_graphy()...\n";
-      worker.build_candidate_graphy_dfs();
-      worker.run_candidate_graphy_dfs();
+      run_candidate(worker);
 
       debug_paths_through_instance(worker, "state_1__reg_p");
 
@@ -287,14 +273,7 @@ void singal_test(char *file_name) {
   //       worker.top_moudle.empty() ? "design" : worker.top_moudle;
   //   std::string report_dir = "./result1/candidate/" + design_name;
 
-  //   std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-  //   worker.build_fanouts();
-
-  //   std::cout << "  [PBA-MAX] Step 2: calculate_load_capacitance()...\n";
-  //   worker.caculate_candidate_load_cap();
-  //   std::cout << "  [PBA-MAX] Step 3: build_candidate_graphy()...\n";
-  //   worker.build_candidate_graphy_dfs();
-  //   worker.run_candidate_graphy_dfs();
+  //   run_candidate(worker);
 
   //   debug_paths_through_instance(worker, "state_1__reg_p");
 
@@ -327,14 +306,7 @@ void singal_test(char *file_name) {
         worker.top_moudle.empty() ? "design" : worker.top_moudle;
     std::string report_dir = "./result1/candidate/" + design_name;
 
-    std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-    worker.build_fanouts();
-
-    std::cout << "  [PBA-MAX] Step 2: calculate_load_capacitance()...\n";
-    worker.caculate_candidate_load_cap();
-    std::cout << "  [PBA-MAX] Step 3: build_candidate_graphy()...\n";
-    worker.build_candidate_graphy_dfs();
-    worker.run_candidate_graphy_dfs();
+    run_candidate(worker);
 
     debug_paths_through_instance(worker, "state_1__reg_p");
 
@@ -372,57 +344,6 @@ void debug_lib_cell() {
   }
 
   sta::show_lib_details("AOI32X0P5H7R", cell_lib);
-}
-
-void spi_test() {
-  std::vector<std::string> libs;
-
-  libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
-      "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
-      "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
-      "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
-
-  celllib::CellLibrary cell_lib;
-  MyCellLibParser lib_parser(cell_lib);
-
-  if (!celllib::try_load_celllib_cache(libs, cell_lib)) {
-    for (const auto &file : libs) {
-      std::cout << "liberty parser handle file " << file << std::endl;
-      lib_parser.parse_from_file(file);
-    }
-    celllib::save_celllib_cache(libs, cell_lib);
-  }
-
-  std::string vfile =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55/s44/s44.v";
-
-  {
-    sta::STAWorker worker;
-    worker.get_config().clk_name = "clk";
-    worker.set_cell_library(cell_lib);
-    MyVerilogParser verilog_parser(worker);
-
-    verilog_parser.read(vfile.c_str());
-    worker.set_analysis_mode(sta::AnalysisMode::MAX);
-
-    std::cout << "  [PBA] Step 1: build_fanouts()...\n";
-    worker.build_fanouts();
-    // fanout_test_by_instance(worker, "state_1__reg_p");
-    worker.caculate_candidate_load_cap();
-    worker.build_candidate_graphy_dfs();
-    worker.run_candidate_graphy_dfs(); // 填充 worker.res
-
-    debug_paths_through_instance(worker, "state_1__reg_p");
-    display_points_fanout(worker, 6);
-  }
 }
 
 void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,

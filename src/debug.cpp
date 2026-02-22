@@ -8,6 +8,74 @@
 
 namespace sta {
 
+static const char *dir_char(TransitionDirection d) {
+  return d == TransitionDirection::RISING    ? "R"
+         : d == TransitionDirection::FALLING ? "F"
+                                             : "?";
+}
+
+void debug_dfs_start_nodes(const std::vector<std::size_t> &node_ids,
+                           const CandidateGraphy &cg) {
+  std::cerr << "[run_candidate_dfs] start_node_ids(" << node_ids.size() << "):";
+  for (std::size_t nid : node_ids)
+    std::cerr << " n" << nid << "(pt" << cg.nodes[nid].point_idx << ")";
+  std::cerr << "\n";
+}
+
+void debug_dfs_start_node(std::size_t node_id, std::size_t pt) {
+  std::cerr << "[run_candidate_dfs] === start_node n" << node_id << " pt" << pt
+            << " ===\n";
+}
+
+void debug_dfs_push_or_continue(std::size_t end_node_id, std::size_t end_pt,
+                                double delay, bool terminal,
+                                TransitionDirection dir) {
+  std::cerr << "[run_candidate_dfs]   push_or_continue end_n" << end_node_id
+            << " pt" << end_pt << " delay=" << delay << " "
+            << (terminal ? "-> PUSH" : "-> recurse")
+            << " dir=" << dir_char(dir) << "\n";
+}
+
+void debug_dfs_dup_skip() {
+  std::cerr << "[run_candidate_dfs]   (dup fp, skip)\n";
+}
+
+void debug_dfs_push_path(std::size_t path_idx, std::size_t startpoint,
+                         std::size_t endpoint, double arrival) {
+  std::cerr << "[run_candidate_dfs]   PUSH path #" << path_idx << " start_pt"
+            << startpoint << " -> end_pt" << endpoint << " arr=" << arrival
+            << "\n";
+}
+
+void debug_dfs_emit_chains(std::size_t node_id, std::size_t pt,
+                           TransitionDirection dir, double delay_so_far,
+                           std::size_t fanout_cnt, std::size_t relate_cnt) {
+  std::cerr << "[run_candidate_dfs] emit_chains cur_n" << node_id << " pt"
+            << pt << " dir=" << dir_char(dir)
+            << " delay_so_far=" << delay_so_far << " fanout_paths=" << fanout_cnt
+            << " relate=" << relate_cnt << "\n";
+}
+
+void debug_dfs_unate_path(std::size_t path_id, std::size_t end_node_id,
+                          std::size_t end_pt) {
+  std::cerr << "[run_candidate_dfs]   path" << path_id << " -> end_n"
+            << end_node_id << " pt" << end_pt << " unate\n";
+}
+
+void debug_dfs_relate(std::size_t to_node_id, std::size_t to_pt) {
+  std::cerr << "[run_candidate_dfs]   relate -> end_n" << to_node_id << " pt"
+            << to_pt << " (rise+fall)\n";
+}
+
+void debug_dfs_branch(bool is_rise, std::size_t start_node_id) {
+  std::cerr << "[run_candidate_dfs] --- branch " << (is_rise ? "rise" : "fall")
+            << " from n" << start_node_id << " ---\n";
+}
+
+void debug_dfs_total_paths(std::size_t total) {
+  std::cerr << "[run_candidate_dfs] total paths=" << total << "\n";
+}
+
 void debug_non_unate_entry(std::size_t from_pt, std::size_t to_pt,
                            const TimingPointRef &from_ref,
                            const TimingPointRef &to_ref,

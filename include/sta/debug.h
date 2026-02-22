@@ -4,6 +4,27 @@
 
 // 编译期调试开关（统一放在此处，便于查找与修改）
 namespace sta {
+/// candidate DFS 过程调试输出，置 true 启用
+inline constexpr bool kDebugCandidateDfs = false;
+
+// candidate DFS 调试打印函数
+void debug_dfs_start_nodes(const std::vector<std::size_t> &node_ids,
+                           const CandidateGraphy &cg);
+void debug_dfs_start_node(std::size_t node_id, std::size_t pt);
+void debug_dfs_push_or_continue(std::size_t end_node_id, std::size_t end_pt,
+                                double delay, bool terminal,
+                                TransitionDirection dir);
+void debug_dfs_dup_skip();
+void debug_dfs_push_path(std::size_t path_idx, std::size_t startpoint,
+                         std::size_t endpoint, double arrival);
+void debug_dfs_emit_chains(std::size_t node_id, std::size_t pt,
+                           TransitionDirection dir, double delay_so_far,
+                           std::size_t fanout_cnt, std::size_t relate_cnt);
+void debug_dfs_unate_path(std::size_t path_id, std::size_t end_node_id,
+                          std::size_t end_pt);
+void debug_dfs_relate(std::size_t to_node_id, std::size_t to_pt);
+void debug_dfs_branch(bool is_rise, std::size_t start_node_id);
+void debug_dfs_total_paths(std::size_t total);
 /// non-unate 段调试输出，置 true 启用
 inline constexpr bool kDebugNonUnateSegment = false;
 /// 只对指定 point 打印，取 static_cast<std::size_t>(-1) 表示全部

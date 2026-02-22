@@ -350,7 +350,8 @@ struct CandidateNode {
   std::size_t id; // 在 CandidateGraphy::nodes 中的下标
   size_t point_idx;
 
-  // 从该节点出发的所有 candidate path 的 id（索引到 CandidateGraphy::paths，均为 unate 段）
+  // 从该节点出发的所有 candidate path 的 id（索引到
+  // CandidateGraphy::paths，均为 unate 段）
   std::vector<std::size_t> relate_candidate_point;
   std::vector<std::size_t> fanout_paths;
 };
@@ -446,7 +447,6 @@ private:
   // input 和 clk 的 point id（collect_port 填充 input，build_fanouts 填充 clk）
   std::vector<std::size_t> input_clk_point_ids;
 
-
 public:
   /**
    * 仿真颗粒度：控制时序分析的精度级别
@@ -527,11 +527,16 @@ public:
   compute_candidate_path_with_input(std::size_t path_id,
                                     TransitionDirection input_dir,
                                     double input_slew_ns) const;
-  /// 单条 non-unate 弧 (from_pt -> to_pt) 的 delay/slew，不经过 segment_delay_slew
-  CandidatePathSegmentResult compute_one_edge_non_unate_segment(
-      std::size_t from_pt, std::size_t to_pt,
-      TransitionDirection output_dir, double input_slew_ns) const;
+  /// 单条 non-unate 弧 (from_pt -> to_pt) 的 delay/slew，不经过
+  /// segment_delay_slew
+  CandidatePathSegmentResult
+  compute_one_edge_non_unate_segment(std::size_t from_pt, std::size_t to_pt,
+                                     TransitionDirection output_dir,
+                                     double input_slew_ns, bool use_max) const;
   void run_candidate_graphy_dfs();
+
+  void candidate_recaculate();
+  void recaculate_in2out();
 
   // void print_all_timing_paths_bfs(); //
   // BFS/拓扑序：用队列按层枚举并打印每一条时序路径（不依赖 timing_queue）
@@ -735,4 +740,15 @@ void print_candidate_nodes(
 void print_candidate_paths(
     const sta::CandidateGraphy &cg,
     const std::unordered_set<std::size_t> &startpoint_nodes);
+
+namespace sta {
+void segment_delay_slew(const TimingRunResult &res,
+                        const celllib::CellLibrary *cell_library_,
+                        AnalysisMode mode, std::size_t from_pt,
+                        std::size_t to_pt, double prev_slew,
+                        TransitionDirection cur_dir, double &out_delay,
+                        double &out_slew, TransitionDirection &out_dir);
+}
+
+void run_candidate(sta::STAWorker &worker);
 #endif // STA_DATA_STRUCTURES_HPP

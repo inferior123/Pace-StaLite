@@ -132,7 +132,9 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/sdc_parser.cpp
   ${PROJECT_SOURCE_DIR}/src/cell_data_structure.cpp
   ${PROJECT_SOURCE_DIR}/src/celllib_cache.cpp
-  ${PROJECT_SOURCE_DIR}/src/candidate.cpp
+  ${PROJECT_SOURCE_DIR}/src/candidate/candidate.cpp
+  ${PROJECT_SOURCE_DIR}/src/candidate/candidate_recaculate.cpp
+  ${PROJECT_SOURCE_DIR}/src/candidate/candidate_graphy.cpp
   ${PROJECT_SOURCE_DIR}/src/utils.cpp
   ${PROJECT_SOURCE_DIR}/src/debug.cpp
   ${FLEX_verilog_lexer_OUTPUTS}
