@@ -17,11 +17,11 @@ namespace sta {
 // 若为 COMB_ARC/SEQ_ARC：遍历所有 related_pin 匹配、且 sdf_cond 为空的
 // TimingArc，分别计算一遍延迟，在 MAX 模式下取最大，在 MIN 模式下取最小。
 void segment_delay_slew(const TimingRunResult &res,
-                               const celllib::CellLibrary *cell_library_,
-                               AnalysisMode mode, std::size_t from_pt,
-                               std::size_t to_pt, double prev_slew,
-                               TransitionDirection cur_dir, double &out_delay,
-                               double &out_slew, TransitionDirection &out_dir) {
+                        const celllib::CellLibrary *cell_library_,
+                        AnalysisMode mode, std::size_t from_pt,
+                        std::size_t to_pt, double prev_slew,
+                        TransitionDirection cur_dir, double &out_delay,
+                        double &out_slew, TransitionDirection &out_dir) {
   out_delay = 0.0;
   out_slew = prev_slew;
   out_dir = cur_dir;
@@ -113,15 +113,24 @@ void segment_delay_slew(const TimingRunResult &res,
       best_slew = slew_tmp;
       best_dir = dir_tmp;
     } else {
-      if ((mode == AnalysisMode::MAX && delay_tmp > best_delay) ||
-          (mode == AnalysisMode::MIN && delay_tmp < best_delay)) {
-        best_delay = delay_tmp;
-        best_slew = slew_tmp;
-        best_dir = dir_tmp;
-      }
-      if ((mode == AnalysisMode::MAX && slew_tmp > best_slew) ||
-          (mode == AnalysisMode::MIN && slew_tmp < best_slew)) {
-        best_slew = slew_tmp;
+      if (mode == AnalysisMode::MAX) {
+        if (delay_tmp > best_delay) {
+          best_delay = delay_tmp;
+          best_slew = slew_tmp;
+          best_dir = dir_tmp;
+        }
+        if (slew_tmp > best_slew) {
+          best_slew = slew_tmp;
+        }
+      } else {
+        if (delay_tmp < best_delay) {
+          best_delay = delay_tmp;
+          // best_slew = slew_tmp;
+          best_dir = dir_tmp;
+        }
+        if (slew_tmp < best_slew) {
+          best_slew = slew_tmp;
+        }
       }
     }
   }
@@ -279,8 +288,8 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
     if constexpr (kDebugNonUnateSegment) {
       if (kDebugNonUnateFilterPt == static_cast<std::size_t>(-1) ||
           from_pt == kDebugNonUnateFilterPt) {
-        debug_non_unate_arc(arc, is_combinational, is_c2q, load_cap,
-                           delay_tmp, slew_tmp);
+        debug_non_unate_arc(arc, is_combinational, is_c2q, load_cap, delay_tmp,
+                            slew_tmp);
       }
     }
 
@@ -418,52 +427,51 @@ void STAWorker::run_candidate_graphy_dfs() {
                            std::vector<TimingStep>, double)>;
     EmitChainsFn emit_chains;
 
-    auto push_or_continue = [&](std::size_t end_node_id,
-                                const CandidatePathSegmentResult &seg,
-                                std::vector<TimingStep> new_steps,
-                                double new_delay) {
-      std::size_t end_pt = candidate_graphy_.nodes[end_node_id].point_idx;
-      bool terminal = is_terminal_node(res, candidate_graphy_, end_node_id);
+    auto push_or_continue =
+        [&](std::size_t end_node_id, const CandidatePathSegmentResult &seg,
+            std::vector<TimingStep> new_steps, double new_delay) {
+          std::size_t end_pt = candidate_graphy_.nodes[end_node_id].point_idx;
+          bool terminal = is_terminal_node(res, candidate_graphy_, end_node_id);
 
-      if constexpr (kDebugCandidateDfs)
-        debug_dfs_push_or_continue(end_node_id, end_pt, new_delay, terminal,
-                                   seg.output_dir);
-
-      if (terminal) {
-        std::string fp =
-            std::to_string(start_pt) + "_" + std::to_string(end_pt);
-        for (const auto &st : new_steps) {
-          fp += "_" + std::to_string(st.start_point) + "-" +
-                std::to_string(st.end_point);
-          fp += (st.dir == TransitionDirection::RISING)
-                    ? "r"
-                    : (st.dir == TransitionDirection::FALLING ? "f" : "?");
-        }
-        if (!path_printed.insert(fp).second) {
           if constexpr (kDebugCandidateDfs)
-            debug_dfs_dup_skip();
-          return;
-        }
-        TimingPathResult pr;
-        pr.startpoint = start_pt;
-        pr.endpoint = end_pt;
-        pr.data_arrival_time = new_delay;
-        pr.steps = std::move(new_steps);
-        pr.index = res.paths.size();
-        if (start_pt < res.points.size() && end_pt < res.points.size())
-          pr.group = classify_path_group(
-              effective_start_type_for_group(res.points[start_pt]),
-              res.points[end_pt].type);
-        compute_path_setup_hold(pr);
-        if constexpr (kDebugCandidateDfs)
-          debug_dfs_push_path(res.paths.size(), pr.startpoint, pr.endpoint,
-                              pr.data_arrival_time);
-        res.paths.push_back(std::move(pr));
-      } else {
-        emit_chains(end_node_id, seg.output_dir, seg.output_slew_ns,
-                    std::move(new_steps), new_delay);
-      }
-    };
+            debug_dfs_push_or_continue(end_node_id, end_pt, new_delay, terminal,
+                                       seg.output_dir);
+
+          if (terminal) {
+            std::string fp =
+                std::to_string(start_pt) + "_" + std::to_string(end_pt);
+            for (const auto &st : new_steps) {
+              fp += "_" + std::to_string(st.start_point) + "-" +
+                    std::to_string(st.end_point);
+              fp += (st.dir == TransitionDirection::RISING)
+                        ? "r"
+                        : (st.dir == TransitionDirection::FALLING ? "f" : "?");
+            }
+            if (!path_printed.insert(fp).second) {
+              if constexpr (kDebugCandidateDfs)
+                debug_dfs_dup_skip();
+              return;
+            }
+            TimingPathResult pr;
+            pr.startpoint = start_pt;
+            pr.endpoint = end_pt;
+            pr.data_arrival_time = new_delay;
+            pr.steps = std::move(new_steps);
+            pr.index = res.paths.size();
+            if (start_pt < res.points.size() && end_pt < res.points.size())
+              pr.group = classify_path_group(
+                  effective_start_type_for_group(res.points[start_pt]),
+                  res.points[end_pt].type);
+            compute_path_setup_hold(pr);
+            if constexpr (kDebugCandidateDfs)
+              debug_dfs_push_path(res.paths.size(), pr.startpoint, pr.endpoint,
+                                  pr.data_arrival_time);
+            res.paths.push_back(std::move(pr));
+          } else {
+            emit_chains(end_node_id, seg.output_dir, seg.output_slew_ns,
+                        std::move(new_steps), new_delay);
+          }
+        };
 
     emit_chains = [&](std::size_t cur_node_id, TransitionDirection cur_dir,
                       double cur_slew_ns, std::vector<TimingStep> steps_so_far,

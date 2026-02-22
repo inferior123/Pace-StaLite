@@ -211,6 +211,9 @@ struct TimingPointRef {
   std::string port_name;
   std::optional<SignalBit> bit;
 
+  // 如果没有值，就说明不是candidate
+  std::optional<size_t> candidate_idx; 
+
   double load_cap = 0.0;
   double rise_cap = 0.0;
   double fall_cap = 0.0;

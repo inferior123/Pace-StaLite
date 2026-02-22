@@ -196,17 +196,20 @@ void STAWorker::build_fanouts() {
             std::size_t output_pt = get_or_create_point(
                 instance.get(), output_pin_name, output_canonical, COMB_PIN);
 
-            if (analysis_granularity_ != AnalysisGranularity::COARSE &&
-                arc.timing_sense == celllib::TimingSense::NON_UNATE) {
+            if (arc.timing_sense == celllib::TimingSense::NON_UNATE) {
               std::size_t input_node_id =
                   get_or_create_candidate_node(input_pt);
               std::size_t output_node_id =
                   get_or_create_candidate_node(output_pt);
+
               if (input_node_id != SIZE_MAX && output_node_id != SIZE_MAX &&
                   input_node_id < candidate_graphy_.nodes.size() &&
                   output_node_id < candidate_graphy_.nodes.size())
                 candidate_graphy_.nodes[input_node_id].relate_candidate_point
                     .push_back(output_node_id);
+
+              res.points[input_pt].candidate_idx = input_node_id;
+              res.points[output_pt].candidate_idx = output_node_id;
             }
 
             pending_edges.push_back({input_pt, output_pt, COMB_ARC});

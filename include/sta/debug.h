@@ -25,6 +25,7 @@ void debug_dfs_unate_path(std::size_t path_id, std::size_t end_node_id,
 void debug_dfs_relate(std::size_t to_node_id, std::size_t to_pt);
 void debug_dfs_branch(bool is_rise, std::size_t start_node_id);
 void debug_dfs_total_paths(std::size_t total);
+
 /// non-unate 段调试输出，置 true 启用
 inline constexpr bool kDebugNonUnateSegment = false;
 /// 只对指定 point 打印，取 static_cast<std::size_t>(-1) 表示全部

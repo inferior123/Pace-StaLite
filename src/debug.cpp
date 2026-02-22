@@ -613,7 +613,7 @@ void debug_paths_through_instance(STAWorker &worker,
                                   const std::string &inst_substr) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
-  const PathGroup group = PathGroup::IN2OUT;
+  const PathGroup group = PathGroup::IN2REG;
   const AnalysisMode target_mode = AnalysisMode::MIN;
 
   if (mode != target_mode)
@@ -621,16 +621,15 @@ void debug_paths_through_instance(STAWorker &worker,
 
   size_t entries_size = worker.get_entries_size(group, mode);
 
-  // 这里以 IN2OUT 组为例，查看最差的前 3 条路径
   std::cout << "[" << group_type_str(group) << " "
             << (mode == AnalysisMode::MAX ? "max" : "min")
-            << "entries size: " << entries_size << "]\n";
-  for (std::size_t i = 0; i < entries_size && i < 1; ++i) {
+            << " entries size: " << entries_size << "]\n";
+  for (std::size_t i = 0; i < entries_size && i < 5; ++i) {
     const PathEntry *e = nullptr;
     if (mode == AnalysisMode::MAX) {
       e = worker.get_top_k(group, mode, i); // MAX：从前往后取最差若干条
     } else {
-      e = worker.get_last_k(group, mode, i); // MIN：从后往前取最差若干条
+      e = worker.get_top_k(group, mode, i); // MIN：从后往前取最差若干条
     }
 
     if (!e || !e->path)
