@@ -118,6 +118,10 @@ void STAWorker::recaculate_in2out() {
   }
 }
 
+void general_recaculate() {
+
+}
+
 void STAWorker::candidate_recaculate() {
     recaculate_in2out();
 }

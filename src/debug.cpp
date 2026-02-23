@@ -609,8 +609,7 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
   std::cout << "===== end cell '" << cell->name << "' =====\n";
 }
 
-void debug_paths_through_instance(STAWorker &worker,
-                                  const std::string &inst_substr) {
+void display_spefic_group(STAWorker &worker) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
   const PathGroup group = PathGroup::IN2REG;
@@ -624,7 +623,7 @@ void debug_paths_through_instance(STAWorker &worker,
   std::cout << "[" << group_type_str(group) << " "
             << (mode == AnalysisMode::MAX ? "max" : "min")
             << " entries size: " << entries_size << "]\n";
-  for (std::size_t i = 0; i < entries_size && i < 5; ++i) {
+  for (std::size_t i = 0; i < entries_size && i<0; ++i) {
     const PathEntry *e = nullptr;
     if (mode == AnalysisMode::MAX) {
       e = worker.get_top_k(group, mode, i); // MAX：从前往后取最差若干条
@@ -635,8 +634,20 @@ void debug_paths_through_instance(STAWorker &worker,
     if (!e || !e->path)
       break;
     worker.display_result_path_detail(*e->path);
-    display_points_fanout(worker, 2137);
+    // display_points_fanout(worker, 2137);
   }
+}
+
+void display_all_path(STAWorker &worker) {
+  for(const auto &path : worker.get_sta_res().paths) {
+    worker.display_result_path_detail(path);
+  }
+}
+
+void debug_paths_through_instance(STAWorker &worker,
+                                  const std::string &inst_substr) {
+    // display_spefic_group(worker);
+    display_all_path(worker);
 }
 
 } // namespace sta

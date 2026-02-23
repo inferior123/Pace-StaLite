@@ -125,7 +125,6 @@ void segment_delay_slew(const TimingRunResult &res,
       } else {
         if (delay_tmp < best_delay) {
           best_delay = delay_tmp;
-          // best_slew = slew_tmp;
           best_dir = dir_tmp;
         }
         if (slew_tmp < best_slew) {
