@@ -332,6 +332,7 @@ struct GbaPath {
   double incr;
   TransitionDirection dir;      // 输出方向
   TransitionDirection input_dir; // 输入方向，回溯时用于确定 prev 的 rise/fall
+  size_t path_idx;              // 在 gba_graphy_.paths 中的下标，供 prev_path_* 使用
 };
 
 struct GbaNode {
@@ -550,12 +551,17 @@ public:
   /// 根据 res.points 的 fanouts 填充 res.edges，供 CandidatePath 使用 edge
   /// index
   void build_res_edges();
-  /// 基于当前 TimingRunResult 构建 GBA 图（节点 + 弧）
+  /// 基于当前 TimingRunResult 构建 GBA 图（节点 + 弧，不含传播）
   void build_gba_graphy();
+  /// 重置 GBA 图中所有节点的 delay/slew/prev 状态
+  void reset_gba_nodes_state();
+  /// 按 pt_type 从 CLK_PIN 或 INPUT 起点传播，填充 paths 和 node 状态
+  void run_gba_propagate(PointType pt_type);
   void caculate_load_cap();
   void calculate_timing_arcs();
-  /// DFS 时序分析：从 input_clk_point_ids 出发，沿 Point 图 DFS，产出 res.paths
-  void run_gba_timing_analysis();
+  /// DFS 时序分析：从 end_node 回溯产出 res.paths。
+  /// clear_paths_first=true 时先清空 res.paths；false 时追加。
+  void run_gba_timing_analysis(bool clear_paths_first = true);
 
   /// 基于 point_idx 创建/获取 candidate 节点（推荐）
   std::size_t get_or_create_candidate_node(std::size_t point_idx);

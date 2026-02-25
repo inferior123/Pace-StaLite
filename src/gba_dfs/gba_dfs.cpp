@@ -26,15 +26,23 @@ void STAWorker::build_gba_graphy() {
   }
 
   // 为每个 TimingPointRef 创建一个 GbaNode，并建立 pt_idx -> node_id 映射
+  // MAX: 未到达用 -inf，更新时取更大；MIN: 未到达用 +inf，更新时取更小
+  const double pos_inf = std::numeric_limits<double>::infinity();
+  const double neg_inf = -pos_inf;
+  const double init_delay =
+      (analysis_mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+  const double init_slew =
+      (analysis_mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+
   gba_graphy_.nodes.reserve(point_count);
   for (std::size_t i = 0; i < point_count; ++i) {
     GbaNode node;
     node.pt_idx = i;
     node.id = i;
-    node.delay_rise = -std::numeric_limits<double>::infinity();
-    node.delay_fall = -std::numeric_limits<double>::infinity();
-    node.slew_rise = 0.0;
-    node.slew_fall = 0.0;
+    node.delay_rise = init_delay;
+    node.delay_fall = init_delay;
+    node.slew_rise = init_slew;
+    node.slew_fall = init_slew;
     node.prev_node_rise = std::numeric_limits<std::size_t>::max();
     node.prev_node_fall = std::numeric_limits<std::size_t>::max();
     node.prev_path_rise = std::numeric_limits<std::size_t>::max();
@@ -48,20 +56,20 @@ void STAWorker::build_gba_graphy() {
   auto add_path = [this](std::size_t from_node, std::size_t to_node,
                         double incr_ps, double slew_ns,
                         TransitionDirection dir,
-                        TransitionDirection input_dir) -> size_t {
+                        TransitionDirection input_dir) -> std::size_t {
     GbaPath path;
-    path.startnode  = from_node;
-    path.endnode    = to_node;
-    path.incr       = incr_ps;   // ps
-    path.slew       = slew_ns;   // ns
-    path.dir        = dir;
-    path.input_dir  = input_dir;
+    path.startnode = from_node;
+    path.endnode = to_node;
+    path.incr = incr_ps;   // ps
+    path.slew = slew_ns;   // ns
+    path.dir = dir;
+    path.input_dir = input_dir;
+    path.path_idx = gba_graphy_.paths.size();
 
     gba_graphy_.nodes[from_node].fanouts.push_back(path);
-    size_t path_idx = gba_graphy_.paths.size();
     gba_graphy_.paths.push_back(path);
 
-    return path_idx;
+    return path.path_idx;
   };
 
   assert(cell_library_);
@@ -99,8 +107,7 @@ void STAWorker::build_gba_graphy() {
     }
   }
 
-  // 3. 初始化起点（input + clock）：从这些点开始做 GBA 传播
-  // 这里直接复用 input_clk_point_ids 作为起点集合
+  // 3. 初始化起点（input + clock）：从这些点开始做 GBA 传播，slew/delay 先全部计算完
   for (std::size_t pt_idx : input_clk_point_ids) {
     auto it = gba_graphy_.pt_to_node.find(pt_idx);
     if (it == gba_graphy_.pt_to_node.end())
@@ -114,7 +121,7 @@ void STAWorker::build_gba_graphy() {
     node.prev_node_fall = node.id;
   }
 
-  // 4. 沿 topo 序做 DP：对每条 edge，分别用 RISE/FALL 两个方向调用 segment_delays_slews
+  // 4. 沿 topo 序做 DP：对每条 edge 计算 slew/delay，add_path，更新 v_node
   const bool use_max = (analysis_mode == AnalysisMode::MAX);
 
   for (std::size_t u_pt : topo) {
@@ -126,19 +133,21 @@ void STAWorker::build_gba_graphy() {
 
     const TimingPointRef &u_ref = res.points[u_pt];
 
-    // 当前节点在 rise / fall 方向上是否已经有可达路径
-    const bool has_rise =
-        (u_node.delay_rise > -std::numeric_limits<double>::infinity());
-    const bool has_fall =
-        (u_node.delay_fall > -std::numeric_limits<double>::infinity());
+    // MAX: 已到达 = delay > -inf；MIN: 已到达 = delay < +inf
+    const bool has_rise = (analysis_mode == AnalysisMode::MAX)
+                              ? (u_node.delay_rise > neg_inf)
+                              : (u_node.delay_rise < pos_inf);
+    const bool has_fall = (analysis_mode == AnalysisMode::MAX)
+                              ? (u_node.delay_fall > neg_inf)
+                              : (u_node.delay_fall < pos_inf);
 
     if (!has_rise && !has_fall)
       continue;
 
-    if(u_ref.type == OUTPUT || u_ref.type == REGD) {
+    if (u_ref.type == OUTPUT || u_ref.type == REGD) {
       gba_graphy_.end_node.push_back(u_pt);
     }
-    
+
     for (const auto &edge : u_ref.fanouts) {
       std::size_t v_pt = edge.target_point;
       if (v_pt >= point_count)
@@ -155,34 +164,34 @@ void STAWorker::build_gba_graphy() {
         double prev_slew_ns = u_node.slew_rise;
         double base_delay = u_node.delay_rise;
 
-        auto segs = segment_delays_slews_gba(res, cell_library_, analysis_mode,
-                                         u_pt, v_pt, prev_slew_ns,
-                                         TransitionDirection::RISING);
+        auto segs = segment_delays_slews_gba(
+            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
+            TransitionDirection::RISING);
 
         if (segs.empty()) {
-          // 视为 WIRE：delay=0，slew 透传，方向保持不变
           segment_res seg;
           seg.slew = prev_slew_ns;
           seg.delay = 0.0;
           seg.dir = TransitionDirection::RISING;
           segs.push_back(seg);
         }
-        
+
         for (const auto &seg : segs) {
           double cand_delay = base_delay + seg.delay;
-          size_t path_idx = add_path(u_node_id, v_node_id, seg.delay, seg.slew,
-                                     seg.dir, TransitionDirection::RISING);
+          std::size_t path_idx =
+              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
+                       TransitionDirection::RISING);
           if (seg.dir == TransitionDirection::RISING) {
-            if ((use_max && cand_delay > v_node.delay_rise) ||
-                (!use_max && cand_delay < v_node.delay_rise)) {
+            if ((use_max && seg.slew > v_node.slew_rise) ||
+                (!use_max && seg.slew < v_node.slew_rise)) {
               v_node.delay_rise = cand_delay;
               v_node.slew_rise = seg.slew;
               v_node.prev_node_rise = u_node_id;
               v_node.prev_path_rise = path_idx;
             }
           } else if (seg.dir == TransitionDirection::FALLING) {
-            if ((use_max && cand_delay > v_node.delay_fall) ||
-                (!use_max && cand_delay < v_node.delay_fall)) {
+            if ((use_max && seg.slew > v_node.slew_fall) ||
+                (!use_max && seg.slew < v_node.slew_fall)) {
               v_node.delay_fall = cand_delay;
               v_node.slew_fall = seg.slew;
               v_node.prev_node_fall = u_node_id;
@@ -197,12 +206,11 @@ void STAWorker::build_gba_graphy() {
         double prev_slew_ns = u_node.slew_fall;
         double base_delay = u_node.delay_fall;
 
-        auto segs = segment_delays_slews_gba(res, cell_library_, analysis_mode,
-                                         u_pt, v_pt, prev_slew_ns,
-                                         TransitionDirection::FALLING);
+        auto segs = segment_delays_slews_gba(
+            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
+            TransitionDirection::FALLING);
 
         if (segs.empty()) {
-          // 视为 WIRE：delay=0，slew 透传，方向保持不变
           segment_res seg;
           seg.slew = prev_slew_ns;
           seg.delay = 0.0;
@@ -212,19 +220,20 @@ void STAWorker::build_gba_graphy() {
 
         for (const auto &seg : segs) {
           double cand_delay = base_delay + seg.delay;
-          size_t path_idx = add_path(u_node_id, v_node_id, seg.delay, seg.slew,
-                                     seg.dir, TransitionDirection::FALLING);
+          std::size_t path_idx =
+              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
+                       TransitionDirection::FALLING);
           if (seg.dir == TransitionDirection::RISING) {
-            if ((use_max && cand_delay > v_node.delay_rise) ||
-                (!use_max && cand_delay < v_node.delay_rise)) {
+            if ((use_max && seg.slew > v_node.slew_rise) ||
+                (!use_max && seg.slew < v_node.slew_rise)) {
               v_node.delay_rise = cand_delay;
               v_node.slew_rise = seg.slew;
               v_node.prev_node_rise = u_node_id;
               v_node.prev_path_rise = path_idx;
             }
           } else if (seg.dir == TransitionDirection::FALLING) {
-            if ((use_max && cand_delay > v_node.delay_fall) ||
-                (!use_max && cand_delay < v_node.delay_fall)) {
+            if ((use_max && seg.slew > v_node.slew_fall) ||
+                (!use_max && seg.slew < v_node.slew_fall)) {
               v_node.delay_fall = cand_delay;
               v_node.slew_fall = seg.slew;
               v_node.prev_node_fall = u_node_id;
@@ -232,19 +241,19 @@ void STAWorker::build_gba_graphy() {
             }
           }
         }
+      }
+    }
   }
-  }
-}
 }
 
 void STAWorker::reset_gba_nodes_state() {
+  AnalysisMode mode = get_analysis_mode();
+  const double pos_inf = std::numeric_limits<double>::infinity();
   const double neg_inf = -std::numeric_limits<double>::infinity();
 
   for (auto &node : gba_graphy_.nodes) {
-    node.delay_rise = neg_inf;
-    node.delay_fall = neg_inf;
-    node.slew_rise = 0.0;
-    node.slew_fall = 0.0;
+    node.delay_rise = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+    node.delay_fall = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
 
     node.prev_node_rise = std::numeric_limits<std::size_t>::max();
     node.prev_node_fall = std::numeric_limits<std::size_t>::max();
@@ -303,39 +312,21 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
     if (it == gba_graphy_.pt_to_node.end())
       continue;
 
-    if(res.points[pt_idx].type != pt_type)
+    PointType start_type = effective_start_type_for_group(res.points[pt_idx]);
+    if (start_type != pt_type)
       continue;
 
     GbaNode &node = gba_graphy_.nodes[it->second];
     node.delay_rise = 0.0;
     node.delay_fall = 0.0;
-    node.slew_rise = 0.0;
-    node.slew_fall = 0.0;
     node.prev_node_rise = node.id;
     node.prev_node_fall = node.id;
   }
 
-  // 3. 沿 topo 序做 DP：与 build_gba_graphy 相同逻辑
+  // 3. 沿 topo 序做 DP：仅选择，不计算；使用 build_gba_graphy 中已有的 paths/fanouts
   const bool use_max = (analysis_mode == AnalysisMode::MAX);
-
-  auto add_path = [this](std::size_t from_node, std::size_t to_node,
-                         double incr_ps, double slew_ns,
-                         TransitionDirection dir,
-                         TransitionDirection input_dir) -> std::size_t {
-    GbaPath path;
-    path.startnode = from_node;
-    path.endnode = to_node;
-    path.incr = incr_ps;   // ps
-    path.slew = slew_ns;   // ns
-    path.dir = dir;
-    path.input_dir = input_dir;
-
-    gba_graphy_.nodes[from_node].fanouts.push_back(path);
-    std::size_t path_idx = gba_graphy_.paths.size();
-    gba_graphy_.paths.push_back(path);
-
-    return path_idx;
-  };
+  const double pos_inf = std::numeric_limits<double>::infinity();
+  const double neg_inf = -pos_inf;
 
   for (std::size_t u_pt : topo) {
     auto it_u = gba_graphy_.pt_to_node.find(u_pt);
@@ -344,111 +335,43 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
     std::size_t u_node_id = it_u->second;
     GbaNode &u_node = gba_graphy_.nodes[u_node_id];
 
-    const TimingPointRef &u_ref = res.points[u_pt];
-
-    // 当前节点在 rise / fall 方向上是否已经有可达路径
-    const bool has_rise =
-        (u_node.delay_rise > -std::numeric_limits<double>::infinity());
-    const bool has_fall =
-        (u_node.delay_fall > -std::numeric_limits<double>::infinity());
+    const bool has_rise = use_max ? (u_node.delay_rise > neg_inf)
+                                 : (u_node.delay_rise < pos_inf);
+    const bool has_fall = use_max ? (u_node.delay_fall > neg_inf)
+                                 : (u_node.delay_fall < pos_inf);
 
     if (!has_rise && !has_fall)
       continue;
 
-    for (const auto &edge : u_ref.fanouts) {
-      std::size_t v_pt = edge.target_point;
-      if (v_pt >= point_count)
+    // 遍历 u 的 fanouts（来自 build_gba_graphy），按 path 选择并更新 v 的 delay/prev
+    for (const GbaPath &path : u_node.fanouts) {
+      std::size_t v_node_id = path.endnode;
+      if (v_node_id >= gba_graphy_.nodes.size())
         continue;
-
-      auto it_v = gba_graphy_.pt_to_node.find(v_pt);
-      if (it_v == gba_graphy_.pt_to_node.end())
-        continue;
-      std::size_t v_node_id = it_v->second;
       GbaNode &v_node = gba_graphy_.nodes[v_node_id];
 
-      // 3.1 以 RISING 作为当前输入方向
-      if (has_rise) {
-        double prev_slew_ns = u_node.slew_rise;
-        double base_delay = u_node.delay_rise;
+      double base_delay = (path.input_dir == TransitionDirection::RISING)
+                              ? u_node.delay_rise
+                              : u_node.delay_fall;
+      if ((path.input_dir == TransitionDirection::RISING && !has_rise) ||
+          (path.input_dir == TransitionDirection::FALLING && !has_fall))
+        continue;
 
-        auto segs = segment_delays_slews_gba(
-            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
-            TransitionDirection::RISING);
+      double cand_delay = base_delay + path.incr;
 
-        if (segs.empty()) {
-          // 视为 WIRE：delay=0，slew 透传，方向保持不变
-          segment_res seg;
-          seg.slew = prev_slew_ns;
-          seg.delay = 0.0;
-          seg.dir = TransitionDirection::RISING;
-          segs.push_back(seg);
+      if (path.dir == TransitionDirection::RISING) {
+        if ((use_max && cand_delay > v_node.delay_rise) ||
+            (!use_max && cand_delay < v_node.delay_rise)) {
+          v_node.delay_rise = cand_delay;
+          v_node.prev_node_rise = u_node_id;
+          v_node.prev_path_rise = path.path_idx;
         }
-
-        for (const auto &seg : segs) {
-          double cand_delay = base_delay + seg.delay;
-          std::size_t path_idx =
-              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
-                       TransitionDirection::RISING);
-          if (seg.dir == TransitionDirection::RISING) {
-            if ((use_max && cand_delay > v_node.delay_rise) ||
-                (!use_max && cand_delay < v_node.delay_rise)) {
-              v_node.delay_rise = cand_delay;
-              v_node.slew_rise = seg.slew;
-              v_node.prev_node_rise = u_node_id;
-              v_node.prev_path_rise = path_idx;
-            }
-          } else if (seg.dir == TransitionDirection::FALLING) {
-            if ((use_max && cand_delay > v_node.delay_fall) ||
-                (!use_max && cand_delay < v_node.delay_fall)) {
-              v_node.delay_fall = cand_delay;
-              v_node.slew_fall = seg.slew;
-              v_node.prev_node_fall = u_node_id;
-              v_node.prev_path_fall = path_idx;
-            }
-          }
-        }
-      }
-
-      // 3.2 以 FALLING 作为当前输入方向
-      if (has_fall) {
-        double prev_slew_ns = u_node.slew_fall;
-        double base_delay = u_node.delay_fall;
-
-        auto segs = segment_delays_slews_gba(
-            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
-            TransitionDirection::FALLING);
-
-        if (segs.empty()) {
-          // 视为 WIRE：delay=0，slew 透传，方向保持不变
-          segment_res seg;
-          seg.slew = prev_slew_ns;
-          seg.delay = 0.0;
-          seg.dir = TransitionDirection::FALLING;
-          segs.push_back(seg);
-        }
-
-        for (const auto &seg : segs) {
-          double cand_delay = base_delay + seg.delay;
-          std::size_t path_idx =
-              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
-                       TransitionDirection::FALLING);
-          if (seg.dir == TransitionDirection::RISING) {
-            if ((use_max && cand_delay > v_node.delay_rise) ||
-                (!use_max && cand_delay < v_node.delay_rise)) {
-              v_node.delay_rise = cand_delay;
-              v_node.slew_rise = seg.slew;
-              v_node.prev_node_rise = u_node_id;
-              v_node.prev_path_rise = path_idx;
-            }
-          } else if (seg.dir == TransitionDirection::FALLING) {
-            if ((use_max && cand_delay > v_node.delay_fall) ||
-                (!use_max && cand_delay < v_node.delay_fall)) {
-              v_node.delay_fall = cand_delay;
-              v_node.slew_fall = seg.slew;
-              v_node.prev_node_fall = u_node_id;
-              v_node.prev_path_fall = path_idx;
-            }
-          }
+      } else if (path.dir == TransitionDirection::FALLING) {
+        if ((use_max && cand_delay > v_node.delay_fall) ||
+            (!use_max && cand_delay < v_node.delay_fall)) {
+          v_node.delay_fall = cand_delay;
+          v_node.prev_node_fall = u_node_id;
+          v_node.prev_path_fall = path.path_idx;
         }
       }
     }
@@ -456,7 +379,10 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
 }
 
 // 从 end_node 回溯构造 TimingPathResult，rise 和 fall 各回溯一条，并计算 setup/hold
-void STAWorker::run_gba_timing_analysis() {
+void STAWorker::run_gba_timing_analysis(bool clear_paths_first) {
+  if (clear_paths_first)
+    res.paths.clear();
+
   constexpr double inf = std::numeric_limits<double>::infinity();
 
   for (std::size_t end_pt : gba_graphy_.end_node) {
@@ -467,10 +393,12 @@ void STAWorker::run_gba_timing_analysis() {
     GbaNode &node = gba_graphy_.nodes[node_id];
 
     // rise 和 fall 各回溯一条
+    // MAX: 未到达时 delay == -inf
+    // MIN: 未到达时 delay == +inf
+    const bool use_max = (analysis_mode == AnalysisMode::MAX);
     for (bool use_rise : {true, false}) {
-      if (use_rise && node.delay_rise <= -inf)
-        continue;
-      if (!use_rise && node.delay_fall <= -inf)
+      const double d = use_rise ? node.delay_rise : node.delay_fall;
+      if (use_max ? (d <= -inf) : (d >= inf))
         continue;
 
       std::size_t cur_node_id = node_id;
@@ -498,6 +426,9 @@ void STAWorker::run_gba_timing_analysis() {
         TimingStep step;
         step.start_point = prev_node.pt_idx;
         step.end_point = cur_node.pt_idx;
+        step.cap_load = (path.dir == TransitionDirection::RISING) ? \
+                  res.points[cur_node.pt_idx].rise_cap : \
+                  res.points[cur_node.pt_idx].fall_cap;
         step.incr = path.incr;
         step.slew = path.slew * 1000.0;  // ns -> ps
         step.dir = path.dir;
@@ -543,7 +474,14 @@ void run_gba_analysis(sta::STAWorker &worker) {
   worker.build_fanouts();
   std::cout << "  [GBA-MAX] Step 2: calculate_load_capacitance()...\n";
   worker.caculate_load_cap();
-  std::cout << "  [GBA-MAX] Step 3: build_candidate_graphy()...\n";
+  std::cout << "  [GBA-MAX] Step 3: build_gba_graphy()...\n";
   worker.build_gba_graphy();
-  worker.run_gba_timing_analysis();
+
+  worker.reset_gba_nodes_state();
+  worker.run_gba_propagate(sta::PointType::CLK_PIN);
+  worker.run_gba_timing_analysis(true);   // clear res.paths first
+
+  worker.reset_gba_nodes_state();
+  worker.run_gba_propagate(sta::PointType::INPUT);
+  worker.run_gba_timing_analysis(false);  // append to res.paths
 }

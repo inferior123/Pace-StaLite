@@ -612,7 +612,7 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
 void display_spefic_group(STAWorker &worker) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
-  const PathGroup group = PathGroup::REG2REG;
+  const PathGroup group = PathGroup::IN2REG;
   const AnalysisMode target_mode = AnalysisMode::MAX;
 
   if (mode != target_mode)
@@ -646,7 +646,7 @@ void display_all_path(STAWorker &worker) {
 
 void debug_paths_through_instance(STAWorker &worker,
                                   const std::string &inst_substr) {
-    // display_spefic_group(worker);
+    display_spefic_group(worker);
     // display_all_path(worker);
 }
 
