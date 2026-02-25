@@ -235,46 +235,228 @@ void STAWorker::build_gba_graphy() {
   }
   }
 }
-
-  // 调试：打印每个点的类型、fanout 以及被选中的 end_node
-  std::cerr << "[gba-debug] ===== TimingPointRef list =====\n";
-  for (std::size_t i = 0; i < res.points.size(); ++i) {
-    const auto &pt = res.points[i];
-    std::cerr << "[gba-debug] pt " << i
-              << " type=" << point_type_str(pt.type) << " fanouts=[";
-    for (std::size_t j = 0; j < pt.fanouts.size(); ++j) {
-      const auto &e = pt.fanouts[j];
-      std::cerr << e.target_point;
-      if (j + 1 < pt.fanouts.size()) {
-        std::cerr << ", ";
-      }
-    }
-    std::cerr << "]\n";
-  }
-
-  std::cerr << "[gba-debug] ===== selected end_node point ids =====\n";
-  std::cerr << "[gba-debug] end_node ids: ";
-  for (std::size_t k = 0; k < gba_graphy_.end_node.size(); ++k) {
-    std::cerr << gba_graphy_.end_node[k];
-    if (k + 1 < gba_graphy_.end_node.size()) {
-      std::cerr << ", ";
-    }
-  }
-  std::cerr << "\n";
 }
 
-// void STAWorker::run_gba_propagate(PointType pt_type) {
-//   if(pt_type != PointType::CLK_PIN || pt_type != PointType::INPUT) {
-//     assert(false);
-//   }
+void STAWorker::reset_gba_nodes_state() {
+  const double neg_inf = -std::numeric_limits<double>::infinity();
 
+  for (auto &node : gba_graphy_.nodes) {
+    node.delay_rise = neg_inf;
+    node.delay_fall = neg_inf;
+    node.slew_rise = 0.0;
+    node.slew_fall = 0.0;
 
-// }
+    node.prev_node_rise = std::numeric_limits<std::size_t>::max();
+    node.prev_node_fall = std::numeric_limits<std::size_t>::max();
+    node.prev_path_rise = std::numeric_limits<std::size_t>::max();
+    node.prev_path_fall = std::numeric_limits<std::size_t>::max();
+  }
+}
+
+void STAWorker::run_gba_propagate(PointType pt_type) {
+  // 目前仅支持从 CLK_PIN 或 INPUT 作为起点的两类传播
+  if (pt_type != PointType::CLK_PIN && pt_type != PointType::INPUT) {
+    assert(false && "run_gba_propagate only supports CLK_PIN or INPUT");
+  }
+
+  const std::size_t point_count = res.points.size();
+  if (point_count == 0)
+    return;
+
+  assert(cell_library_);
+
+  // 1. 重新计算 point 图的拓扑顺序（与 build_gba_graphy 中一致）
+  std::vector<std::size_t> indeg(point_count, 0);
+  for (const auto &pt : res.points) {
+    for (const auto &e : pt.fanouts) {
+      if (e.target_point < point_count) {
+        indeg[e.target_point]++;
+      }
+    }
+  }
+
+  std::vector<std::size_t> topo;
+  topo.reserve(point_count);
+  std::vector<std::size_t> queue;
+  queue.reserve(point_count);
+
+  for (std::size_t i = 0; i < point_count; ++i) {
+    if (indeg[i] == 0) {
+      queue.push_back(i);
+    }
+  }
+
+  for (std::size_t head = 0; head < queue.size(); ++head) {
+    std::size_t u_pt = queue[head];
+    topo.push_back(u_pt);
+    const auto &pt = res.points[u_pt];
+    for (const auto &e : pt.fanouts) {
+      if (e.target_point < point_count && --indeg[e.target_point] == 0) {
+        queue.push_back(e.target_point);
+      }
+    }
+  }
+
+  // 2. 初始化起点：根据 pt_type 只选择 CLK_PIN 或 INPUT
+  for (std::size_t pt_idx : input_clk_point_ids) {
+    auto it = gba_graphy_.pt_to_node.find(pt_idx);
+    if (it == gba_graphy_.pt_to_node.end())
+      continue;
+
+    if(res.points[pt_idx].type != pt_type)
+      continue;
+
+    GbaNode &node = gba_graphy_.nodes[it->second];
+    node.delay_rise = 0.0;
+    node.delay_fall = 0.0;
+    node.slew_rise = 0.0;
+    node.slew_fall = 0.0;
+    node.prev_node_rise = node.id;
+    node.prev_node_fall = node.id;
+  }
+
+  // 3. 沿 topo 序做 DP：与 build_gba_graphy 相同逻辑
+  const bool use_max = (analysis_mode == AnalysisMode::MAX);
+
+  auto add_path = [this](std::size_t from_node, std::size_t to_node,
+                         double incr_ps, double slew_ns,
+                         TransitionDirection dir,
+                         TransitionDirection input_dir) -> std::size_t {
+    GbaPath path;
+    path.startnode = from_node;
+    path.endnode = to_node;
+    path.incr = incr_ps;   // ps
+    path.slew = slew_ns;   // ns
+    path.dir = dir;
+    path.input_dir = input_dir;
+
+    gba_graphy_.nodes[from_node].fanouts.push_back(path);
+    std::size_t path_idx = gba_graphy_.paths.size();
+    gba_graphy_.paths.push_back(path);
+
+    return path_idx;
+  };
+
+  for (std::size_t u_pt : topo) {
+    auto it_u = gba_graphy_.pt_to_node.find(u_pt);
+    if (it_u == gba_graphy_.pt_to_node.end())
+      continue;
+    std::size_t u_node_id = it_u->second;
+    GbaNode &u_node = gba_graphy_.nodes[u_node_id];
+
+    const TimingPointRef &u_ref = res.points[u_pt];
+
+    // 当前节点在 rise / fall 方向上是否已经有可达路径
+    const bool has_rise =
+        (u_node.delay_rise > -std::numeric_limits<double>::infinity());
+    const bool has_fall =
+        (u_node.delay_fall > -std::numeric_limits<double>::infinity());
+
+    if (!has_rise && !has_fall)
+      continue;
+
+    for (const auto &edge : u_ref.fanouts) {
+      std::size_t v_pt = edge.target_point;
+      if (v_pt >= point_count)
+        continue;
+
+      auto it_v = gba_graphy_.pt_to_node.find(v_pt);
+      if (it_v == gba_graphy_.pt_to_node.end())
+        continue;
+      std::size_t v_node_id = it_v->second;
+      GbaNode &v_node = gba_graphy_.nodes[v_node_id];
+
+      // 3.1 以 RISING 作为当前输入方向
+      if (has_rise) {
+        double prev_slew_ns = u_node.slew_rise;
+        double base_delay = u_node.delay_rise;
+
+        auto segs = segment_delays_slews_gba(
+            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
+            TransitionDirection::RISING);
+
+        if (segs.empty()) {
+          // 视为 WIRE：delay=0，slew 透传，方向保持不变
+          segment_res seg;
+          seg.slew = prev_slew_ns;
+          seg.delay = 0.0;
+          seg.dir = TransitionDirection::RISING;
+          segs.push_back(seg);
+        }
+
+        for (const auto &seg : segs) {
+          double cand_delay = base_delay + seg.delay;
+          std::size_t path_idx =
+              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
+                       TransitionDirection::RISING);
+          if (seg.dir == TransitionDirection::RISING) {
+            if ((use_max && cand_delay > v_node.delay_rise) ||
+                (!use_max && cand_delay < v_node.delay_rise)) {
+              v_node.delay_rise = cand_delay;
+              v_node.slew_rise = seg.slew;
+              v_node.prev_node_rise = u_node_id;
+              v_node.prev_path_rise = path_idx;
+            }
+          } else if (seg.dir == TransitionDirection::FALLING) {
+            if ((use_max && cand_delay > v_node.delay_fall) ||
+                (!use_max && cand_delay < v_node.delay_fall)) {
+              v_node.delay_fall = cand_delay;
+              v_node.slew_fall = seg.slew;
+              v_node.prev_node_fall = u_node_id;
+              v_node.prev_path_fall = path_idx;
+            }
+          }
+        }
+      }
+
+      // 3.2 以 FALLING 作为当前输入方向
+      if (has_fall) {
+        double prev_slew_ns = u_node.slew_fall;
+        double base_delay = u_node.delay_fall;
+
+        auto segs = segment_delays_slews_gba(
+            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
+            TransitionDirection::FALLING);
+
+        if (segs.empty()) {
+          // 视为 WIRE：delay=0，slew 透传，方向保持不变
+          segment_res seg;
+          seg.slew = prev_slew_ns;
+          seg.delay = 0.0;
+          seg.dir = TransitionDirection::FALLING;
+          segs.push_back(seg);
+        }
+
+        for (const auto &seg : segs) {
+          double cand_delay = base_delay + seg.delay;
+          std::size_t path_idx =
+              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
+                       TransitionDirection::FALLING);
+          if (seg.dir == TransitionDirection::RISING) {
+            if ((use_max && cand_delay > v_node.delay_rise) ||
+                (!use_max && cand_delay < v_node.delay_rise)) {
+              v_node.delay_rise = cand_delay;
+              v_node.slew_rise = seg.slew;
+              v_node.prev_node_rise = u_node_id;
+              v_node.prev_path_rise = path_idx;
+            }
+          } else if (seg.dir == TransitionDirection::FALLING) {
+            if ((use_max && cand_delay > v_node.delay_fall) ||
+                (!use_max && cand_delay < v_node.delay_fall)) {
+              v_node.delay_fall = cand_delay;
+              v_node.slew_fall = seg.slew;
+              v_node.prev_node_fall = u_node_id;
+              v_node.prev_path_fall = path_idx;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 // 从 end_node 回溯构造 TimingPathResult，rise 和 fall 各回溯一条，并计算 setup/hold
 void STAWorker::run_gba_timing_analysis() {
-  res.paths.clear();
-
   constexpr double inf = std::numeric_limits<double>::infinity();
 
   for (std::size_t end_pt : gba_graphy_.end_node) {
