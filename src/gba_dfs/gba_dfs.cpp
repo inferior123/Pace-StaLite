@@ -1,323 +1,367 @@
-#include "cell/cell_data_structure.hpp"
 #include "sta/sta_data_structures.hpp"
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
-#include <optional>
-#include <stack>
-#include <string>
-#include <unordered_set>
+#include <iostream>
+#include <limits>
 #include <vector>
 
+#include "sta/debug.h"
 
 namespace sta {
-// Liberty LUT 返回 ns，STA 内部统一用 ps
-static constexpr double NS_TO_PS = 1000.0;
 
-// 辅助函数：从查找表中获取悲观值（最大值），返回 ps
-double get_pessimistic_delay_from_lut(const celllib::LookupTable &lut) {
-  double max_delay_ns = 0.0;
-  for (const auto &row : lut.values) {
-    for (double val : row) {
-      if (val > max_delay_ns) {
-        max_delay_ns = val;
-      }
-    }
+void STAWorker::build_gba_graphy() {
+  // 清空旧图
+  gba_graphy_.nodes.clear();
+  gba_graphy_.paths.clear();
+  gba_graphy_.pt_to_node.clear();
+  gba_graphy_.end_node.clear();
+
+  const std::size_t point_count = res.points.size();
+  std::cerr << "[gba] build_gba_graphy: points=" << point_count
+            << " edges=" << res.edges.size() << "\n";
+
+  if (point_count == 0) {
+    std::cerr << "[gba] no res point detect, skip\n";
   }
-  return max_delay_ns * NS_TO_PS;
-}
 
-void STAWorker::run_timing_analysis_dfs() {
+  // 为每个 TimingPointRef 创建一个 GbaNode，并建立 pt_idx -> node_id 映射
+  gba_graphy_.nodes.reserve(point_count);
+  for (std::size_t i = 0; i < point_count; ++i) {
+    GbaNode node;
+    node.pt_idx = i;
+    node.id = i;
+    node.delay_rise = -std::numeric_limits<double>::infinity();
+    node.delay_fall = -std::numeric_limits<double>::infinity();
+    node.slew_rise = 0.0;
+    node.slew_fall = 0.0;
+    node.prev_node_rise = std::numeric_limits<std::size_t>::max();
+    node.prev_node_fall = std::numeric_limits<std::size_t>::max();
+    node.prev_path_rise = std::numeric_limits<std::size_t>::max();
+    node.prev_path_fall = std::numeric_limits<std::size_t>::max();
+    node.fanouts.clear();
+
+    gba_graphy_.pt_to_node[i] = node.id;
+    gba_graphy_.nodes.push_back(std::move(node));
+  }
+
+  auto add_path = [this](std::size_t from_node, std::size_t to_node,
+                        double incr_ps, double slew_ns,
+                        TransitionDirection dir,
+                        TransitionDirection input_dir) -> size_t {
+    GbaPath path;
+    path.startnode  = from_node;
+    path.endnode    = to_node;
+    path.incr       = incr_ps;   // ps
+    path.slew       = slew_ns;   // ns
+    path.dir        = dir;
+    path.input_dir  = input_dir;
+
+    gba_graphy_.nodes[from_node].fanouts.push_back(path);
+    size_t path_idx = gba_graphy_.paths.size();
+    gba_graphy_.paths.push_back(path);
+
+    return path_idx;
+  };
+
   assert(cell_library_);
-  res.paths.clear();
 
-  if (analysis_granularity_ == AnalysisGranularity::FINE) {
-    assert(false &&
-           "FINE mode uses candidate path, not run_timing_analysis_dfs");
+  // 1. 计算 point 图的入度，用于拓扑排序
+  std::vector<std::size_t> indeg(point_count, 0);
+  for (const auto &pt : res.points) {
+    for (const auto &e : pt.fanouts) {
+      if (e.target_point < point_count) {
+        indeg[e.target_point]++;
+      }
+    }
   }
 
-  const double clk_slew_ns =
-      std::max(static_cast<double>(cfg.clock_transit_raise),
-               static_cast<double>(cfg.clock_transit_fall)) /
-      NS_TO_PS;
+  // 2. Kahn 拓扑排序，得到 point 层面的 topo 序列
+  std::vector<std::size_t> topo;
+  topo.reserve(point_count);
+  std::vector<std::size_t> queue;
+  queue.reserve(point_count);
 
-  struct PathFrame {
-    std::size_t point_id;
-    double arrival;
-    double slew_rise_ns;
-    double slew_fall_ns;
-    TransitionDirection dir;
-    std::size_t fanout_idx;
-  };
-  struct StackFrame {
-    std::size_t point_id;
-    double arrival;
-    double slew_rise_ns;
-    double slew_fall_ns;
-    TransitionDirection dir;
-    std::size_t fanout_idx;
-  };
+  for (std::size_t i = 0; i < point_count; ++i) {
+    if (indeg[i] == 0) {
+      queue.push_back(i);
+    }
+  }
 
-  auto find_arc = [this](const TimingPointRef &origin,
-                         const TimingPointRef &target,
-                         EdgeType edge_type) -> const celllib::TimingArc * {
-    if (!target.inst)
-      return nullptr;
-    const auto *cell = cell_library_->get_cell(target.inst->module_name);
-    if (!cell)
-      return nullptr;
-    const auto *out_pin = cell->get_pin(target.port_name);
-    if (!out_pin)
-      return nullptr;
-
-    if (edge_type == COMB_ARC) {
-      // 优先选择 sdf_cond 为空的默认组合弧
-      for (const auto &a : out_pin->timing_arcs) {
-        if (a.timing_type == celllib::TimingType::COMBINATIONAL &&
-            a.related_pin == origin.port_name && !a.sdf_cond.has_value())
-          return &a;
-      }
-      // 若没有无条件弧，则退回到原始逻辑（任意匹配弧）
-      for (const auto &a : out_pin->timing_arcs) {
-        if (a.timing_type == celllib::TimingType::COMBINATIONAL &&
-            a.related_pin == origin.port_name)
-          return &a;
-      }
-    } else if (edge_type == SEQ_ARC) {
-      std::string clk_pin = "CK";
-      if (cell->ff.has_value() && cell->ff->clocked_on.has_value())
-        clk_pin = cell->ff->clocked_on.value();
-
-      // 优先选择 sdf_cond 为空的 C2Q 弧
-      for (const auto &a : out_pin->timing_arcs) {
-        if ((a.timing_type == celllib::TimingType::RISING_EDGE ||
-             a.timing_type == celllib::TimingType::FALLING_EDGE) &&
-            a.related_pin == clk_pin && !a.sdf_cond.has_value())
-          return &a;
-      }
-      // 若没有无条件弧，则退回到原始逻辑
-      for (const auto &a : out_pin->timing_arcs) {
-        if ((a.timing_type == celllib::TimingType::RISING_EDGE ||
-             a.timing_type == celllib::TimingType::FALLING_EDGE) &&
-            a.related_pin == clk_pin)
-          return &a;
+  for (std::size_t head = 0; head < queue.size(); ++head) {
+    std::size_t u_pt = queue[head];
+    topo.push_back(u_pt);
+    const auto &pt = res.points[u_pt];
+    for (const auto &e : pt.fanouts) {
+      if (e.target_point < point_count && --indeg[e.target_point] == 0) {
+        queue.push_back(e.target_point);
       }
     }
-    return nullptr;
-  };
+  }
 
-  auto compute_setup_hold =
-      [this, clk_slew_ns](
-          Instance *sink, const std::string &port, double data_arrival_ps,
-          double data_slew_rise_ns, double data_slew_fall_ns,
-          TransitionDirection data_dir) -> std::pair<double, double> {
-    if (!sink || !cell_library_)
-      return {0, 0};
-    const auto *cell = cell_library_->get_cell(sink->module_name);
-    if (!cell)
-      return {0, 0};
-    const auto *pin = cell->get_pin(port);
-    if (!pin)
-      return {0, 0};
-    double data_trans = std::max(data_slew_rise_ns, data_slew_fall_ns);
-    double setup_ps = 0, hold_ps = 0;
-    for (const auto &arc : pin->timing_arcs) {
-      if (arc.timing_type == celllib::TimingType::SETUP_RISING ||
-          arc.timing_type == celllib::TimingType::SETUP_FALLING) {
-        double sr =
-            caculate_setup_rise(arc, cell_library_, data_trans, clk_slew_ns);
-        double sf =
-            caculate_setup_fall(arc, cell_library_, data_trans, clk_slew_ns);
-        if (data_dir == TransitionDirection::RISING)
-          setup_ps = sr * NS_TO_PS;
-        else if (data_dir == TransitionDirection::FALLING)
-          setup_ps = sf * NS_TO_PS;
-        else
-          setup_ps = std::max(sr, sf) * NS_TO_PS;
-      }
-      if (arc.timing_type == celllib::TimingType::HOLD_RISING ||
-          arc.timing_type == celllib::TimingType::HOLD_FALLING) {
-        double hr =
-            caculate_hold_rise(arc, cell_library_, data_trans, clk_slew_ns);
-        double hf =
-            caculate_hold_fall(arc, cell_library_, data_trans, clk_slew_ns);
-        if (data_dir == TransitionDirection::RISING)
-          hold_ps = hr * NS_TO_PS;
-        else if (data_dir == TransitionDirection::FALLING)
-          hold_ps = hf * NS_TO_PS;
-        else
-          hold_ps = std::max(hr, hf) * NS_TO_PS;
-      }
-    }
-    return {setup_ps, hold_ps};
-  };
+  // 3. 初始化起点（input + clock）：从这些点开始做 GBA 传播
+  // 这里直接复用 input_clk_point_ids 作为起点集合
+  for (std::size_t pt_idx : input_clk_point_ids) {
+    auto it = gba_graphy_.pt_to_node.find(pt_idx);
+    if (it == gba_graphy_.pt_to_node.end())
+      continue;
+    GbaNode &node = gba_graphy_.nodes[it->second];
+    node.delay_rise = 0.0;
+    node.delay_fall = 0.0;
+    node.slew_rise = 0.0;
+    node.slew_fall = 0.0;
+    node.prev_node_rise = node.id;
+    node.prev_node_fall = node.id;
+  }
 
-  int path_count = 0;
-  std::unordered_set<std::string> path_printed;
+  // 4. 沿 topo 序做 DP：对每条 edge，分别用 RISE/FALL 两个方向调用 segment_delays_slews
+  const bool use_max = (analysis_mode == AnalysisMode::MAX);
 
-  for (std::size_t start_id : input_clk_point_ids) {
-    if (start_id >= res.points.size())
+  for (std::size_t u_pt : topo) {
+    auto it_u = gba_graphy_.pt_to_node.find(u_pt);
+    if (it_u == gba_graphy_.pt_to_node.end())
+      continue;
+    std::size_t u_node_id = it_u->second;
+    GbaNode &u_node = gba_graphy_.nodes[u_node_id];
+
+    const TimingPointRef &u_ref = res.points[u_pt];
+
+    // 当前节点在 rise / fall 方向上是否已经有可达路径
+    const bool has_rise =
+        (u_node.delay_rise > -std::numeric_limits<double>::infinity());
+    const bool has_fall =
+        (u_node.delay_fall > -std::numeric_limits<double>::infinity());
+
+    if (!has_rise && !has_fall)
       continue;
 
-    double slew_ns = clk_slew_ns;
-
-    std::stack<StackFrame> stk;
-    std::vector<PathFrame> path;
-    stk.push(
-        {start_id, 0.0, slew_ns, slew_ns, TransitionDirection::UNKNOWN, 0});
-
-    while (!stk.empty()) {
-      StackFrame f = stk.top();
-      stk.pop();
-
-      if (f.fanout_idx == 0) {
-        path.push_back(
-            {f.point_id, f.arrival, f.slew_rise_ns, f.slew_fall_ns, f.dir, 0});
-      }
-
-      const TimingPointRef &cur = res.points[f.point_id];
-
-      if (cur.type == REGD || cur.type == OUTPUT) {
-        std::string fp;
-        for (const auto &pf : path)
-          fp += std::to_string(pf.point_id) + ":" + std::to_string(pf.arrival) +
-                "->";
-        if (path_printed.insert(fp).second) {
-          path_count++;
-          TimingPathResult pr;
-          pr.startpoint = path.front().point_id;
-          pr.endpoint = path.back().point_id;
-          pr.data_arrival_time = f.arrival;
-          pr.index = res.paths.size();
-          pr.group = classify_path_group(
-              effective_start_type_for_group(res.points[pr.startpoint]),
-              cur.type);
-
-          if (cur.type == REGD && cur.inst) {
-            auto [setup_ps, hold_ps] =
-                compute_setup_hold(cur.inst, cur.port_name, f.arrival,
-                                   f.slew_rise_ns, f.slew_fall_ns, f.dir);
-            pr.library_setup_time = setup_ps;
-            pr.library_hold_time = hold_ps;
-          }
-
-          for (size_t i = 0; i < path.size(); ++i) {
-            if (i == 0) {
-              continue;
-            }
-            double incr = path[i].arrival - path[i - 1].arrival;
-            double slew =
-                std::max(path[i].slew_rise_ns, path[i].slew_fall_ns) * NS_TO_PS;
-            TimingStep step{
-                path[i - 1].point_id,
-                path[i].point_id,
-                incr,
-                slew,
-                res.points[path[i - 1].point_id].load_cap,
-                path[i].arrival,
-                path[i].dir};
-            pr.steps.push_back(step);
-          }
-          res.paths.push_back(pr);
-
-          std::cout << "  [DEBUG] Path #" << path_count << " pt"
-                    << pr.startpoint << "->pt" << pr.endpoint
-                    << " arrival=" << f.arrival << "ps"
-                    << ", steps=" << pr.steps.size() << "\n";
-        }
-      }
-
-      if (f.fanout_idx >= cur.fanouts.size()) {
-        path.pop_back();
-        continue;
-      }
-
-      const TimingEdge &e = cur.fanouts[f.fanout_idx];
-      stk.push({f.point_id, f.arrival, f.slew_rise_ns, f.slew_fall_ns, f.dir,
-                f.fanout_idx + 1});
-
-      const TimingPointRef &target = res.points[e.target_point];
-
-      double delay_ps = 0.0;
-      double out_slew_rise_ns = f.slew_rise_ns;
-      double out_slew_fall_ns = f.slew_fall_ns;
-      TransitionDirection out_dir = f.dir;
-
-      if (e.type == WIRE) {
-        delay_ps = 0.0;
-        out_slew_rise_ns = f.slew_rise_ns;
-        out_slew_fall_ns = f.slew_fall_ns;
-        out_dir = f.dir;
-      } else {
-        const celllib::TimingArc *arc = find_arc(cur, target, e.type);
-        if (!arc) {
-          std::cerr << "  [DEBUG] arc not found: pt " << f.point_id << " -> "
-                    << e.target_point << " type "
-                    << (e.type == COMB_ARC ? "COMB_ARC" : "SEQ_ARC") << "\n";
-          // 不 pop_back：target 尚未加入 path，cur 仍应保留在 path 中
-          continue;
-        }
-
-        double load_cap = target.load_cap;
-
-        double in_slew_rise = f.slew_rise_ns;
-        double in_slew_fall = f.slew_fall_ns;
-        bool is_start = (cur.type == INPUT || cur.type == CLK_PIN);
-        if (is_start && in_slew_rise == 0)
-          in_slew_rise = clk_slew_ns;
-        if (is_start && in_slew_fall == 0)
-          in_slew_fall = clk_slew_ns;
-
-        bool is_ck2q = (e.type == SEQ_ARC);
-
-        if (analysis_granularity_ == AnalysisGranularity::COARSE) {
-          delay_ps = get_pessimistic_delay_from_lut(
-              arc->cell_rise.has_value() ? arc->cell_rise.value()
-                                         : celllib::LookupTable{});
-          if (delay_ps == 0 && arc->cell_fall.has_value())
-            delay_ps = get_pessimistic_delay_from_lut(arc->cell_fall.value());
-          if (delay_ps == 0 && arc->intrinsic_rise.has_value())
-            delay_ps = std::max(arc->intrinsic_rise.value_or(0),
-                                arc->intrinsic_fall.value_or(0)) *
-                       NS_TO_PS;
-        } else {
-          double dr =
-              caculate_delay_rise(*arc, cell_library_, in_slew_rise, load_cap);
-          double df =
-              caculate_delay_fall(*arc, cell_library_, in_slew_fall, load_cap);
-          out_slew_rise_ns = caculate_transition_rise(*arc, cell_library_,
-                                                      in_slew_rise, load_cap) /
-                             NS_TO_PS;
-          out_slew_fall_ns = caculate_transition_fall(*arc, cell_library_,
-                                                      in_slew_fall, load_cap) /
-                             NS_TO_PS;
-          out_dir = speculate_transition_direction(is_ck2q, *arc, f.dir);
-          if (out_dir == TransitionDirection::RISING)
-            delay_ps = dr;
-          else if (out_dir == TransitionDirection::FALLING)
-            delay_ps = df;
-          else
-            delay_ps = std::max(dr, df);
-
-          std::string cell_name =
-              target.inst ? target.inst->instance_name : "?";
-          std::cout << "  [DEBUG] delay lut: " << cell_name << " "
-                    << cur.port_name << "->" << target.port_name
-                    << " slew_rise=" << in_slew_rise
-                    << " slew_fall=" << in_slew_fall << " load_cap=" << load_cap
-                    << " delay_rise=" << dr << " delay_fall=" << df << " -> "
-                    << delay_ps << "ps\n";
-        }
-      }
-
-      double new_arrival = f.arrival + delay_ps;
-      stk.push({e.target_point, new_arrival, out_slew_rise_ns, out_slew_fall_ns,
-                out_dir, 0});
+    if(u_ref.type == OUTPUT || u_ref.type == REGD) {
+      gba_graphy_.end_node.push_back(u_pt);
     }
+    
+    for (const auto &edge : u_ref.fanouts) {
+      std::size_t v_pt = edge.target_point;
+      if (v_pt >= point_count)
+        continue;
+
+      auto it_v = gba_graphy_.pt_to_node.find(v_pt);
+      if (it_v == gba_graphy_.pt_to_node.end())
+        continue;
+      std::size_t v_node_id = it_v->second;
+      GbaNode &v_node = gba_graphy_.nodes[v_node_id];
+
+      // 4.1 以 RISING 作为当前输入方向
+      if (has_rise) {
+        double prev_slew_ns = u_node.slew_rise;
+        double base_delay = u_node.delay_rise;
+
+        auto segs = segment_delays_slews_gba(res, cell_library_, analysis_mode,
+                                         u_pt, v_pt, prev_slew_ns,
+                                         TransitionDirection::RISING);
+
+        if (segs.empty()) {
+          // 视为 WIRE：delay=0，slew 透传，方向保持不变
+          segment_res seg;
+          seg.slew = prev_slew_ns;
+          seg.delay = 0.0;
+          seg.dir = TransitionDirection::RISING;
+          segs.push_back(seg);
+        }
+        
+        for (const auto &seg : segs) {
+          double cand_delay = base_delay + seg.delay;
+          size_t path_idx = add_path(u_node_id, v_node_id, seg.delay, seg.slew,
+                                     seg.dir, TransitionDirection::RISING);
+          if (seg.dir == TransitionDirection::RISING) {
+            if ((use_max && cand_delay > v_node.delay_rise) ||
+                (!use_max && cand_delay < v_node.delay_rise)) {
+              v_node.delay_rise = cand_delay;
+              v_node.slew_rise = seg.slew;
+              v_node.prev_node_rise = u_node_id;
+              v_node.prev_path_rise = path_idx;
+            }
+          } else if (seg.dir == TransitionDirection::FALLING) {
+            if ((use_max && cand_delay > v_node.delay_fall) ||
+                (!use_max && cand_delay < v_node.delay_fall)) {
+              v_node.delay_fall = cand_delay;
+              v_node.slew_fall = seg.slew;
+              v_node.prev_node_fall = u_node_id;
+              v_node.prev_path_fall = path_idx;
+            }
+          }
+        }
+      }
+
+      // 4.2 以 FALLING 作为当前输入方向
+      if (has_fall) {
+        double prev_slew_ns = u_node.slew_fall;
+        double base_delay = u_node.delay_fall;
+
+        auto segs = segment_delays_slews_gba(res, cell_library_, analysis_mode,
+                                         u_pt, v_pt, prev_slew_ns,
+                                         TransitionDirection::FALLING);
+
+        if (segs.empty()) {
+          // 视为 WIRE：delay=0，slew 透传，方向保持不变
+          segment_res seg;
+          seg.slew = prev_slew_ns;
+          seg.delay = 0.0;
+          seg.dir = TransitionDirection::FALLING;
+          segs.push_back(seg);
+        }
+
+        for (const auto &seg : segs) {
+          double cand_delay = base_delay + seg.delay;
+          size_t path_idx = add_path(u_node_id, v_node_id, seg.delay, seg.slew,
+                                     seg.dir, TransitionDirection::FALLING);
+          if (seg.dir == TransitionDirection::RISING) {
+            if ((use_max && cand_delay > v_node.delay_rise) ||
+                (!use_max && cand_delay < v_node.delay_rise)) {
+              v_node.delay_rise = cand_delay;
+              v_node.slew_rise = seg.slew;
+              v_node.prev_node_rise = u_node_id;
+              v_node.prev_path_rise = path_idx;
+            }
+          } else if (seg.dir == TransitionDirection::FALLING) {
+            if ((use_max && cand_delay > v_node.delay_fall) ||
+                (!use_max && cand_delay < v_node.delay_fall)) {
+              v_node.delay_fall = cand_delay;
+              v_node.slew_fall = seg.slew;
+              v_node.prev_node_fall = u_node_id;
+              v_node.prev_path_fall = path_idx;
+            }
+          }
+        }
+  }
+  }
+}
+
+  // 调试：打印每个点的类型、fanout 以及被选中的 end_node
+  std::cerr << "[gba-debug] ===== TimingPointRef list =====\n";
+  for (std::size_t i = 0; i < res.points.size(); ++i) {
+    const auto &pt = res.points[i];
+    std::cerr << "[gba-debug] pt " << i
+              << " type=" << point_type_str(pt.type) << " fanouts=[";
+    for (std::size_t j = 0; j < pt.fanouts.size(); ++j) {
+      const auto &e = pt.fanouts[j];
+      std::cerr << e.target_point;
+      if (j + 1 < pt.fanouts.size()) {
+        std::cerr << ", ";
+      }
+    }
+    std::cerr << "]\n";
   }
 
-  std::cout << "  [DEBUG] run_timing_analysis_dfs: " << path_count
-            << " paths found, res.paths.size()=" << res.paths.size() << "\n";
+  std::cerr << "[gba-debug] ===== selected end_node point ids =====\n";
+  std::cerr << "[gba-debug] end_node ids: ";
+  for (std::size_t k = 0; k < gba_graphy_.end_node.size(); ++k) {
+    std::cerr << gba_graphy_.end_node[k];
+    if (k + 1 < gba_graphy_.end_node.size()) {
+      std::cerr << ", ";
+    }
+  }
+  std::cerr << "\n";
 }
+
+// void STAWorker::run_gba_propagate(PointType pt_type) {
+//   if(pt_type != PointType::CLK_PIN || pt_type != PointType::INPUT) {
+//     assert(false);
+//   }
+
+
+// }
+
+// 从 end_node 回溯构造 TimingPathResult，rise 和 fall 各回溯一条，并计算 setup/hold
+void STAWorker::run_gba_timing_analysis() {
+  res.paths.clear();
+
+  constexpr double inf = std::numeric_limits<double>::infinity();
+
+  for (std::size_t end_pt : gba_graphy_.end_node) {
+    auto it = gba_graphy_.pt_to_node.find(end_pt);
+    if (it == gba_graphy_.pt_to_node.end())
+      continue;
+    std::size_t node_id = it->second;
+    GbaNode &node = gba_graphy_.nodes[node_id];
+
+    // rise 和 fall 各回溯一条
+    for (bool use_rise : {true, false}) {
+      if (use_rise && node.delay_rise <= -inf)
+        continue;
+      if (!use_rise && node.delay_fall <= -inf)
+        continue;
+
+      std::size_t cur_node_id = node_id;
+      bool cur_dir_rise = use_rise;
+
+      std::vector<TimingStep> steps_rev;
+
+      while (true) {
+        GbaNode &cur_node = gba_graphy_.nodes[cur_node_id];
+        std::size_t prev_id =
+            cur_dir_rise ? cur_node.prev_node_rise : cur_node.prev_node_fall;
+
+        // 到达起点（prev 指向自身）
+        if (prev_id == cur_node_id)
+          break;
+
+        GbaNode &prev_node = gba_graphy_.nodes[prev_id];
+        std::size_t path_idx =
+            cur_dir_rise ? cur_node.prev_path_rise : cur_node.prev_path_fall;
+        if (path_idx >= gba_graphy_.paths.size())
+          break;
+
+        const GbaPath &path = gba_graphy_.paths[path_idx];
+
+        TimingStep step;
+        step.start_point = prev_node.pt_idx;
+        step.end_point = cur_node.pt_idx;
+        step.incr = path.incr;
+        step.slew = path.slew * 1000.0;  // ns -> ps
+        step.dir = path.dir;
+        steps_rev.push_back(step);
+
+        cur_dir_rise = (path.input_dir == TransitionDirection::RISING);
+        cur_node_id = prev_id;
+      }
+
+      if (steps_rev.empty())
+        continue;
+
+      // 反转为 start -> end 顺序，并计算 arrival
+      std::vector<TimingStep> steps(steps_rev.rbegin(), steps_rev.rend());
+      double arrival = 0.0;
+      for (auto &s : steps) {
+        arrival += s.incr;
+        s.arrival = arrival;
+      }
+
+      std::size_t start_pt = steps.front().start_point;
+      PointType start_type = effective_start_type_for_group(res.points[start_pt]);
+      PointType end_type = res.points[end_pt].type;
+
+      TimingPathResult pr;
+      pr.group = classify_path_group(start_type, end_type);
+      pr.index = res.paths.size();
+      pr.startpoint = start_pt;
+      pr.endpoint = end_pt;
+      pr.need_to_recaculate = false;
+      pr.data_arrival_time = arrival;
+      pr.steps = std::move(steps);
+
+      compute_path_setup_hold(pr);
+      res.paths.push_back(std::move(pr));
+    }
+  }
+}
+}
+
+void run_gba_analysis(sta::STAWorker &worker) {
+  std::cout << "  [GBA] Step 1: build_fanouts()...\n";
+  worker.build_fanouts();
+  std::cout << "  [GBA-MAX] Step 2: calculate_load_capacitance()...\n";
+  worker.caculate_load_cap();
+  std::cout << "  [GBA-MAX] Step 3: build_candidate_graphy()...\n";
+  worker.build_gba_graphy();
+  worker.run_gba_timing_analysis();
 }

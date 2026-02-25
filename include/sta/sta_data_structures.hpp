@@ -275,6 +275,7 @@ struct TimingPathResult {
   size_t startpoint;
   size_t endpoint;
 
+  bool need_to_recaculate; // 用来标记需要recaculate的路径
   double data_arrival_time = 0.0;
 
   std::optional<double> library_setup_time;
@@ -319,6 +320,44 @@ inline PointType effective_start_type_for_group(const TimingPointRef &p) {
   }
   return p.type;
 }
+// ============================================================================
+// 5. GBA数据结构(GBA )
+// ============================================================================
+struct GbaPath {
+  size_t startnode;
+  size_t endnode;
+  celllib::TimingArc *arc;
+
+  double slew;
+  double incr;
+  TransitionDirection dir;      // 输出方向
+  TransitionDirection input_dir; // 输入方向，回溯时用于确定 prev 的 rise/fall
+};
+
+struct GbaNode {
+  size_t pt_idx;
+  size_t id;
+
+  double delay_rise;
+  double delay_fall;
+  double slew_rise;
+  double slew_fall;
+
+  size_t prev_node_rise;
+  size_t prev_node_fall;
+  size_t prev_path_rise;
+  size_t prev_path_fall;
+
+  std::vector<GbaPath> fanouts;
+};
+
+struct GbaGraphy {
+  std::vector<GbaNode> nodes;
+  std::vector<GbaPath> paths;
+
+  std::unordered_map<size_t, size_t> pt_to_node;
+  std::vector<size_t> end_node;
+};
 
 // ============================================================================
 // 5. 无知节点 (Candidate)
@@ -416,6 +455,9 @@ private:
   // 无知节点图（用于处理clk2q段 / input / 非单调cell输入等“沿不确定”场景）
   CandidateGraphy candidate_graphy_;
 
+  // GBA 图（基于全图拓扑 + 最长路的分析）
+  GbaGraphy gba_graphy_;
+
   // 顶层模块端口信息
   std::unordered_set<SignalBit, SignalBitHash>
       top_module_inputs; // 顶层模块的输入端口
@@ -508,13 +550,12 @@ public:
   /// 根据 res.points 的 fanouts 填充 res.edges，供 CandidatePath 使用 edge
   /// index
   void build_res_edges();
-  void calculate_load_capacitance_dfs();
-  /// candidate 精确模式：按 output 上升/下降分别累加 fanout 的 rise/fall 电容
-  void caculate_candidate_load_cap();
+  /// 基于当前 TimingRunResult 构建 GBA 图（节点 + 弧）
+  void build_gba_graphy();
+  void caculate_load_cap();
   void calculate_timing_arcs();
-
   /// DFS 时序分析：从 input_clk_point_ids 出发，沿 Point 图 DFS，产出 res.paths
-  void run_timing_analysis_dfs();
+  void run_gba_timing_analysis();
 
   /// 基于 point_idx 创建/获取 candidate 节点（推荐）
   std::size_t get_or_create_candidate_node(std::size_t point_idx);
@@ -745,13 +786,33 @@ void print_candidate_paths(
     const std::unordered_set<std::size_t> &startpoint_nodes);
 
 namespace sta {
+struct segment_res {
+  double slew;
+  double delay;
+  TransitionDirection dir;
+};
+
 void segment_delay_slew(const TimingRunResult &res,
                         const celllib::CellLibrary *cell_library_,
                         AnalysisMode mode, std::size_t from_pt,
                         std::size_t to_pt, double prev_slew,
                         TransitionDirection cur_dir, double &out_delay,
                         double &out_slew, TransitionDirection &out_dir);
+
+std::vector<segment_res> segment_delays_slews(const TimingRunResult &res,
+                        const celllib::CellLibrary *cell_library_,
+                        AnalysisMode mode, std::size_t from_pt,
+                        std::size_t to_pt, double prev_slew,
+                        TransitionDirection cur_dir);
+
+std::vector<segment_res> segment_delays_slews_gba(const TimingRunResult &res,
+                        const celllib::CellLibrary *cell_library_,
+                        AnalysisMode mode, std::size_t from_pt,
+                        std::size_t to_pt, double prev_slew,
+                        TransitionDirection cur_dir);
 }
 
-void run_candidate(sta::STAWorker &worker);
+void run_pba_analysis(sta::STAWorker &worker);
+void run_gba_analysis(sta::STAWorker &worker);
+
 #endif // STA_DATA_STRUCTURES_HPP

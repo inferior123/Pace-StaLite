@@ -2,8 +2,11 @@
 """
 解析 ref（PT/iEDA）与 candidate 的 timing 报告，对比 slack、data arrival、data required。
 用法:
-  python3 compare_timing_reports.py --ref ./ref/simpel_pt --candidate ./result/candidate/simple
-  python3 compare_timing_reports.py --ref ./ref/simpel_pt --candidate ./result/candidate/simple --tolerance 0.01
+  python3 compare_timing_reports.py --mode gba --table
+  python3 compare_timing_reports.py --mode pba --table
+  python3 compare_timing_reports.py --mode gba --design simple
+  python3 compare_timing_reports.py --ref <dir> --candidate <dir>  # 显式指定目录
+ref=Testing/ics55_{gba|pba}, candidate=result/{gba|pba}
 """
 
 import argparse
@@ -195,6 +198,12 @@ def main():
         description="对比 ref（PT/ics55）与 candidate 的 timing 报告"
     )
     parser.add_argument(
+        "--mode",
+        choices=["gba", "pba"],
+        default="gba",
+        help="gba 或 pba：ref=Testing/ics55_{mode}，candidate=result/{mode}",
+    )
+    parser.add_argument(
         "--table",
         action="store_true",
         help="输出误差表格：按 design 匹配 ref-root 与 candidate-root，R=仅PT有 C=仅我有 -=双方无",
@@ -202,14 +211,14 @@ def main():
     parser.add_argument(
         "--ref-root",
         type=Path,
-        default=Path("Testing/ics55"),
-        help="表格模式：ref 根目录（PT 结果）",
+        default=None,
+        help="表格模式：ref 根目录，默认 Testing/ics55_{mode}",
     )
     parser.add_argument(
         "--candidate-root",
         type=Path,
-        default=Path("result/candidate"),
-        help="表格模式：candidate 根目录",
+        default=None,
+        help="表格模式：candidate 根目录，默认 result/{mode}",
     )
     parser.add_argument(
         "--ref",
@@ -224,6 +233,12 @@ def main():
         help="单 design：candidate 报告目录",
     )
     parser.add_argument(
+        "--design",
+        type=str,
+        default="simple",
+        help="单 design 模式下的 design 子目录名",
+    )
+    parser.add_argument(
         "--tolerance",
         type=float,
         default=0.02,
@@ -231,20 +246,21 @@ def main():
     )
     args = parser.parse_args()
 
+    ref_root = args.ref_root or Path(f"Testing/ics55_{args.mode}")
+    cand_root = args.candidate_root or Path(f"result/{args.mode}")
+
     if args.table:
-        if not args.ref_root.is_dir():
-            print(f"ERROR: ref 根目录不存在: {args.ref_root}", file=sys.stderr)
+        if not ref_root.is_dir():
+            print(f"ERROR: ref 根目录不存在: {ref_root}", file=sys.stderr)
             sys.exit(1)
-        if not args.candidate_root.is_dir():
-            print(
-                f"ERROR: candidate 根目录不存在: {args.candidate_root}", file=sys.stderr
-            )
+        if not cand_root.is_dir():
+            print(f"ERROR: candidate 根目录不存在: {cand_root}", file=sys.stderr)
             sys.exit(1)
-        run_table(args.ref_root, args.candidate_root)
+        run_table(ref_root, cand_root)
         return
 
-    ref_dir = args.ref or Path("ref/simpel_pt")
-    cand_dir = args.candidate or Path("result/candidate/simple")
+    ref_dir = args.ref or ref_root / args.design
+    cand_dir = args.candidate or cand_root / args.design
     if not ref_dir.is_dir():
         print(f"ERROR: ref 目录不存在: {ref_dir}", file=sys.stderr)
         sys.exit(1)

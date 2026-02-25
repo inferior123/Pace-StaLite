@@ -58,7 +58,7 @@ int candidate_test(int argc, char *argv[]) {
   std::cout << "Step 1: build_fanouts()..." << std::endl;
   worker.build_fanouts();
   std::cout << "Step 2: calculate_load_capacitance()..." << std::endl;
-  worker.caculate_candidate_load_cap();
+  worker.caculate_load_cap();
   std::cout << "Step 3: build_candidate_graphy()..." << std::endl;
   worker.build_candidate_graphy_dfs();
 

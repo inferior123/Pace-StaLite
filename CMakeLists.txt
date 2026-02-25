@@ -37,14 +37,9 @@ include_directories(${PROJECT_SOURCE_DIR}/parser-verilog)  # For Flex/Bison gene
 # -----------------------------------------------------------------------------
 set(LIBERTY_RUST_PROJECT liberty_parser)
 set(LIBERTY_RUST_DIR ${PROJECT_SOURCE_DIR}/third_party/liberty-parser/lib-rust/liberty-parser)
+set(LIBERTY_RUST_LIB_PATH ${LIBERTY_RUST_DIR}/target/release/libliberty_parser.a)
+set(LIBERTY_RUST_CARGO_FLAGS "--release")
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-  set(LIBERTY_RUST_LIB_PATH ${LIBERTY_RUST_DIR}/target/debug/libliberty_parser.a)
-  set(LIBERTY_RUST_CARGO_FLAGS "")
-else()
-  set(LIBERTY_RUST_LIB_PATH ${LIBERTY_RUST_DIR}/target/release/libliberty_parser.a)
-  set(LIBERTY_RUST_CARGO_FLAGS "--release")
-endif()
 
 include(ExternalProject)
 ExternalProject_Add(${LIBERTY_RUST_PROJECT}
@@ -135,6 +130,8 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/candidate/candidate.cpp
   ${PROJECT_SOURCE_DIR}/src/candidate/candidate_recaculate.cpp
   ${PROJECT_SOURCE_DIR}/src/candidate/candidate_graphy.cpp
+  ${PROJECT_SOURCE_DIR}/src/candidate/candidate_utils.cpp
+  ${PROJECT_SOURCE_DIR}/src/gba_dfs/gba_dfs.cpp
   ${PROJECT_SOURCE_DIR}/src/utils.cpp
   ${PROJECT_SOURCE_DIR}/src/debug.cpp
   ${FLEX_verilog_lexer_OUTPUTS}
@@ -181,9 +178,3 @@ add_custom_target(tar
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   COMMENT "Building executable, generating tags, and compile_commands.json"
 )
-
-# -----------------------------------------------------------------------------
-# Test: Rust liberty parser (standalone)
-# -----------------------------------------------------------------------------
-add_executable(test_rust_lib third_party_test/lib_parser_test.cpp)
-target_link_libraries(test_rust_lib PRIVATE liberty_rust pthread dl)

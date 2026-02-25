@@ -37,13 +37,44 @@ bool STAWorker::is_reg(std::string name) {
   return false;
 }
 
+std::size_t STAWorker::get_or_create_point_node(Instance *inst,
+                                                const SignalBit &bit,
+                                                const std::string &port_name) {
+  return get_or_create_point(inst, port_name, bit, COMB_PIN);
+}
+
+std::size_t STAWorker::get_or_create_point(Instance *inst,
+                                           const std::string &port_name,
+                                           std::optional<SignalBit> bit,
+                                           PointType type) {
+  TimingPointRefKey key{inst, port_name, bit};
+  auto it = res.point_index.find(key);
+  if (it != res.point_index.end()) {
+    return it->second;
+  }
+
+  std::size_t id = res.points.size();
+  res.point_index.emplace(key, id);
+
+  TimingPointRef point;
+  point.id = id;
+  point.inst = inst;
+  point.port_name = port_name;
+  point.bit = bit;
+  point.type = type;
+  point.fanouts = {};
+
+  res.points.push_back(std::move(point));
+  return id;
+}
+
 SignalBit *STAWorker::get_virtual_clock() {
   static SignalBit global_clk("__clk__", 0);
   return &global_clk;
 }
 
 static inline void check_cell_lib(const celllib::CellLibrary *lib) {
-  if(!lib) {
+  if (!lib) {
     assert(false && "CellLibrary is required, no hardcoded fallback");
   }
   return;
@@ -189,8 +220,8 @@ void STAWorker::build_fanouts() {
               if (input_node_id != SIZE_MAX && output_node_id != SIZE_MAX &&
                   input_node_id < candidate_graphy_.nodes.size() &&
                   output_node_id < candidate_graphy_.nodes.size())
-                candidate_graphy_.nodes[input_node_id].relate_candidate_point
-                    .push_back(output_node_id);
+                candidate_graphy_.nodes[input_node_id]
+                    .relate_candidate_point.push_back(output_node_id);
 
               res.points[input_pt].candidate_idx = input_node_id;
               res.points[output_pt].candidate_idx = output_node_id;
@@ -284,6 +315,8 @@ void STAWorker::build_fanouts() {
     if (!already)
       fanouts.push_back(TimingEdge{e.type, e.from_pt, e.to_pt});
   }
+
+  build_res_edges();
 }
 
 void STAWorker::build_res_edges() {
@@ -291,6 +324,73 @@ void STAWorker::build_res_edges() {
   for (std::size_t i = 0; i < res.points.size(); ++i) {
     for (const TimingEdge &e : res.points[i].fanouts) {
       res.edges.push_back(TimingEdge{e.type, i, e.target_point});
+    }
+  }
+}
+
+void STAWorker::caculate_load_cap() {
+  if (!cell_library_)
+    return;
+
+  std::deque<std::size_t> queue(input_clk_point_ids.begin(),
+                                input_clk_point_ids.end());
+  std::unordered_set<std::size_t> visited;
+  while (!queue.empty()) {
+    std::size_t pt_id = queue.front();
+    queue.pop_front();
+    if (visited.count(pt_id))
+      continue;
+    visited.insert(pt_id);
+    TimingPointRef &pt = res.points[pt_id];
+    if (pt.type == COMB_PIN || pt.type == REGQ || pt.type == INPUT) {
+      for (const TimingEdge &e : pt.fanouts) {
+        if (e.target_point >= res.points.size())
+          continue;
+        const TimingPointRef &target = res.points[e.target_point];
+        if (!target.inst) // 输出是output
+          continue;
+        const auto *fanout_cell =
+            cell_library_->get_cell(target.inst->module_name);
+        if (!fanout_cell)
+          continue;
+        const auto *input_pin = fanout_cell->get_pin(target.port_name);
+        if (!input_pin)
+          continue;
+        const bool use_max = (get_analysis_mode() == AnalysisMode::MAX);
+
+        if (use_max) {
+          if (input_pin->rise_capacitance_max.has_value())
+            pt.rise_cap += input_pin->rise_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.rise_cap += input_pin->capacitance.value();
+        } else {
+          // min 模式：优先 min，若 min 无值则用 max
+          if (input_pin->rise_capacitance_min.has_value())
+            pt.rise_cap += input_pin->rise_capacitance_min.value();
+          else if (input_pin->rise_capacitance_max.has_value())
+            pt.rise_cap += input_pin->rise_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.rise_cap += input_pin->capacitance.value();
+        }
+
+        if (use_max) {
+          if (input_pin->fall_capacitance_max.has_value())
+            pt.fall_cap += input_pin->fall_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.fall_cap += input_pin->capacitance.value();
+        } else {
+          if (input_pin->fall_capacitance_min.has_value())
+            pt.fall_cap += input_pin->fall_capacitance_min.value();
+          else if (input_pin->fall_capacitance_max.has_value())
+            pt.fall_cap += input_pin->fall_capacitance_max.value();
+          else if (input_pin->capacitance.has_value())
+            pt.fall_cap += input_pin->capacitance.value();
+        }
+      }
+    }
+    for (const TimingEdge &e : pt.fanouts) {
+      if (visited.count(e.target_point) == 0)
+        queue.push_back(e.target_point);
     }
   }
 }

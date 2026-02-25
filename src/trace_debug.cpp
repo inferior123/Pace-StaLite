@@ -10,6 +10,8 @@
 #include "cell/celllib_cache.hpp"
 #include "sta/debug.h"
 
+bool run_pba = false;
+
 namespace {
 std::string point_name(const sta::TimingPointRef &p) {
   if (p.inst) {
@@ -102,10 +104,10 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
     celllib::save_celllib_cache(libs, cell_lib);
   }
 
-  // 2) 枚举 Testing/ics55 目录下所有 .v 文件
+  // 2) 枚举 Testing/ics55_pba 目录下所有 .v 文件
   std::vector<fs::path> verilog_files;
   const fs::path root_dir =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55";
+      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55_pba";
   for (auto &entry : fs::recursive_directory_iterator(root_dir)) {
     if (!entry.is_regular_file())
       continue;
@@ -148,9 +150,15 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
 
       std::string design_name =
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
-      std::string report_dir = "./result/candidate/" + design_name;
 
-      run_candidate(worker);
+      std::string dir_prefix = (run_pba) ? "pba" : "gba";
+      std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
+
+      if(run_pba == false) {
+        run_gba_analysis(worker);
+      } else {
+        run_pba_analysis(worker);
+      }
 
       // display_all_longest_path(worker);
 
@@ -181,9 +189,15 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
 
       std::string design_name =
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
-      std::string report_dir = "./result/candidate/" + design_name;
 
-      run_candidate(worker);
+      std::string dir_prefix = (run_pba) ? "pba" : "gba";
+      std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
+
+      if(run_pba == false) {
+        run_gba_analysis(worker);
+      } else {
+        run_pba_analysis(worker);
+      }
 
       debug_paths_through_instance(worker, "state_1__reg_p");
 
@@ -249,38 +263,44 @@ void singal_test(char *file_name) {
 
   std::string vfile = file_name;
 
-  // {
-  //   sta::STAWorker worker;
+  {
+    sta::STAWorker worker;
 
-  //   MySDCParser sdc_interface(worker);
-  //   sdc::SDCParser sdc_parser(&sdc_interface);
-  //   std::string sdc_file = vfile;
-  //   size_t pos = sdc_file.find_last_of('.');
-  //   if (pos != std::string::npos && sdc_file.substr(pos) == ".v") {
-  //     sdc_file.replace(pos, std::string::npos, ".sdc");
-  //   }
-  //   std::cout << "Parsing SDC file: " << sdc_file << std::endl;
-  //   sdc_parser.parse_file(sdc_file);
-  //   std::cout << "finish parse SDC file" << std::endl;
+    MySDCParser sdc_interface(worker);
+    sdc::SDCParser sdc_parser(&sdc_interface);
+    std::string sdc_file = vfile;
+    size_t pos = sdc_file.find_last_of('.');
+    if (pos != std::string::npos && sdc_file.substr(pos) == ".v") {
+      sdc_file.replace(pos, std::string::npos, ".sdc");
+    }
+    std::cout << "Parsing SDC file: " << sdc_file << std::endl;
+    sdc_parser.parse_file(sdc_file);
+    std::cout << "finish parse SDC file" << std::endl;
 
-  //   worker.set_cell_library(cell_lib);
-  //   MyVerilogParser verilog_parser(worker);
+    worker.set_cell_library(cell_lib);
+    MyVerilogParser verilog_parser(worker);
 
-  //   verilog_parser.read(vfile.c_str());
-  //   worker.set_analysis_mode(sta::AnalysisMode::MAX);
+    verilog_parser.read(vfile.c_str());
+    worker.set_analysis_mode(sta::AnalysisMode::MAX);
 
-  //   std::string design_name =
-  //       worker.top_moudle.empty() ? "design" : worker.top_moudle;
-  //   std::string report_dir = "./result1/candidate/" + design_name;
+      std::string design_name =
+          worker.top_moudle.empty() ? "design" : worker.top_moudle;
 
-  //   run_candidate(worker);
+      std::string dir_prefix = (run_pba) ? "pba" : "gba";
+      std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
-  //   debug_paths_through_instance(worker, "state_1__reg_p");
+      if(run_pba == false) {
+        run_gba_analysis(worker);
+      } else {
+        run_pba_analysis(worker);
+      }
 
-  //   worker.get_config().clk_period = 10000;
-  //   sta::STAReportGenerator::generate_report_pt_files(
-  //       worker, "__clk__", report_dir, design_name, 1);
-  // }
+    debug_paths_through_instance(worker, "state_1__reg_p");
+
+    worker.get_config().clk_period = 10000;
+    sta::STAReportGenerator::generate_report_pt_files(
+        worker, "__clk__", report_dir, design_name, 1);
+  }
 
   {
     sta::STAWorker worker;
@@ -302,11 +322,17 @@ void singal_test(char *file_name) {
     verilog_parser.read(vfile.c_str());
     worker.set_analysis_mode(sta::AnalysisMode::MIN);
 
-    std::string design_name =
-        worker.top_moudle.empty() ? "design" : worker.top_moudle;
-    std::string report_dir = "./result1/candidate/" + design_name;
+      std::string design_name =
+          worker.top_moudle.empty() ? "design" : worker.top_moudle;
 
-    run_candidate(worker);
+      std::string dir_prefix = (run_pba) ? "pba" : "gba";
+      std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
+
+      if(run_pba == false) {
+        run_gba_analysis(worker);
+      } else {
+        run_pba_analysis(worker);
+      }
 
     debug_paths_through_instance(worker, "state_1__reg_p");
 
