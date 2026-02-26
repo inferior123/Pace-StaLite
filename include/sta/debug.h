@@ -43,6 +43,20 @@ void debug_non_unate_arc(const celllib::TimingArc &arc, bool is_comb,
 void debug_non_unate_summary(std::size_t from_pt, std::size_t to_pt,
                              bool has_unate, double best_delay, double best_slew,
                              double unate_delay, double unate_slew);
+
+/// GBA setup/hold 调试输出，置 true 启用
+inline constexpr bool kDebugGbaSetupHold = true;
+/// 只对指定 endpoint pt 打印，取 static_cast<std::size_t>(-1) 表示全部
+inline constexpr std::size_t kDebugGbaSetupHoldFilterPt = 20;
+
+void debug_gba_setup_hold_propagate(std::size_t u_pt, std::size_t v_pt,
+                                    const GbaPath &path, double cand_delay,
+                                    double data_trans_ns);
+void debug_gba_setup_hold_result(const TimingPathResult &pr,
+                                 std::size_t v_node_id);
+void debug_gba_setup_hold_lut(std::size_t endpoint, const char *arc_type,
+                              double data_trans_ns, double clk_trans_ns,
+                              double result_ns, double result_ps);
 } // namespace sta
 
 void fanout_debuger(sta::STAWorker &worker);
@@ -55,7 +69,10 @@ void singal_test(char *file_name);
 void auto_test(int /*argc*/, char * /*argv*/[]);
 void debug_lib_cell();
 void spi_test();
-void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap, double slew);
+void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
+              double slew);
+void test_setup_hold(const char *cell_name, const char *pin_name,
+                     const char *related_pin, double slew_ns);
 
 namespace sta {
     void display_longest_path(sta::STAWorker &worker);

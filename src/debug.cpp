@@ -2,6 +2,7 @@
 #include "cell/cell_data_structure.hpp"
 #include "sta/sta_data_structures.hpp"
 #include <cstddef>
+#include <iomanip>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -117,6 +118,50 @@ void debug_non_unate_summary(std::size_t from_pt, std::size_t to_pt,
             << " best_delay=" << best_delay << " best_slew_ns=" << best_slew
             << " unate_delay=" << unate_delay
             << " unate_slew_ns=" << unate_slew << std::endl;
+}
+
+void debug_gba_setup_hold_propagate(std::size_t u_pt, std::size_t v_pt,
+                                    const GbaPath &path, double cand_delay,
+                                    double data_trans_ns) {
+  std::cerr << "[gba_setup_hold] === propagate pt" << u_pt << " -> pt" << v_pt
+            << " (REGD) ===\n";
+  std::cerr << "  path: incr=" << path.incr << "ps slew=" << path.slew
+            << "ns dir=" << dir_char(path.dir)
+            << " input_dir=" << dir_char(path.input_dir)
+            << " path_idx=" << path.path_idx << "\n";
+  std::cerr << "  cand_delay=" << cand_delay << "ps\n";
+  std::cerr << "  data_trans_ns=" << data_trans_ns
+            << " (from path.slew or step.slew/1000)\n";
+}
+
+void debug_gba_setup_hold_result(const TimingPathResult &pr,
+                                 std::size_t v_node_id) {
+  std::cerr << "[gba_setup_hold] === compute_path_setup_hold result ===\n";
+  std::cerr << "  v_node_id=" << v_node_id << " endpoint=pt" << pr.endpoint
+            << "\n";
+  std::cerr << "  library_setup_time=";
+  if (pr.library_setup_time.has_value())
+    std::cerr << pr.library_setup_time.value() << "ps";
+  else
+    std::cerr << "(none)";
+  std::cerr << "\n  library_hold_time=";
+  if (pr.library_hold_time.has_value())
+    std::cerr << pr.library_hold_time.value() << "ps ("
+              << (pr.library_hold_time.value() / 1000.0) << "ns)";
+  else
+    std::cerr << "(none)";
+  std::cerr << "\n";
+}
+
+void debug_gba_setup_hold_lut(std::size_t endpoint, const char *arc_type,
+                              double data_trans_ns, double clk_trans_ns,
+                              double result_ns, double result_ps) {
+  std::cerr << "[gba_setup_hold] LUT pt" << endpoint << " " << arc_type
+            << " data_trans=" << std::setprecision(10) << data_trans_ns
+            << "ns clk_trans=" << clk_trans_ns << "ns -> result_ns=" << result_ns
+            << " result_ps=" << result_ps << "\n";
+  std::cerr << "  (data_required_time参考=-0.0085453279ns=-8.5453279ps "
+               "若hold作为data_required则比对)\n";
 }
 
 } // namespace sta
@@ -612,8 +657,8 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
 void display_spefic_group(STAWorker &worker) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
-  const PathGroup group = PathGroup::IN2REG;
-  const AnalysisMode target_mode = AnalysisMode::MAX;
+  const PathGroup group = PathGroup::REG2REG;
+  const AnalysisMode target_mode = AnalysisMode::MIN;
 
   if (mode != target_mode)
     return;

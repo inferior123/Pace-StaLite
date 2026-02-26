@@ -75,9 +75,14 @@ int candidate_test(int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
 
-  if(argc > 6) {
+  if (argc > 6) {
     test_lut(argv[2], argv[3], argv[4], std::stod(argv[5]), std::stod(argv[6]));
-  } else if(argc > 2) {
+  } else if (argc > 5) {
+    // test_setup_hold: cell pin related_pin slew_ns（4参数，cell被忽略时可不传）
+    test_setup_hold(argv[2], argv[3], argv[4], std::stod(argv[5]));
+  } else if(argc > 3) {
+    debug_lib_cell();
+  } else if (argc > 2) {
     std::cerr << "unknow argv num" << std::endl;
   } else if (argc > 1)
     singal_test(argv[1]);

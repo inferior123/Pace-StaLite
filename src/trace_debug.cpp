@@ -107,7 +107,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
   // 2) 枚举 Testing/ics55_pba 目录下所有 .v 文件
   std::vector<fs::path> verilog_files;
   const fs::path root_dir =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55_pba";
+      "/home/ysyx/project/pba-sta-base/proj/Testing/all";
   for (auto &entry : fs::recursive_directory_iterator(root_dir)) {
     if (!entry.is_regular_file())
       continue;
@@ -120,6 +120,9 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
     std::cout << "No .v files found under " << root_dir << "\n";
     return;
   }
+
+  // std::string dir_prefix = (run_pba) ? "pba" : "gba";
+  std::string dir_prefix = "all";
 
   // 3) 对每个 verilog 设计分别跑 DFS 和 PBA，两套 worker 互不干扰
   for (const auto &vpath : verilog_files) {
@@ -151,7 +154,6 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       std::string design_name =
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
 
-      std::string dir_prefix = (run_pba) ? "pba" : "gba";
       std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
       if(run_pba == false) {
@@ -190,7 +192,6 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       std::string design_name =
           worker.top_moudle.empty() ? "design" : worker.top_moudle;
 
-      std::string dir_prefix = (run_pba) ? "pba" : "gba";
       std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
       if(run_pba == false) {
@@ -369,7 +370,7 @@ void debug_lib_cell() {
     celllib::save_celllib_cache(libs, cell_lib);
   }
 
-  sta::show_lib_details("AOI32X0P5H7R", cell_lib);
+  sta::show_lib_details("DFFQX1H7L", cell_lib);
 }
 
 void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
@@ -426,5 +427,79 @@ void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
     std::cout << "delay rise is " << res << std::endl;
 
     std::cout << std::endl;
+  }
+}
+
+void test_setup_hold(const char *cell_name, const char *pin_name,
+                     const char *related_pin, double slew_ns) {
+  std::vector<std::string> libs;
+  libs.push_back(
+      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
+      "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
+  libs.push_back(
+      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
+      "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
+  libs.push_back(
+      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
+      "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
+
+  celllib::CellLibrary cell_lib;
+  MyCellLibParser lib_parser(cell_lib);
+
+  if (!celllib::try_load_celllib_cache(libs, cell_lib)) {
+    for (const auto &file : libs) {
+      std::cout << "liberty parser handle file " << file << std::endl;
+      lib_parser.parse_from_file(file);
+    }
+    celllib::save_celllib_cache(libs, cell_lib);
+  }
+
+  auto cell = cell_lib.get_cell(cell_name);
+  if (!cell) {
+    std::cerr << "cell '" << cell_name << "' not found\n";
+    return;
+  }
+
+  auto pin = cell->get_pin(pin_name);
+  if (!pin) {
+    std::cerr << "pin '" << pin_name << "' not found in cell '" << cell_name
+              << "'\n";
+    return;
+  }
+
+  // slew_ns 同时用作 data_trans 和 clk_trans
+  double data_trans = slew_ns;
+  double clk_trans = 0.0;
+
+  for (const auto &arc : pin->timing_arcs) {
+    if (arc.related_pin != related_pin)
+      continue;
+
+    using TT = celllib::TimingType;
+    if (arc.timing_type == TT::SETUP_RISING ||
+        arc.timing_type == TT::SETUP_FALLING) {
+      double setup_rise =
+          caculate_setup_rise(arc, &cell_lib, data_trans, clk_trans);
+      double setup_fall =
+          caculate_setup_fall(arc, &cell_lib, data_trans, clk_trans);
+      std::cout << "cell=" << cell_name << " pin=" << pin_name
+                << " related=" << related_pin << " slew_ns=" << slew_ns
+                << " setup_rise=" << (setup_rise * 1000.0) << "ps"
+                << " setup_fall=" << (setup_fall * 1000.0) << "ps\n";
+    }
+    if (arc.timing_type == TT::HOLD_RISING ||
+        arc.timing_type == TT::HOLD_FALLING) {
+      double hold_rise =
+          caculate_hold_rise(arc, &cell_lib, data_trans, clk_trans);
+      double hold_fall =
+          caculate_hold_fall(arc, &cell_lib, data_trans, clk_trans);
+      std::cout << "cell=" << cell_name << " pin=" << pin_name
+                << " related=" << related_pin << " slew_ns=" << slew_ns
+                << " hold_rise=" << (hold_rise * 1000.0) << "ps"
+                << " hold_fall=" << (hold_fall * 1000.0) << "ps\n";
+    }
   }
 }

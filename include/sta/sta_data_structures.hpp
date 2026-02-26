@@ -349,6 +349,12 @@ struct GbaNode {
   size_t prev_path_rise;
   size_t prev_path_fall;
 
+  /// 传播途中计算的 setup/hold 库约束（仅 REGD 端点有效），区分 rise/fall
+  std::optional<double> library_setup_time_rise;
+  std::optional<double> library_setup_time_fall;
+  std::optional<double> library_hold_time_rise;
+  std::optional<double> library_hold_time_fall;
+
   std::vector<GbaPath> fanouts;
 };
 

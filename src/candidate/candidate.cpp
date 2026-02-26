@@ -248,7 +248,6 @@ void STAWorker::compute_path_setup_hold(TimingPathResult &pr) const {
                  1000.0;
       pr.library_hold_time = h;
     }
-    // 其他 arc 类型（如 COMBINATIONAL 等）跳过，与原 display 内逻辑一致
   }
 }
 

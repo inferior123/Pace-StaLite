@@ -339,10 +339,10 @@ double CellLibrary::caculate_lookuptable(const LookupTable &tb, double x0,
       insert_caculate(mapped_x0, x1, x2, mapped_y0, y1, y2, T11, T12, T21, T22);
 
   // 显示插值计算的中间步骤
-  // double x01 = (mapped_x0 - x1) / (x2 - x1);
-  // double x20 = (x2 - mapped_x0) / (x2 - x1);
-  // double y01 = (mapped_y0 - y1) / (y2 - y1);
-  // double y20 = (y2 - mapped_y0) / (y2 - y1);
+  double x01 = (mapped_x0 - x1) / (x2 - x1);
+  double x20 = (x2 - mapped_x0) / (x2 - x1);
+  double y01 = (mapped_y0 - y1) / (y2 - y1);
+  double y20 = (y2 - mapped_y0) / (y2 - y1);
   // std::cout << "      Interpolation weights: x01=" << x01 << ", x20=" << x20
   //           << ", y01=" << y01 << ", y20=" << y20 << std::endl;
   // std::cout << "Calculation: " << x20 << "*" << y20 << "*" << T11 << " + "
