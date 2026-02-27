@@ -120,6 +120,37 @@ void debug_non_unate_summary(std::size_t from_pt, std::size_t to_pt,
             << " unate_slew_ns=" << unate_slew << std::endl;
 }
 
+void debug_gba_propagate_arcs(const GbaGraphy &g,
+                              const std::vector<TimingPointRef> &points) {
+  std::cerr << "[gba_arcs] total paths=" << g.paths.size()
+            << " nodes=" << g.nodes.size() << "\n";
+  for (const auto &path : g.paths) {
+    std::size_t from_pt = (path.startnode < g.nodes.size())
+                              ? g.nodes[path.startnode].pt_idx
+                              : SIZE_MAX;
+    std::size_t to_pt = (path.endnode < g.nodes.size())
+                            ? g.nodes[path.endnode].pt_idx
+                            : SIZE_MAX;
+    const char *from_inst = (from_pt < points.size() && points[from_pt].inst)
+                                ? points[from_pt].inst->instance_name.c_str()
+                                : "(null)";
+    const char *from_port = (from_pt < points.size())
+                                ? points[from_pt].port_name.c_str()
+                                : "?";
+    const char *to_inst = (to_pt < points.size() && points[to_pt].inst)
+                              ? points[to_pt].inst->instance_name.c_str()
+                              : "(null)";
+    const char *to_port =
+        (to_pt < points.size()) ? points[to_pt].port_name.c_str() : "?";
+    std::cerr << "  arc[" << path.path_idx << "] pt" << from_pt << " "
+              << from_inst << "/" << from_port << " -> pt" << to_pt << " "
+              << to_inst << "/" << to_port
+              << " input_dir=" << dir_char(path.input_dir)
+              << " dir=" << dir_char(path.dir) << " incr=" << path.incr
+              << "ps slew=" << path.slew << "ns\n";
+  }
+}
+
 void debug_gba_setup_hold_propagate(std::size_t u_pt, std::size_t v_pt,
                                     const GbaPath &path, double cand_delay,
                                     double data_trans_ns) {
@@ -657,7 +688,7 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
 void display_spefic_group(STAWorker &worker) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
-  const PathGroup group = PathGroup::REG2REG;
+  const PathGroup group = PathGroup::IN2REG;
   const AnalysisMode target_mode = AnalysisMode::MIN;
 
   if (mode != target_mode)

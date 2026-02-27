@@ -232,7 +232,16 @@ void STAWorker::build_fanouts() {
             if (it != bit_to_driver.end()) {
               pending_edges.push_back({it->second, input_pt, WIRE});
             }
-            bit_to_driver[output_canonical] = output_pt;
+            // 仅当该 net 尚无 driver，或现有 driver 也是 COMB（非 REGQ）时才覆盖。
+            // REGQ 优先级高于 COMB：若 net 已被寄存器 Q 驱动，不用组合逻辑输出覆盖，
+            // 避免形成 COMB_Y → COMB_input 的组合环（multi-driver net 中 REGQ 为真正 driver）。
+            {
+              auto existing = bit_to_driver.find(output_canonical);
+              if (existing == bit_to_driver.end() ||
+                  res.points[existing->second].type != REGQ) {
+                bit_to_driver[output_canonical] = output_pt;
+              }
+            }
           }
         }
       }
@@ -257,9 +266,14 @@ void STAWorker::build_fanouts() {
     auto it = bit_to_driver.find(pt.bit.value());
     if (it == bit_to_driver.end() || it->second == pt.id)
       continue;
-    std::size_t driver_pt = it->second;
-    if (!pending_has(driver_pt, pt.id))
-      pending_edges.push_back({driver_pt, pt.id, WIRE});
+    std::size_t driver_pt_id = it->second;
+    const TimingPointRef &driver = res.points[driver_pt_id];
+    // 跳过同一 cell 内部的输出→输入反馈边（组合环），
+    // 例如 MUX 的 Y 输出 net 连接到同一 cell 的 B 输入。
+    if (driver.inst != nullptr && driver.inst == pt.inst)
+      continue;
+    if (!pending_has(driver_pt_id, pt.id))
+      pending_edges.push_back({driver_pt_id, pt.id, WIRE});
   }
 
   for (auto &instance : instances) {

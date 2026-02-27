@@ -107,7 +107,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
   // 2) 枚举 Testing/ics55_pba 目录下所有 .v 文件
   std::vector<fs::path> verilog_files;
   const fs::path root_dir =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/all";
+      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55_gba";
   for (auto &entry : fs::recursive_directory_iterator(root_dir)) {
     if (!entry.is_regular_file())
       continue;
@@ -121,8 +121,8 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
     return;
   }
 
-  // std::string dir_prefix = (run_pba) ? "pba" : "gba";
-  std::string dir_prefix = "all";
+  std::string dir_prefix = (run_pba) ? "pba" : "gba";
+  // std::string dir_prefix = "all";
 
   // 3) 对每个 verilog 设计分别跑 DFS 和 PBA，两套 worker 互不干扰
   for (const auto &vpath : verilog_files) {

@@ -65,9 +65,9 @@ std::vector<segment_res> segment_delays_slews_gba(const TimingRunResult &res,
                    arc.timing_type == celllib::TimingType::FALLING_EDGE);
     if ((!is_combinational && !is_c2q) || arc.related_pin != related_pin)
       continue;
-
-    TransitionDirection dir_tmp =
-        speculate_transition_direction(is_clock_to_q, arc, cur_dir);
+    
+    TransitionDirection dir_tmp = (is_c2q) ? TransitionDirection::UNKNOWN : 
+          speculate_transition_direction(is_clock_to_q, arc, cur_dir);
 
     double rise_cap = to_ref.rise_cap;
     double fall_cap = to_ref.fall_cap;
