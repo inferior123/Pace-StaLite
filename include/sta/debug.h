@@ -44,8 +44,14 @@ void debug_non_unate_summary(std::size_t from_pt, std::size_t to_pt,
                              bool has_unate, double best_delay, double best_slew,
                              double unate_delay, double unate_slew);
 
+/// GBA run_gba_propagate 每条 path 详细信息调试输出，置 true 启用
+inline constexpr bool kDebugGbaPropPath = false;
+/// 只对指定 u_pt 打印，取 static_cast<std::size_t>(-1) 表示全部
+inline constexpr std::size_t kDebugGbaPropPathFilterPt =
+    static_cast<std::size_t>(-1);
+
 /// GBA setup/hold 调试输出，置 true 启用
-inline constexpr bool kDebugGbaSetupHold = true;
+inline constexpr bool kDebugGbaSetupHold = false;
 /// 只对指定 endpoint pt 打印，取 static_cast<std::size_t>(-1) 表示全部
 inline constexpr std::size_t kDebugGbaSetupHoldFilterPt = 20;
 

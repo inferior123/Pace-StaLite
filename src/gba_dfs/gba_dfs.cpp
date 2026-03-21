@@ -16,6 +16,7 @@ void STAWorker::build_gba_graphy() {
   gba_graphy_.paths.clear();
   gba_graphy_.pt_to_node.clear();
   gba_graphy_.end_node.clear();
+  gba_graphy_.topo_order.clear();
 
   const std::size_t point_count = res.points.size();
   std::cerr << "[gba] build_gba_graphy: points=" << point_count
@@ -84,8 +85,9 @@ void STAWorker::build_gba_graphy() {
     }
   }
 
-  // 2. Kahn 拓扑排序，得到 point 层面的 topo 序列
-  std::vector<std::size_t> topo;
+  // 2. Kahn 拓扑排序，得到 point 层面的 topo 序列，并缓存到 gba_graphy_.topo_order
+  std::vector<std::size_t> &topo = gba_graphy_.topo_order;
+  topo.clear();
   topo.reserve(point_count);
   std::vector<std::size_t> queue;
   queue.reserve(point_count);
@@ -106,6 +108,95 @@ void STAWorker::build_gba_graphy() {
       }
     }
   }
+
+  // 检测环：若有节点未进入 topo，说明图中存在环。
+  // 处理策略：
+  //   1. 先做一次完整 topo，收集所有仍在环中（indeg > 0）的节点，打印环结构
+  //   2. 在环中节点之间找一条 WIRE 边删除
+  //   3. 重新做 topo，重复直到无环
+  //   4. 若环中无 WIRE 边可删，强制追加到 topo 末尾
+  auto retopo = [&]() {
+    std::fill(indeg.begin(), indeg.end(), 0);
+    for (const auto &pt : res.points)
+      for (const auto &e : pt.fanouts)
+        if (e.target_point < point_count)
+          indeg[e.target_point]++;
+    topo.clear();
+    queue.clear();
+    for (std::size_t i = 0; i < point_count; ++i)
+      if (indeg[i] == 0)
+        queue.push_back(i);
+    for (std::size_t head = 0; head < queue.size(); ++head) {
+      std::size_t u_pt = queue[head];
+      topo.push_back(u_pt);
+      for (const auto &e : res.points[u_pt].fanouts)
+        if (e.target_point < point_count && --indeg[e.target_point] == 0)
+          queue.push_back(e.target_point);
+    }
+  };
+
+  auto break_cycles = [&]() {
+    while (topo.size() < point_count) {
+      // 1. 收集环中节点（indeg > 0），打印完整环结构
+      std::unordered_set<std::size_t> in_cycle;
+      for (std::size_t i = 0; i < point_count; ++i)
+        if (indeg[i] > 0)
+          in_cycle.insert(i);
+
+      std::cerr << "[GBA] WARNING: combinational loop detected! "
+                << in_cycle.size() << " node(s) involved"
+                << " (total=" << point_count << ", reached=" << topo.size() << ")\n";
+      for (std::size_t u : in_cycle) {
+        const auto &fp = res.points[u];
+        std::cerr << "  [GBA] cycle node: pt" << u << "("
+                  << (fp.inst ? fp.inst->instance_name : "(port)")
+                  << "/" << fp.port_name << ") edges-in-cycle:";
+        for (const auto &e : fp.fanouts)
+          if (in_cycle.count(e.target_point)) {
+            const auto &tp = res.points[e.target_point];
+            std::cerr << " ->pt" << e.target_point << "("
+                      << (tp.inst ? tp.inst->instance_name : "(port)")
+                      << "/" << tp.port_name << ","
+                      << (e.type == WIRE ? "WIRE" : "COMB") << ")";
+          }
+        std::cerr << "\n";
+      }
+
+      // 2. 找环中第一条 WIRE 边删除
+      bool removed = false;
+      for (std::size_t u : in_cycle) {
+        auto &fanouts = res.points[u].fanouts;
+        for (auto it = fanouts.begin(); it != fanouts.end(); ++it) {
+          if (it->type == WIRE && in_cycle.count(it->target_point)) {
+            const auto &fp = res.points[u];
+            const auto &tp = res.points[it->target_point];
+            std::cerr << "  [GBA] break cycle: remove WIRE pt" << u << "("
+                      << (fp.inst ? fp.inst->instance_name : "(port)")
+                      << "/" << fp.port_name << ") -> pt" << it->target_point
+                      << "(" << (tp.inst ? tp.inst->instance_name : "(port)")
+                      << "/" << tp.port_name << ")\n";
+            fanouts.erase(it);
+            removed = true;
+            break;
+          }
+        }
+        if (removed) break;
+      }
+
+      if (!removed) {
+        // 环中无 WIRE 边（全是 COMB_ARC），无法打断，强制追加
+        std::cerr << "[GBA] WARNING: no WIRE edge to break, "
+                     "forcing remaining nodes into topo\n";
+        for (std::size_t i : in_cycle)
+          topo.push_back(i);
+        break;
+      }
+
+      // 3. 重新 topo，检查是否还有环
+      retopo();
+    }
+  };
+  break_cycles();
 
   // 3. 初始化起点（input + clock）：从这些点开始做 GBA 传播，slew/delay 先全部计算完
   for (std::size_t pt_idx : input_clk_point_ids) {
@@ -274,37 +365,8 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
 
   assert(cell_library_);
 
-  // 1. 重新计算 point 图的拓扑顺序（与 build_gba_graphy 中一致）
-  std::vector<std::size_t> indeg(point_count, 0);
-  for (const auto &pt : res.points) {
-    for (const auto &e : pt.fanouts) {
-      if (e.target_point < point_count) {
-        indeg[e.target_point]++;
-      }
-    }
-  }
-
-  std::vector<std::size_t> topo;
-  topo.reserve(point_count);
-  std::vector<std::size_t> queue;
-  queue.reserve(point_count);
-
-  for (std::size_t i = 0; i < point_count; ++i) {
-    if (indeg[i] == 0) {
-      queue.push_back(i);
-    }
-  }
-
-  for (std::size_t head = 0; head < queue.size(); ++head) {
-    std::size_t u_pt = queue[head];
-    topo.push_back(u_pt);
-    const auto &pt = res.points[u_pt];
-    for (const auto &e : pt.fanouts) {
-      if (e.target_point < point_count && --indeg[e.target_point] == 0) {
-        queue.push_back(e.target_point);
-      }
-    }
-  }
+  // 1. 直接复用 build_gba_graphy() 中已缓存的拓扑排序
+  const std::vector<std::size_t> &topo = gba_graphy_.topo_order;
 
   // 2. 初始化起点：根据 pt_type 只选择 CLK_PIN 或 INPUT
   for (std::size_t pt_idx : input_clk_point_ids) {
@@ -343,6 +405,22 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
     if (!has_rise && !has_fall)
       continue;
 
+    if constexpr (kDebugGbaPropPath) {  // NOLINT
+      const std::size_t filter = kDebugGbaPropPathFilterPt;
+      if (filter == static_cast<std::size_t>(-1) || u_pt == filter) {
+        const auto &u_ref = res.points[u_pt];
+        std::cerr << "[prop] u_pt=" << u_pt
+                  << " (" << (u_ref.inst ? u_ref.inst->instance_name : "(port)")
+                  << "/" << u_ref.port_name << ")"
+                  << " delay_rise=" << u_node.delay_rise << "ps"
+                  << " delay_fall=" << u_node.delay_fall << "ps"
+                  << " slew_rise_max=" << u_node.slew_rise << "ns"
+                  << " slew_rise_min=" << u_node.slew_fall << "ns"
+                  << " load_cap=" << u_ref.load_cap << "pF"
+                  << " fanouts=" << u_node.fanouts.size() << "\n";
+      }
+    }
+
     // 遍历 u 的 fanouts（来自 build_gba_graphy），按 path 选择并更新 v 的 delay/prev
     for (const GbaPath &path : u_node.fanouts) {
       std::size_t v_node_id = path.endnode;
@@ -358,6 +436,30 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
         continue;
 
       double cand_delay = base_delay + path.incr;
+
+      if constexpr (kDebugGbaPropPath) {  // NOLINT
+        const std::size_t filter = kDebugGbaPropPathFilterPt;
+        if (filter == static_cast<std::size_t>(-1) || u_pt == filter) {
+          std::size_t v_pt = v_node.pt_idx;
+          const auto &v_ref = res.points[v_pt];
+          const char *idir = path.input_dir == TransitionDirection::RISING ? "R" : "F";
+          const char *odir = path.dir == TransitionDirection::RISING ? "R" : "F";
+          std::cerr << "  -> v_pt=" << v_pt
+                    << " (" << (v_ref.inst ? v_ref.inst->instance_name : "(port)")
+                    << "/" << v_ref.port_name << ")"
+                    << " [" << idir << "->" << odir << "]"
+                    << " incr=" << path.incr << "ps"
+                    << " slew=" << path.slew << "ns"
+                    << " v.load_cap=" << v_ref.load_cap << "pF"
+                    << " v.rise_cap=" << v_ref.rise_cap << "pF"
+                    << " v.fall_cap=" << v_ref.fall_cap << "pF"
+                    << " base=" << base_delay << "ps"
+                    << " cand=" << cand_delay << "ps"
+                    << " v.delay_rise=" << v_node.delay_rise << "ps"
+                    << " v.delay_fall=" << v_node.delay_fall << "ps"
+                    << "\n";
+        }
+      }
 
       if (path.dir == TransitionDirection::RISING) {
         if ((use_max && cand_delay > v_node.delay_rise) ||
@@ -376,6 +478,30 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
       }
     }
   }
+}
+
+void STAWorker::compute_setup_hold_gba(TimingPathResult &pr) {
+  if (pr.steps.empty())
+    return;
+
+  // 起点 slew 单位为 ps（step.slew 存储单位），转换为 ns 供 recalc 函数使用
+  double cur_slew_ns = pr.steps.front().slew / 1000.0;
+
+  // 逐级用 max/min cap 重算输出 slew，链式传递，不修改 pr.steps 中的值
+  for (const auto &s : pr.steps) {
+    cur_slew_ns = recalc_slew_with_max_cap(
+        res, cell_library_, analysis_mode,
+        s.start_point, s.end_point,
+        cur_slew_ns, s.dir);
+  }
+
+  // 用重算后的末步 slew 构造临时路径，仅借用 compute_path_setup_hold 计算约束
+  TimingPathResult tmp = pr;
+  tmp.steps.back().slew = cur_slew_ns * 1000.0; // ns -> ps
+  compute_path_setup_hold(tmp);
+
+  pr.library_setup_time = tmp.library_setup_time;
+  pr.library_hold_time  = tmp.library_hold_time;
 }
 
 // 从 end_node 回溯构造 TimingPathResult，rise 和 fall 各回溯一条，并计算 setup/hold

@@ -218,6 +218,11 @@ struct TimingPointRef {
   double rise_cap = 0.0;
   double fall_cap = 0.0;
 
+  double fall_max_cap = 0.0;
+  double fall_min_cap = 0.0;
+  double rise_max_cap = 0.0;
+  double rise_min_cap = 0.0;
+
   PointType type;
   std::vector<TimingEdge> fanouts;
 };
@@ -364,6 +369,9 @@ struct GbaGraphy {
 
   std::unordered_map<size_t, size_t> pt_to_node;
   std::vector<size_t> end_node;
+
+  // 缓存 point 层面的拓扑排序结果，由 build_gba_graphy() 填充，run_gba_propagate() 复用
+  std::vector<std::size_t> topo_order;
 };
 
 // ============================================================================
@@ -736,6 +744,10 @@ private:
   /// library_hold_time
   void compute_path_setup_hold(TimingPathResult &pr) const;
 
+  /// GBA 专用：沿路径用 max/min cap 逐级重算 slew，仅更新 pr 的
+  /// library_setup_time / library_hold_time，不修改路径中间的 slew 值
+  void compute_setup_hold_gba(TimingPathResult &pr);
+
   std::vector<PathEntry> *get_sorted_entries(PathGroup group_type,
                                              AnalysisMode mode);
 
@@ -822,6 +834,13 @@ std::vector<segment_res> segment_delays_slews_gba(const TimingRunResult &res,
                         AnalysisMode mode, std::size_t from_pt,
                         std::size_t to_pt, double prev_slew,
                         TransitionDirection cur_dir);
+
+// 使用该方向的 max/min cap load 重算单步输出 slew（ns），用于 GBA setup/hold 计算
+double recalc_slew_with_max_cap(const TimingRunResult &res,
+                                const celllib::CellLibrary *cell_library_,
+                                AnalysisMode mode, std::size_t from_pt,
+                                std::size_t to_pt, double prev_slew,
+                                TransitionDirection out_dir);
 }
 
 void run_pba_analysis(sta::STAWorker &worker);

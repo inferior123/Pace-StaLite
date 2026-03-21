@@ -400,6 +400,26 @@ void STAWorker::caculate_load_cap() {
           else if (input_pin->capacitance.has_value())
             pt.fall_cap += input_pin->capacitance.value();
         }
+
+        if (input_pin->rise_capacitance_max.has_value())
+          pt.rise_max_cap += input_pin->rise_capacitance_max.value();
+        else if (input_pin->capacitance.has_value())
+          pt.rise_max_cap += input_pin->capacitance.value();
+
+        if (input_pin->rise_capacitance_min.has_value())
+          pt.rise_min_cap += input_pin->rise_capacitance_min.value();
+        else if (input_pin->capacitance.has_value())
+          pt.rise_min_cap += input_pin->capacitance.value();
+
+        if (input_pin->fall_capacitance_max.has_value())
+          pt.fall_max_cap += input_pin->fall_capacitance_max.value();
+        else if (input_pin->capacitance.has_value())
+          pt.fall_max_cap += input_pin->capacitance.value();
+
+        if (input_pin->fall_capacitance_min.has_value())
+          pt.fall_min_cap += input_pin->fall_capacitance_min.value();
+        else if (input_pin->capacitance.has_value())
+          pt.fall_min_cap += input_pin->capacitance.value();
       }
     }
     for (const TimingEdge &e : pt.fanouts) {

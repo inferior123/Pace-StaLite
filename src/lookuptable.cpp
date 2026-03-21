@@ -4,6 +4,47 @@
 // Liberty LUT 返回 ns，STA 内部统一用 ps
 static constexpr double NS_TO_PS = 1000.0;
 
+// 将 cap clamp 到 LUT 中 total_output_net_capacitance 轴的最大值。
+// var1/var2 指明哪个轴是 cap 轴；LUT 自身的 index 优先于 template 的 index。
+static double clamp_cap_to_lut_max(const celllib::LookupTable &lut,
+                                   const celllib::CellLibrary *lib,
+                                   const std::string &var1,
+                                   const std::string &var2,
+                                   double cap) {
+  static const std::string CAP_VAR = "total_output_net_capacitance";
+  // 确定 cap 对应哪个轴（index_1 or index_2）
+  bool cap_is_index2 = (var2 == CAP_VAR);
+  bool cap_is_index1 = (var1 == CAP_VAR);
+  if (!cap_is_index1 && !cap_is_index2)
+    return cap;  // 该表无 cap 轴，不 clamp
+
+  // 取 LUT 自身 index 优先，否则用 template 的 index
+  const std::vector<double> *indices = nullptr;
+  if (cap_is_index2) {
+    if (!lut.index_2.empty()) {
+      indices = &lut.index_2;
+    } else if (lib) {
+      const auto *templ = lib->get_table_template(lut.template_name.value_or(""));
+      if (templ && !templ->index_2.empty())
+        indices = &templ->index_2;
+    }
+  } else {
+    if (!lut.index_1.empty()) {
+      indices = &lut.index_1;
+    } else if (lib) {
+      const auto *templ = lib->get_table_template(lut.template_name.value_or(""));
+      if (templ && !templ->index_1.empty())
+        indices = &templ->index_1;
+    }
+  }
+
+  if (!indices || indices->empty())
+    return cap;
+
+  double max_cap = indices->back();
+  return (cap > max_cap) ? max_cap : cap;
+}
+
 double get_lut_avg(std::optional<celllib::LookupTable> lut) {
   if (lut.has_value() && !lut->index_1.empty()) {
     size_t mid = lut->index_1.size() / 2;

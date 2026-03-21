@@ -72,31 +72,24 @@ std::vector<segment_res> segment_delays_slews_gba(const TimingRunResult &res,
     double rise_cap = to_ref.rise_cap;
     double fall_cap = to_ref.fall_cap;
 
-    double delay_tmp = 0.0;
-    double slew_tmp = 0.0;
+    auto push_rise = [&](double cap) {
+      double delay = caculate_delay_rise(arc, cell_library_, prev_slew, cap);
+      double slew = caculate_transition_rise(arc, cell_library_, prev_slew, cap) / 1000;
+      seg_res.push_back({slew, delay, TransitionDirection::RISING});
+    };
+    auto push_fall = [&](double cap) {
+      double delay = caculate_delay_fall(arc, cell_library_, prev_slew, cap);
+      double slew = caculate_transition_fall(arc, cell_library_, prev_slew, cap) / 1000;
+      seg_res.push_back({slew, delay, TransitionDirection::FALLING});
+    };
+
     if (dir_tmp == TransitionDirection::RISING) {
-      delay_tmp = caculate_delay_rise(arc, cell_library_, prev_slew, rise_cap);
-      slew_tmp =
-          caculate_transition_rise(arc, cell_library_, prev_slew, rise_cap) /
-          1000;
-      seg_res.push_back({slew_tmp, delay_tmp, dir_tmp});
+      push_rise(rise_cap);
     } else if (dir_tmp == TransitionDirection::FALLING) {
-      delay_tmp = caculate_delay_fall(arc, cell_library_, prev_slew, fall_cap);
-      slew_tmp =
-          caculate_transition_fall(arc, cell_library_, prev_slew, fall_cap) /
-          1000;
-      seg_res.push_back({slew_tmp, delay_tmp, dir_tmp});
+      push_fall(fall_cap);
     } else {
-      delay_tmp = caculate_delay_rise(arc, cell_library_, prev_slew, rise_cap);
-      slew_tmp =
-          caculate_transition_rise(arc, cell_library_, prev_slew, rise_cap) /
-          1000;
-      seg_res.push_back({slew_tmp, delay_tmp, TransitionDirection::RISING});
-      delay_tmp = caculate_delay_fall(arc, cell_library_, prev_slew, fall_cap);
-      slew_tmp =
-          caculate_transition_fall(arc, cell_library_, prev_slew, fall_cap) /
-          1000;
-      seg_res.push_back({slew_tmp, delay_tmp, TransitionDirection::FALLING});
+      push_rise(rise_cap);
+      push_fall(fall_cap);
     }
   }
   return seg_res;
@@ -186,6 +179,77 @@ std::vector<segment_res> segment_delays_slews(const TimingRunResult &res,
     seg_res.push_back({slew_tmp, delay_tmp, dir_tmp});
   }
   return seg_res;
+}
+
+// 沿路径单步重算 slew：使用该方向的 max/min cap load（rise_max_cap / fall_max_cap
+// 或 rise_min_cap / fall_min_cap）代替普通 cap，以便 GBA 路径 setup/hold 计算
+// 得到更保守的 slew 估计。
+// 返回重算后的输出 slew（单位 ns）；若该步为 WIRE 或找不到 arc，则透传 prev_slew。
+double recalc_slew_with_max_cap(const TimingRunResult &res,
+                                const celllib::CellLibrary *cell_library_,
+                                AnalysisMode mode, std::size_t from_pt,
+                                std::size_t to_pt, double prev_slew,
+                                TransitionDirection out_dir) {
+  if (from_pt >= res.points.size() || to_pt >= res.points.size())
+    return prev_slew;
+  const TimingPointRef &from_ref = res.points[from_pt];
+  const TimingPointRef &to_ref   = res.points[to_pt];
+
+  const TimingEdge *edge = nullptr;
+  for (const auto &e : from_ref.fanouts) {
+    if (e.target_point == to_pt) { edge = &e; break; }
+  }
+  if (!edge || edge->type == WIRE)
+    return prev_slew;
+
+  Instance *inst = to_ref.inst;
+  if (!inst || !cell_library_)
+    return prev_slew;
+  const auto *cell = cell_library_->get_cell(inst->module_name);
+  if (!cell)
+    return prev_slew;
+  const auto *output_pin = cell->get_pin(to_ref.port_name);
+  if (!output_pin)
+    return prev_slew;
+
+  std::string related_pin = from_ref.port_name;
+  if (edge->type == SEQ_ARC && cell->ff.has_value() &&
+      cell->ff->clocked_on.has_value())
+    related_pin = cell->ff->clocked_on.value();
+
+  double cap = 0.0;
+  if (out_dir == TransitionDirection::RISING)
+    cap = to_ref.rise_max_cap;
+  else
+    cap = to_ref.fall_max_cap;
+
+  const bool use_max = (mode == AnalysisMode::MAX);
+  double best_slew = use_max ? -std::numeric_limits<double>::infinity()
+                             :  std::numeric_limits<double>::infinity();
+  bool found = false;
+
+  for (const auto &arc : output_pin->timing_arcs) {
+    bool is_combinational = (arc.timing_type == celllib::TimingType::COMBINATIONAL);
+    bool is_c2q = (arc.timing_type == celllib::TimingType::RISING_EDGE ||
+                   arc.timing_type == celllib::TimingType::FALLING_EDGE);
+    if ((!is_combinational && !is_c2q) || arc.related_pin != related_pin)
+      continue;
+
+    double slew_tmp = 0.0;
+    if (out_dir == TransitionDirection::RISING)
+      slew_tmp = caculate_transition_rise(arc, cell_library_, prev_slew, cap) / 1000.0;
+    else if(out_dir == TransitionDirection::FALLING)
+      slew_tmp = caculate_transition_fall(arc, cell_library_, prev_slew, cap) / 1000.0;
+    else
+      assert(false && "meet a unknow path");
+
+    if (!found || (use_max ? slew_tmp > best_slew : slew_tmp < best_slew)) {
+      best_slew = slew_tmp;
+      found = true;
+    }
+  }
+
+  return found ? best_slew : prev_slew;
 }
 
 void segment_delay_slew(const TimingRunResult &res,

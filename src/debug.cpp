@@ -688,7 +688,7 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
 void display_spefic_group(STAWorker &worker) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
-  const PathGroup group = PathGroup::IN2REG;
+  const PathGroup group = PathGroup::REG2REG;
   const AnalysisMode target_mode = AnalysisMode::MIN;
 
   if (mode != target_mode)
