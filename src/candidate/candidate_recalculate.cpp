@@ -66,7 +66,7 @@ static TransitionDirection derive_input_dir(const TimingRunResult &res,
   return output_dir;
 }
 
-void STAWorker::recaculate_in2out() {
+void STAWorker::recalculate_in2out() {
   for (auto &path : res.paths) {
     if (path.group != PathGroup::IN2OUT)
       continue;
@@ -152,9 +152,9 @@ get_slews_and_delays(const TimingRunResult &res,
   return {slews, delays};
 }
 
-TimingPathResult recaculate_one_path(const STAWorker &worker, const TimingPathResult &path,
+TimingPathResult recalculate_one_path(const STAWorker &worker, const TimingPathResult &path,
                                     AnalysisMode mode, size_t path_idx_for_dbg) {
-  struct recaculate_frame {
+  struct recalculate_frame {
     std::vector<double> slews;
     double delay;
     double incr;
@@ -180,20 +180,20 @@ TimingPathResult recaculate_one_path(const STAWorker &worker, const TimingPathRe
   double best_delay = (mode == AnalysisMode::MAX ? -std::numeric_limits<double>::infinity()
                                               : std::numeric_limits<double>::infinity());
 
-  std::vector<recaculate_frame> stack;
+  std::vector<recalculate_frame> stack;
   stack.push_back({{init_slew}, 0.0, 0});
   size_t cur_step_idx = 0;
   size_t iter_count = 0;
 
   if (dbg) {
-    std::cerr << "[recac_dbg] path " << path_idx_for_dbg << " steps=" << path.steps.size()
+    std::cerr << "[recalc] path " << path_idx_for_dbg << " steps=" << path.steps.size()
               << " start\n";
   }
 
   while (true) {
     iter_count++;
     if (dbg && dbg_interval > 0 && iter_count % dbg_interval == 0) {
-      std::cerr << "[recac_dbg] path " << path_idx_for_dbg << " iter=" << iter_count
+      std::cerr << "[recalc] path " << path_idx_for_dbg << " iter=" << iter_count
                 << " cur_step=" << cur_step_idx << "/" << path.steps.size()
                 << " stack_sz=" << stack.size() << " "
                 << (cur_step_idx >= path.steps.size() ? "BT" : "FWD") << "\n";
@@ -217,7 +217,7 @@ TimingPathResult recaculate_one_path(const STAWorker &worker, const TimingPathRe
       if (stack.empty())
         break;
       cur_step_idx--;
-      recaculate_frame &prev_top = stack.back();
+      recalculate_frame &prev_top = stack.back();
       if (prev_top.cur_ + 1 < prev_top.slews.size()) {
         prev_top.cur_++;
       } else {
@@ -233,7 +233,7 @@ TimingPathResult recaculate_one_path(const STAWorker &worker, const TimingPathRe
       continue;
     }
 
-    recaculate_frame &top = stack.back();
+    recalculate_frame &top = stack.back();
     const TimingStep &step = path.steps[cur_step_idx];
     double prev_slew = top.slews[top.cur_];
     double prev_delay = top.delay;
@@ -271,33 +271,33 @@ TimingPathResult recaculate_one_path(const STAWorker &worker, const TimingPathRe
   }
 
   if (dbg) {
-    std::cerr << "[recac_dbg] path " << path_idx_for_dbg << " done iters=" << iter_count
+    std::cerr << "[recalc] path " << path_idx_for_dbg << " done iters=" << iter_count
               << "\n";
   }
   // 循环结束以后根据 mode 判断应该取哪个值
   return best;
 }
 
-void general_recaculate(STAWorker &worker,
+void general_recalculate(STAWorker &worker,
                         std::vector<TimingPathResult> &paths) {
   const size_t total = paths.size();
   if (total == 0)
     return;
   for (size_t i = 0; i < total; i++) {
     paths[i] =
-        recaculate_one_path(worker, paths[i], worker.get_analysis_mode(), i);
+        recalculate_one_path(worker, paths[i], worker.get_analysis_mode(), i);
     if ((i + 1) % 25 == 0 || i + 1 == total) {
       int pct = static_cast<int>(100 * (i + 1) / total);
-      std::cerr << "\r  [recaculate] " << (i + 1) << "/" << total << " (" << pct
+      std::cerr << "\r  [recalculate] " << (i + 1) << "/" << total << " (" << pct
                 << "%)" << std::flush;
     }
   }
-  std::cerr << "\r  [recaculate] " << total << "/" << total << " (100%)\n";
+  std::cerr << "\r  [recalculate] " << total << "/" << total << " (100%)\n";
 }
 
-void STAWorker::candidate_recaculate() {
-    // recaculate_in2out();
-    general_recaculate(*this, res.paths);
+void STAWorker::candidate_recalculate() {
+    // recalculate_in2out();
+    general_recalculate(*this, res.paths);
 }
 
 }

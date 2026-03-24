@@ -135,14 +135,14 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
     double slew_tmp = 0.0;
     if (output_dir == TransitionDirection::RISING) {
       delay_tmp =
-          caculate_delay_rise(arc, cell_library_, input_slew_ns, load_cap);
-      slew_tmp = caculate_transition_rise(arc, cell_library_, input_slew_ns,
+          calculate_delay_rise(arc, cell_library_, input_slew_ns, load_cap);
+      slew_tmp = calculate_transition_rise(arc, cell_library_, input_slew_ns,
                                           load_cap) /
                  1000;
     } else {
       delay_tmp =
-          caculate_delay_fall(arc, cell_library_, input_slew_ns, load_cap);
-      slew_tmp = caculate_transition_fall(arc, cell_library_, input_slew_ns,
+          calculate_delay_fall(arc, cell_library_, input_slew_ns, load_cap);
+      slew_tmp = calculate_transition_fall(arc, cell_library_, input_slew_ns,
                                           load_cap) /
                  1000;
     }
@@ -232,18 +232,18 @@ void STAWorker::compute_path_setup_hold(TimingPathResult &pr) const {
     if (arc.timing_type == TT::SETUP_RISING ||
         arc.timing_type == TT::SETUP_FALLING) {
       double s = (st.dir == TransitionDirection::RISING
-                      ? caculate_setup_rise(arc, cell_library_, data_trans_ns,
+                      ? calculate_setup_rise(arc, cell_library_, data_trans_ns,
                                             clk_trans)
-                      : caculate_setup_fall(arc, cell_library_, data_trans_ns,
+                      : calculate_setup_fall(arc, cell_library_, data_trans_ns,
                                             clk_trans)) *
                  1000.0;
       pr.library_setup_time = s;
     } else if (arc.timing_type == TT::HOLD_RISING ||
                arc.timing_type == TT::HOLD_FALLING) {
       double h = (st.dir == TransitionDirection::RISING
-                      ? caculate_hold_rise(arc, cell_library_, data_trans_ns,
+                      ? calculate_hold_rise(arc, cell_library_, data_trans_ns,
                                            clk_trans)
-                      : caculate_hold_fall(arc, cell_library_, data_trans_ns,
+                      : calculate_hold_fall(arc, cell_library_, data_trans_ns,
                                            clk_trans)) *
                  1000.0;
       pr.library_hold_time = h;
@@ -412,10 +412,10 @@ void run_pba_analysis(sta::STAWorker &worker) {
   worker.build_fanouts();
 
   std::cout << "  [PBA-MAX] Step 2: calculate_load_capacitance()...\n";
-  worker.caculate_load_cap();
+  worker.calculate_load_cap();
   std::cout << "  [PBA-MAX] Step 3: build_candidate_graphy()...\n";
   worker.build_candidate_graphy_dfs();
   worker.run_candidate_graphy_dfs();
 
-  worker.candidate_recaculate();
+  worker.candidate_recalculate();
 }

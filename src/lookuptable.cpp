@@ -57,7 +57,7 @@ double get_lut_avg(std::optional<celllib::LookupTable> lut) {
 }
 
 // 调试打印：给定具体的 LUT 表（而不是整条 arc），输出索引与所有表值，
-// 供 caculate_transition_* / caculate_setup_* 等调用处查看。
+// 供 calculate_transition_* / calculate_setup_* 等调用处查看。
 static void debug_print_tb(const celllib::LookupTable &tb,
                            const std::string &template_name,
                            const std::string &var1, const std::string &var2) {
@@ -101,7 +101,7 @@ const celllib::TimingArc *find_default_arc(celllib::Pin &pin,
   return nullptr;
 }
 
-double caculate_delay_rise(const celllib::TimingArc arc,
+double calculate_delay_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib,
                            double input_slew_rise, double load_cap) {
   // 计算cell_rise延迟（使用rise的slew）
@@ -116,7 +116,7 @@ double caculate_delay_rise(const celllib::TimingArc arc,
 
       // debug_print_tb(*arc.cell_rise, template_name, var1, var2);
 
-      delay_rise = lib->caculate_lookuptable(
+      delay_rise = lib->calculate_lookuptable(
           arc.cell_rise.value(), input_slew_rise, load_cap, var1, var2);
       delay_rise *= NS_TO_PS; // Liberty ns -> ps
     }
@@ -128,7 +128,7 @@ double caculate_delay_rise(const celllib::TimingArc arc,
   return delay_rise;
 }
 
-double caculate_delay_fall(const celllib::TimingArc arc,
+double calculate_delay_fall(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib,
                            double input_slew_fall, double load_cap) {
   double delay_fall = 0.0;
@@ -143,7 +143,7 @@ double caculate_delay_fall(const celllib::TimingArc arc,
 
       // debug_print_tb(*arc.cell_fall, template_name, var1, var2);
 
-      delay_fall = lib->caculate_lookuptable(
+      delay_fall = lib->calculate_lookuptable(
           arc.cell_fall.value(), input_slew_fall, load_cap, var1, var2);
       delay_fall *= NS_TO_PS; // Liberty ns -> ps
     }
@@ -154,7 +154,7 @@ double caculate_delay_fall(const celllib::TimingArc arc,
   return delay_fall;
 }
 
-double caculate_transition_rise(const celllib::TimingArc arc,
+double calculate_transition_rise(const celllib::TimingArc arc,
                                 const celllib::CellLibrary *lib,
                                 double input_slew_rise, double load_cap) {
   double rise_transition_time = 0.0;
@@ -170,7 +170,7 @@ double caculate_transition_rise(const celllib::TimingArc arc,
       // 调试：打印当前 rise_transition 的 LUT 完整表
       // debug_print_tb(*arc.rise_transition, template_name, var1, var2);
 
-      rise_transition_time = lib->caculate_lookuptable(
+      rise_transition_time = lib->calculate_lookuptable(
           arc.rise_transition.value(), input_slew_rise, load_cap, var1, var2);
       rise_transition_time *= NS_TO_PS; // Liberty ns -> ps
     }
@@ -179,7 +179,7 @@ double caculate_transition_rise(const celllib::TimingArc arc,
   return rise_transition_time;
 }
 
-double caculate_transition_fall(const celllib::TimingArc arc,
+double calculate_transition_fall(const celllib::TimingArc arc,
                                 const celllib::CellLibrary *lib,
                                 double input_slew_fall, double load_cap) {
   double fall_transition_time = 0.0;
@@ -194,7 +194,7 @@ double caculate_transition_fall(const celllib::TimingArc arc,
 
       // debug_print_tb(*arc.fall_transition, template_name, var1, var2);
 
-      fall_transition_time = lib->caculate_lookuptable(
+      fall_transition_time = lib->calculate_lookuptable(
           arc.fall_transition.value(), input_slew_fall, load_cap, var1, var2);
       fall_transition_time *= NS_TO_PS; // Liberty ns -> ps
     }
@@ -204,7 +204,7 @@ double caculate_transition_fall(const celllib::TimingArc arc,
 }
 
 // 计算 setup_rise / setup_fall 约束（单位：ns，供 LUT 使用）
-double caculate_setup_rise(const celllib::TimingArc arc,
+double calculate_setup_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib, double data_trans,
                            double clk_trans) {
   double setup_rise = 0.0;
@@ -216,14 +216,14 @@ double caculate_setup_rise(const celllib::TimingArc arc,
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
 
-      setup_rise = lib->caculate_lookuptable(arc.rise_constraint.value(),
+      setup_rise = lib->calculate_lookuptable(arc.rise_constraint.value(),
                                              data_trans, clk_trans, var1, var2);
     }
   }
   return setup_rise;
 }
 
-double caculate_setup_fall(const celllib::TimingArc arc,
+double calculate_setup_fall(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib, double data_trans,
                            double clk_trans) {
   double setup_fall = 0.0;
@@ -234,14 +234,14 @@ double caculate_setup_fall(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
-      setup_fall = lib->caculate_lookuptable(arc.fall_constraint.value(),
+      setup_fall = lib->calculate_lookuptable(arc.fall_constraint.value(),
                                              data_trans, clk_trans, var1, var2);
     }
   }
   return setup_fall;
 }
 
-double caculate_hold_rise(const celllib::TimingArc arc,
+double calculate_hold_rise(const celllib::TimingArc arc,
                           const celllib::CellLibrary *lib, double data_trans,
                           double clk_trans) {
   double hold_rise = 0.0;
@@ -252,14 +252,14 @@ double caculate_hold_rise(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
-      hold_rise = lib->caculate_lookuptable(arc.rise_constraint.value(),
+      hold_rise = lib->calculate_lookuptable(arc.rise_constraint.value(),
                                             data_trans, clk_trans, var1, var2);
     }
   }
   return hold_rise;
 }
 
-double caculate_hold_fall(const celllib::TimingArc arc,
+double calculate_hold_fall(const celllib::TimingArc arc,
                           const celllib::CellLibrary *lib, double data_trans,
                           double clk_trans) {
   double hold_fall = 0.0;
@@ -270,7 +270,7 @@ double caculate_hold_fall(const celllib::TimingArc arc,
     if (t && t->variable_1.has_value() && t->variable_2.has_value()) {
       std::string var1 = t->variable_1.value();
       std::string var2 = t->variable_2.value();
-      hold_fall = lib->caculate_lookuptable(arc.fall_constraint.value(),
+      hold_fall = lib->calculate_lookuptable(arc.fall_constraint.value(),
                                             data_trans, clk_trans, var1, var2);
     }
   }

@@ -9,6 +9,7 @@ Makefile
 # Compiled object files
 *.o
 *.o.d
+*.a
 
 # Executables
 pba_sta
@@ -39,3 +40,11 @@ stack.hh
 # Debug files
 *.dSYM/
 *.pdb
+
+.sta_cache
+.cache
+compile_commands.json
+compile_flags.txt
+result
+Testing/all_back/
+

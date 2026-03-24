@@ -71,7 +71,7 @@ void run_debuger(sta::STAWorker &worker, bool verbose);
 int setup_hold_test(int argc, char *argv[]);
 
 void gcd_test();
-void singal_test(char *file_name);
+void signal_test(char *file_name);
 void auto_test(int /*argc*/, char * /*argv*/[]);
 void debug_lib_cell();
 void spi_test();

@@ -283,7 +283,7 @@ std::string point_type_str(sta::PointType type) {
   case sta::COMB_PIN:
     return "COMB_PIN";
   case sta::CLK_SOURCE:
-    return "CLK_COURCE";
+    return "CLK_SOURCE";
   }
 
   return "?";
@@ -685,7 +685,7 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
   std::cout << "===== end cell '" << cell->name << "' =====\n";
 }
 
-void display_spefic_group(STAWorker &worker) {
+void display_specific_group(STAWorker &worker) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
   const PathGroup group = PathGroup::REG2REG;
@@ -722,7 +722,7 @@ void display_all_path(STAWorker &worker) {
 
 void debug_paths_through_instance(STAWorker &worker,
                                   const std::string &inst_substr) {
-    display_spefic_group(worker);
+    display_specific_group(worker);
     // display_all_path(worker);
 }
 

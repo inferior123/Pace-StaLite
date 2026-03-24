@@ -28,7 +28,7 @@ public:
   const std::string &get_filename() const { return filename; }
 
   // Function that will be called when encountering the top module name.
-  void add_module(std::string &&name) { worker_.top_moudle = name; }
+  void add_module(std::string &&name) { worker_.top_module = name; }
 
   // Function that will be called when encountering a port.
   void add_port(verilog::Port &&port) { worker_.collect_port(port); }

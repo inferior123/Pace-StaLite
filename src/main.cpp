@@ -30,8 +30,8 @@ int candidate_test(int argc, char *argv[]) {
   std::cout << "finish parse SDC file" << std::endl;
 
   if (sdc_interface.celllib_file_name.empty()) {
-    std::cout << "not stanard lib specific, abort" << std::endl;
-    assert(false && "no stanard lib specificed");
+    std::cout << "not standard lib specific, abort" << std::endl;
+    assert(false && "no standard lib specified");
   }
 
   if (!celllib::try_load_celllib_cache(sdc_interface.celllib_file_name,
@@ -58,7 +58,7 @@ int candidate_test(int argc, char *argv[]) {
   std::cout << "Step 1: build_fanouts()..." << std::endl;
   worker.build_fanouts();
   std::cout << "Step 2: calculate_load_capacitance()..." << std::endl;
-  worker.caculate_load_cap();
+  worker.calculate_load_cap();
   std::cout << "Step 3: build_candidate_graphy()..." << std::endl;
   worker.build_candidate_graphy_dfs();
 
@@ -66,7 +66,7 @@ int candidate_test(int argc, char *argv[]) {
 
   // 生成与 PT 格式一致的 8 个 timing 报告文件，便于与 ref 对比
   std::string design_name =
-      worker.top_moudle.empty() ? "design" : worker.top_moudle;
+      worker.top_module.empty() ? "design" : worker.top_module;
   std::string report_dir = "./result/candidate/" + design_name;
   sta::STAReportGenerator::generate_report_pt_files(worker, "__clk__",
                                                     report_dir, design_name, 1);
@@ -83,9 +83,9 @@ int main(int argc, char *argv[]) {
   } else if(argc > 3) {
     debug_lib_cell();
   } else if (argc > 2) {
-    std::cerr << "unknow argv num" << std::endl;
+    std::cerr << "unknown argv count" << std::endl;
   } else if (argc > 1)
-    singal_test(argv[1]);
+    signal_test(argv[1]);
   else
     auto_test(argc, argv);
 

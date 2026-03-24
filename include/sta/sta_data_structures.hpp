@@ -280,7 +280,7 @@ struct TimingPathResult {
   size_t startpoint;
   size_t endpoint;
 
-  bool need_to_recaculate; // 用来标记需要recaculate的路径
+  bool need_to_recalculate; // 用来标记需要recalculate的路径
   double data_arrival_time = 0.0;
 
   std::optional<double> library_setup_time;
@@ -571,7 +571,7 @@ public:
   void reset_gba_nodes_state();
   /// 按 pt_type 从 CLK_PIN 或 INPUT 起点传播，填充 paths 和 node 状态
   void run_gba_propagate(PointType pt_type);
-  void caculate_load_cap();
+  void calculate_load_cap();
   void calculate_timing_arcs();
   /// DFS 时序分析：从 end_node 回溯产出 res.paths。
   /// clear_paths_first=true 时先清空 res.paths；false 时追加。
@@ -599,8 +599,8 @@ public:
                                      double input_slew_ns, bool use_max) const;
   void run_candidate_graphy_dfs();
 
-  void candidate_recaculate();
-  void recaculate_in2out();
+  void candidate_recalculate();
+  void recalculate_in2out();
 
   // void print_all_timing_paths_bfs(); //
   // BFS/拓扑序：用队列按层枚举并打印每一条时序路径（不依赖 timing_queue）
@@ -638,7 +638,7 @@ public:
   void divide_path_entry();
 
   // top module name
-  std::string top_moudle;
+  std::string top_module;
 
   // 配置访问器
   const sta_config &get_config() const { return cfg; }
@@ -676,7 +676,7 @@ public:
     return effective_period - setup_time;
   }
 
-  double caculate_data_required_time(double setup_time) const {
+  double calculate_data_required_time(double setup_time) const {
     int effective_period = get_effective_clock_period();
     return (double)effective_period - setup_time; // 均以 ps 为单位
   }
@@ -769,32 +769,32 @@ private:
 
 // 复用 sta.cpp 中的 LUT 计算与方向推断工具函数（在 namespace sta 中定义）
 double get_lut_avg(std::optional<celllib::LookupTable> lut);
-double caculate_delay_rise(const celllib::TimingArc arc,
+double calculate_delay_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib,
                            double input_slew_rise, double load_cap);
-double caculate_delay_fall(const celllib::TimingArc arc,
+double calculate_delay_fall(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib,
                            double input_slew_fall, double load_cap);
-double caculate_transition_fall(const celllib::TimingArc arc,
+double calculate_transition_fall(const celllib::TimingArc arc,
                                 const celllib::CellLibrary *lib,
                                 double input_slew_fall, double load_cap);
-double caculate_transition_rise(const celllib::TimingArc arc,
+double calculate_transition_rise(const celllib::TimingArc arc,
                                 const celllib::CellLibrary *lib,
                                 double input_slew_rise, double load_cap);
 sta::TransitionDirection
 speculate_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
                                sta::TransitionDirection input_direction);
 
-double caculate_setup_fall(const celllib::TimingArc arc,
+double calculate_setup_fall(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib, double data_trans,
                            double clk_trans);
-double caculate_hold_rise(const celllib::TimingArc arc,
+double calculate_hold_rise(const celllib::TimingArc arc,
                           const celllib::CellLibrary *lib, double data_trans,
                           double clk_trans);
-double caculate_setup_rise(const celllib::TimingArc arc,
+double calculate_setup_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib, double data_trans,
                            double clk_trans);
-double caculate_hold_fall(const celllib::TimingArc arc,
+double calculate_hold_fall(const celllib::TimingArc arc,
                           const celllib::CellLibrary *lib, double data_trans,
                           double clk_trans);
 const celllib::TimingArc *find_default_arc(celllib::Pin &pin,

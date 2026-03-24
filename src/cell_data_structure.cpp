@@ -164,7 +164,7 @@ std::vector<std::string> CellLibrary::get_table_template_names() const {
   return names;
 }
 
-inline double insert_caculate(double x0, double x1, double x2, double y0,
+inline double insert_calculate(double x0, double x1, double x2, double y0,
                               double y1, double y2, double T11, double T12,
                               double T21, double T22) {
   double x01 = (x0 - x1) / (x2 - x1);
@@ -176,7 +176,7 @@ inline double insert_caculate(double x0, double x1, double x2, double y0,
   return x20 * y20 * T11 + x20 * y01 * T12 + x01 * y20 * T21 + x01 * y01 * T22;
 }
 
-double CellLibrary::caculate_lookuptable(const LookupTable &tb, double x0,
+double CellLibrary::calculate_lookuptable(const LookupTable &tb, double x0,
                                          double y0,
                                          const std::string &va_name_1,
                                          const std::string &va_name_2) const {
@@ -234,7 +234,7 @@ double CellLibrary::caculate_lookuptable(const LookupTable &tb, double x0,
       mapped_x0 = y0;
       mapped_y0 = x0;
     } else {
-      std::cerr << "mismatch index name for caculate lookuptable" << std::endl;
+      std::cerr << "mismatch index name for calculate lookuptable" << std::endl;
       std::cerr << "  templ: " << templ->variable_1.value() << " "
                 << templ->variable_2.value() << std::endl;
       std::cerr << "  provided: " << va_name_1 << " " << va_name_2 << std::endl;
@@ -336,7 +336,7 @@ double CellLibrary::caculate_lookuptable(const LookupTable &tb, double x0,
   // clang-format on 
 
   double result =
-      insert_caculate(mapped_x0, x1, x2, mapped_y0, y1, y2, T11, T12, T21, T22);
+      insert_calculate(mapped_x0, x1, x2, mapped_y0, y1, y2, T11, T12, T21, T22);
 
   // 显示插值计算的中间步骤
   double x01 = (mapped_x0 - x1) / (x2 - x1);

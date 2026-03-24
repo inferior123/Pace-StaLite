@@ -73,13 +73,13 @@ std::vector<segment_res> segment_delays_slews_gba(const TimingRunResult &res,
     double fall_cap = to_ref.fall_cap;
 
     auto push_rise = [&](double cap) {
-      double delay = caculate_delay_rise(arc, cell_library_, prev_slew, cap);
-      double slew = caculate_transition_rise(arc, cell_library_, prev_slew, cap) / 1000;
+      double delay = calculate_delay_rise(arc, cell_library_, prev_slew, cap);
+      double slew = calculate_transition_rise(arc, cell_library_, prev_slew, cap) / 1000;
       seg_res.push_back({slew, delay, TransitionDirection::RISING});
     };
     auto push_fall = [&](double cap) {
-      double delay = caculate_delay_fall(arc, cell_library_, prev_slew, cap);
-      double slew = caculate_transition_fall(arc, cell_library_, prev_slew, cap) / 1000;
+      double delay = calculate_delay_fall(arc, cell_library_, prev_slew, cap);
+      double slew = calculate_transition_fall(arc, cell_library_, prev_slew, cap) / 1000;
       seg_res.push_back({slew, delay, TransitionDirection::FALLING});
     };
 
@@ -165,14 +165,14 @@ std::vector<segment_res> segment_delays_slews(const TimingRunResult &res,
     double delay_tmp = 0.0;
     double slew_tmp = 0.0;
     if (dir_tmp == TransitionDirection::RISING) {
-      delay_tmp = caculate_delay_rise(arc, cell_library_, prev_slew, load_cap);
+      delay_tmp = calculate_delay_rise(arc, cell_library_, prev_slew, load_cap);
       slew_tmp =
-          caculate_transition_rise(arc, cell_library_, prev_slew, load_cap) /
+          calculate_transition_rise(arc, cell_library_, prev_slew, load_cap) /
           1000;
     } else {
-      delay_tmp = caculate_delay_fall(arc, cell_library_, prev_slew, load_cap);
+      delay_tmp = calculate_delay_fall(arc, cell_library_, prev_slew, load_cap);
       slew_tmp =
-          caculate_transition_fall(arc, cell_library_, prev_slew, load_cap) /
+          calculate_transition_fall(arc, cell_library_, prev_slew, load_cap) /
           1000;
     }
 
@@ -237,11 +237,11 @@ double recalc_slew_with_max_cap(const TimingRunResult &res,
 
     double slew_tmp = 0.0;
     if (out_dir == TransitionDirection::RISING)
-      slew_tmp = caculate_transition_rise(arc, cell_library_, prev_slew, cap) / 1000.0;
+      slew_tmp = calculate_transition_rise(arc, cell_library_, prev_slew, cap) / 1000.0;
     else if(out_dir == TransitionDirection::FALLING)
-      slew_tmp = caculate_transition_fall(arc, cell_library_, prev_slew, cap) / 1000.0;
+      slew_tmp = calculate_transition_fall(arc, cell_library_, prev_slew, cap) / 1000.0;
     else
-      assert(false && "meet a unknow path");
+      assert(false && "meet an unknown path");
 
     if (!found || (use_max ? slew_tmp > best_slew : slew_tmp < best_slew)) {
       best_slew = slew_tmp;
@@ -336,14 +336,14 @@ void segment_delay_slew(const TimingRunResult &res,
     double delay_tmp = 0.0;
     double slew_tmp = 0.0;
     if (dir_tmp == TransitionDirection::RISING) {
-      delay_tmp = caculate_delay_rise(arc, cell_library_, prev_slew, load_cap);
+      delay_tmp = calculate_delay_rise(arc, cell_library_, prev_slew, load_cap);
       slew_tmp =
-          caculate_transition_rise(arc, cell_library_, prev_slew, load_cap) /
+          calculate_transition_rise(arc, cell_library_, prev_slew, load_cap) /
           1000;
     } else {
-      delay_tmp = caculate_delay_fall(arc, cell_library_, prev_slew, load_cap);
+      delay_tmp = calculate_delay_fall(arc, cell_library_, prev_slew, load_cap);
       slew_tmp =
-          caculate_transition_fall(arc, cell_library_, prev_slew, load_cap) /
+          calculate_transition_fall(arc, cell_library_, prev_slew, load_cap) /
           1000;
     }
 

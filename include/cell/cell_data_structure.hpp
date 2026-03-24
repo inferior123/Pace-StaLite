@@ -354,7 +354,7 @@ public:
   /**
    * 对 lookuptable 进行插值
    */
-  double caculate_lookuptable(const LookupTable &tb, double x0, double y0,
+  double calculate_lookuptable(const LookupTable &tb, double x0, double y0,
                               const std::string &va_name_1,
                               const std::string &va_name_2) const;
 };

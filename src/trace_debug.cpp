@@ -10,7 +10,7 @@
 #include "cell/celllib_cache.hpp"
 #include "sta/debug.h"
 
-bool run_pba = false;
+bool run_pba = true;
 
 namespace {
 std::string point_name(const sta::TimingPointRef &p) {
@@ -152,11 +152,11 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       worker.set_analysis_mode(sta::AnalysisMode::MAX);
 
       std::string design_name =
-          worker.top_moudle.empty() ? "design" : worker.top_moudle;
+          worker.top_module.empty() ? "design" : worker.top_module;
 
       std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
-      if(run_pba == false) {
+      if (run_pba == false) {
         run_gba_analysis(worker);
       } else {
         run_pba_analysis(worker);
@@ -190,11 +190,11 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       worker.set_analysis_mode(sta::AnalysisMode::MIN);
 
       std::string design_name =
-          worker.top_moudle.empty() ? "design" : worker.top_moudle;
+          worker.top_module.empty() ? "design" : worker.top_module;
 
       std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
-      if(run_pba == false) {
+      if (run_pba == false) {
         run_gba_analysis(worker);
       } else {
         run_pba_analysis(worker);
@@ -234,7 +234,7 @@ void display_all_longest_path(sta::STAWorker &worker) {
   sta::display_points_fanout(worker, 466);
 }
 
-void singal_test(char *file_name) {
+void signal_test(char *file_name) {
 
   std::vector<std::string> libs;
 
@@ -284,17 +284,17 @@ void singal_test(char *file_name) {
     verilog_parser.read(vfile.c_str());
     worker.set_analysis_mode(sta::AnalysisMode::MAX);
 
-      std::string design_name =
-          worker.top_moudle.empty() ? "design" : worker.top_moudle;
+    std::string design_name =
+        worker.top_module.empty() ? "design" : worker.top_module;
 
-      std::string dir_prefix = (run_pba) ? "pba" : "gba";
-      std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
+    std::string dir_prefix = (run_pba) ? "pba" : "gba";
+    std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
-      if(run_pba == false) {
-        run_gba_analysis(worker);
-      } else {
-        run_pba_analysis(worker);
-      }
+    if (run_pba == false) {
+      run_gba_analysis(worker);
+    } else {
+      run_pba_analysis(worker);
+    }
 
     debug_paths_through_instance(worker, "state_1__reg_p");
 
@@ -323,17 +323,17 @@ void singal_test(char *file_name) {
     verilog_parser.read(vfile.c_str());
     worker.set_analysis_mode(sta::AnalysisMode::MIN);
 
-      std::string design_name =
-          worker.top_moudle.empty() ? "design" : worker.top_moudle;
+    std::string design_name =
+        worker.top_module.empty() ? "design" : worker.top_module;
 
-      std::string dir_prefix = (run_pba) ? "pba" : "gba";
-      std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
+    std::string dir_prefix = (run_pba) ? "pba" : "gba";
+    std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
-      if(run_pba == false) {
-        run_gba_analysis(worker);
-      } else {
-        run_pba_analysis(worker);
-      }
+    if (run_pba == false) {
+      run_gba_analysis(worker);
+    } else {
+      run_pba_analysis(worker);
+    }
 
     debug_paths_through_instance(worker, "state_1__reg_p");
 
@@ -414,16 +414,16 @@ void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
                                              : "sdf_cond none")
               << "\n";
 
-    double res = caculate_transition_fall(arc, &cell_lib, slew, cap);
+    double res = calculate_transition_fall(arc, &cell_lib, slew, cap);
     std::cout << "transition fall is " << res << std::endl;
 
-    res = caculate_transition_rise(arc, &cell_lib, slew, cap);
+    res = calculate_transition_rise(arc, &cell_lib, slew, cap);
     std::cout << "transition rise is " << res << std::endl;
 
-    res = caculate_delay_fall(arc, &cell_lib, slew, cap);
+    res = calculate_delay_fall(arc, &cell_lib, slew, cap);
     std::cout << "delay fall is " << res << std::endl;
 
-    res = caculate_delay_rise(arc, &cell_lib, slew, cap);
+    res = calculate_delay_rise(arc, &cell_lib, slew, cap);
     std::cout << "delay rise is " << res << std::endl;
 
     std::cout << std::endl;
@@ -482,9 +482,9 @@ void test_setup_hold(const char *cell_name, const char *pin_name,
     if (arc.timing_type == TT::SETUP_RISING ||
         arc.timing_type == TT::SETUP_FALLING) {
       double setup_rise =
-          caculate_setup_rise(arc, &cell_lib, data_trans, clk_trans);
+          calculate_setup_rise(arc, &cell_lib, data_trans, clk_trans);
       double setup_fall =
-          caculate_setup_fall(arc, &cell_lib, data_trans, clk_trans);
+          calculate_setup_fall(arc, &cell_lib, data_trans, clk_trans);
       std::cout << "cell=" << cell_name << " pin=" << pin_name
                 << " related=" << related_pin << " slew_ns=" << slew_ns
                 << " setup_rise=" << (setup_rise * 1000.0) << "ps"
@@ -493,9 +493,9 @@ void test_setup_hold(const char *cell_name, const char *pin_name,
     if (arc.timing_type == TT::HOLD_RISING ||
         arc.timing_type == TT::HOLD_FALLING) {
       double hold_rise =
-          caculate_hold_rise(arc, &cell_lib, data_trans, clk_trans);
+          calculate_hold_rise(arc, &cell_lib, data_trans, clk_trans);
       double hold_fall =
-          caculate_hold_fall(arc, &cell_lib, data_trans, clk_trans);
+          calculate_hold_fall(arc, &cell_lib, data_trans, clk_trans);
       std::cout << "cell=" << cell_name << " pin=" << pin_name
                 << " related=" << related_pin << " slew_ns=" << slew_ns
                 << " hold_rise=" << (hold_rise * 1000.0) << "ps"

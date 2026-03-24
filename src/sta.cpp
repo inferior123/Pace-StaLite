@@ -342,7 +342,7 @@ void STAWorker::build_res_edges() {
   }
 }
 
-void STAWorker::caculate_load_cap() {
+void STAWorker::calculate_load_cap() {
   if (!cell_library_)
     return;
 

@@ -584,7 +584,7 @@ void STAWorker::run_gba_timing_analysis(bool clear_paths_first) {
       pr.index = res.paths.size();
       pr.startpoint = start_pt;
       pr.endpoint = end_pt;
-      pr.need_to_recaculate = false;
+      pr.need_to_recalculate = false;
       pr.data_arrival_time = arrival;
       pr.steps = std::move(steps);
 
@@ -599,7 +599,7 @@ void run_gba_analysis(sta::STAWorker &worker) {
   std::cout << "  [GBA] Step 1: build_fanouts()...\n";
   worker.build_fanouts();
   std::cout << "  [GBA-MAX] Step 2: calculate_load_capacitance()...\n";
-  worker.caculate_load_cap();
+  worker.calculate_load_cap();
   std::cout << "  [GBA-MAX] Step 3: build_gba_graphy()...\n";
   worker.build_gba_graphy();
 

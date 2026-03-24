@@ -359,7 +359,7 @@ void STAReportGenerator::generate_report(const STAWorker &worker,
   std::cout
       << "╚══════════════════════════════════════════════════════════╝\n\n";
 
-  std::cout << "Module: " << worker.top_moudle << "\n";
+  std::cout << "Module: " << worker.top_module << "\n";
   std::cout << "Clock Period: " << clock_period << "ps ("
             << format_time(clock_period) << "ns)\n";
   std::cout
