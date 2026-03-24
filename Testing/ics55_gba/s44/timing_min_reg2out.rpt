@@ -1,0 +1,270 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-transition_time
+	-capacitance
+	-sort_by slack
+Design : s44
+Version: U-2022.12-SP3
+Date   : Wed Feb 25 16:27:52 2026
+****************************************
+
+
+  Startpoint: config_out[2]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[2]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[2]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[2]_reg_p/Q (DFFQX1H7R) 0.0011259280 0.0281293169 0.0743816718 0.0743816718 f
+  config_out[2] (out)                         0.0281293169 0.0000000000 0.0743816718 f
+  data arrival time                                                 0.0743816718
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0743816718
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0743816718
+
+
+  Startpoint: config_out[6]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[6]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[6]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[6]_reg_p/Q (DFFQX1H7R) 0.0011259280 0.0281293169 0.0743816718 0.0743816718 f
+  config_out[6] (out)                         0.0281293169 0.0000000000 0.0743816718 f
+  data arrival time                                                 0.0743816718
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0743816718
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0743816718
+
+
+  Startpoint: config_out[0]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[0]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[0]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[0]_reg_p/Q (DFFQX1H7R) 0.0011391810 0.0282638744 0.0745059624 0.0745059624 f
+  config_out[0] (out)                         0.0282638744 0.0000000000 0.0745059624 f
+  data arrival time                                                 0.0745059624
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0745059624
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0745059624
+
+
+  Startpoint: config_out[4]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[4]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[4]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[4]_reg_p/Q (DFFQX1H7R) 0.0011391810 0.0282638744 0.0745059624 0.0745059624 f
+  config_out[4] (out)                         0.0282638744 0.0000000000 0.0745059624 f
+  data arrival time                                                 0.0745059624
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0745059624
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0745059624
+
+
+  Startpoint: config_out[1]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[1]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[1]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[1]_reg_p/Q (DFFQX1H7R) 0.0011529240 0.0284034032 0.0746348724 0.0746348724 f
+  config_out[1] (out)                         0.0284034032 0.0000000000 0.0746348724 f
+  data arrival time                                                 0.0746348724
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0746348724
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0746348724
+
+
+  Startpoint: config_out[5]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[5]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[5]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[5]_reg_p/Q (DFFQX1H7R) 0.0011529240 0.0284034032 0.0746348724 0.0746348724 f
+  config_out[5] (out)                         0.0284034032 0.0000000000 0.0746348724 f
+  data arrival time                                                 0.0746348724
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0746348724
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0746348724
+
+
+  Startpoint: config_out[3]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[3]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[3]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[3]_reg_p/Q (DFFQX1H7R) 0.0011583060 0.0284580477 0.0746853426 0.0746853426 f
+  config_out[3] (out)                         0.0284580477 0.0000000000 0.0746853426 f
+  data arrival time                                                 0.0746853426
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0746853426
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0746853426
+
+
+  Startpoint: config_out[7]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[7]
+               (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[7]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[7]_reg_p/Q (DFFQX1H7R) 0.0011583060 0.0284580477 0.0746853426 0.0746853426 f
+  config_out[7] (out)                         0.0284580477 0.0000000000 0.0746853426 f
+  data arrival time                                                 0.0746853426
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0746853426
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0746853426
+
+
+  Startpoint: config_out[1]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: out (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  config_out[1]_reg_p/CK (DFFQX1H7R)          0.0000000000 0.0000000000 0.0000000000 r
+  config_out[1]_reg_p/Q (DFFQX1H7R) 0.0011532460 0.0267688334 0.1001776159 0.1001776159 r
+  _67_/Y (MUX4X1P4H7R)             0.0006113230 0.0235540606 0.0803322792 0.1805098951 r
+  _74_/Y (MUX4X0P7H7L)             0.0000000000 0.0140290884 0.0634742379 0.2439841330 r
+  out (out)                                   0.0140290884 0.0000000000 0.2439841330 r
+  data arrival time                                                 0.2439841330
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.2439841330
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.2439841330
+
+
+1

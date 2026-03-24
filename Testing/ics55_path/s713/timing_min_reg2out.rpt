@@ -1,0 +1,597 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-transition_time
+	-capacitance
+	-pba_mode path
+	-sort_by slack
+Design : s713
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 15:40:58 2026
+****************************************
+
+
+  Startpoint: DFF_15.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G107 (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_15.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_15.Q_reg_p/Q (DFFQX1H7R)     0.0004865290 0.0216376781 0.0683846623 0.0683846623 f
+  _150_/Y (AND3X0P5H7L)            0.0000000000 0.0108818589 0.0333242863 0.1017089486 f
+  G107 (out)                                  0.0108818589 0.0000000000 0.1017089486 f
+  data arrival time                                                 0.1017089486
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1017089486
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1017089486
+
+
+  Startpoint: DFF_18.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G85 (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_18.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_18.Q_reg_p/Q (DFFQX1H7R)     0.0005785980 0.0225724317 0.0692481920 0.0692481920 f
+  _153_/Y (AND3X0P5H7L)            0.0000000000 0.0116092162 0.0355066285 0.1047548205 f
+  G85 (out)                                   0.0116092162 0.0000000000 0.1047548205 f
+  data arrival time                                                 0.1047548205
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1047548205
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1047548205
+
+
+  Startpoint: DFF_17.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G84 (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_17.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_17.Q_reg_p/Q (DFFQX1H7R)     0.0005785980 0.0225724317 0.0692481920 0.0692481920 f
+  _152_/Y (AND3X0P5H7L)            0.0000000000 0.0116092162 0.0355066285 0.1047548205 f
+  G84 (out)                                   0.0116092162 0.0000000000 0.1047548205 f
+  data arrival time                                                 0.1047548205
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1047548205
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1047548205
+
+
+  Startpoint: DFF_16.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G83 (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_16.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_16.Q_reg_p/Q (DFFQX1H7R)     0.0005785980 0.0225724317 0.0692481920 0.0692481920 f
+  _151_/Y (AND3X0P5H7L)            0.0000000000 0.0116092162 0.0355066285 0.1047548205 f
+  G83 (out)                                   0.0116092162 0.0000000000 0.1047548205 f
+  data arrival time                                                 0.1047548205
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1047548205
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1047548205
+
+
+  Startpoint: DFF_11.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G103BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_11.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_11.Q_reg_p/Q (DFFQX1H7R)     0.0025357830 0.0401452668 0.0854485855 0.0854485855 f
+  _145_/Y (OAI211X1P4H7L)          0.0000000000 0.0188049860 0.0203424022 0.1057909876 r
+  G103BF (out)                                0.0188049860 0.0000000000 0.1057909876 r
+  data arrival time                                                 0.1057909876
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1057909876
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1057909876
+
+
+  Startpoint: DFF_6.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G99BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_6.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_6.Q_reg_p/Q (DFFQX1H7R)      0.0023429850 0.0386808291 0.0841029212 0.0841029212 f
+  _171_/Y (NAND3X0P5H7R)           0.0000000000 0.0213318989 0.0244911909 0.1085941121 r
+  G99BF (out)                                 0.0213318989 0.0000000000 0.1085941121 r
+  data arrival time                                                 0.1085941121
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1085941121
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1085941121
+
+
+  Startpoint: DFF_12.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G104BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_12.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_12.Q_reg_p/Q (DFFQX1H7R)     0.0036490110 0.0486010239 0.0932185799 0.0932185799 f
+  _146_/Y (OAI211X1P4H7L)          0.0000000000 0.0197834782 0.0193070173 0.1125255972 r
+  G104BF (out)                                0.0197834782 0.0000000000 0.1125255972 r
+  data arrival time                                                 0.1125255972
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1125255972
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1125255972
+
+
+  Startpoint: DFF_10.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G95BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_10.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_10.Q_reg_p/Q (DFFQX1H7R)     0.0035847679 0.0481130518 0.0927701965 0.0927701965 f
+  _167_/Y (NAND3X0P5H7R)           0.0000000000 0.0240338780 0.0272981450 0.1200683415 r
+  G95BF (out)                                 0.0240338780 0.0000000000 0.1200683415 r
+  data arrival time                                                 0.1200683415
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1200683415
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1200683415
+
+
+  Startpoint: DFF_7.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G98BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_7.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_7.Q_reg_p/Q (DFFQX1H7R)      0.0006901670 0.0237051584 0.0702946037 0.0702946037 f
+  _107_/Z (NOR2BX1P4H7L)           0.0021639250 0.0224523302 0.0399771556 0.1102717593 f
+  _170_/Y (NAND2X0P5H7R)           0.0000000000 0.0128355939 0.0171464756 0.1274182349 r
+  G98BF (out)                                 0.0128355939 0.0000000000 0.1274182349 r
+  data arrival time                                                 0.1274182349
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1274182349
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1274182349
+
+
+  Startpoint: DFF_5.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G100BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_5.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_5.Q_reg_p/Q (DFFQX1H7R)      0.0006901670 0.0237051584 0.0702946037 0.0702946037 f
+  _117_/Z (NOR2BX1P4H7L)           0.0021664950 0.0224670246 0.0399873853 0.1102819890 f
+  _143_/Y (NAND2X0P5H7R)           0.0000000000 0.0128366845 0.0171512067 0.1274331957 r
+  G100BF (out)                                0.0128366845 0.0000000000 0.1274331957 r
+  data arrival time                                                 0.1274331957
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1274331957
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1274331957
+
+
+  Startpoint: DFF_8.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G97BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_8.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_8.Q_reg_p/Q (DFFQX1H7R)      0.0012708330 0.0296005029 0.0757407695 0.0757407695 f
+  _138_/Z (NOR2BX1P4H7L)           0.0017388829 0.0201645680 0.0400847197 0.1158254892 f
+  _169_/Y (NAND2X0P5H7R)           0.0000000000 0.0126658129 0.0164099485 0.1322354376 r
+  G97BF (out)                                 0.0126658129 0.0000000000 0.1322354376 r
+  data arrival time                                                 0.1322354376
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1322354376
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1322354376
+
+
+  Startpoint: DFF_3.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G89BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_3.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_3.Q_reg_p/Q (DFFQX1H7R)      0.0026169301 0.0407616347 0.0860149637 0.0860149637 f
+  _072_/Z (NOR2BX8H7L)             0.0034806360 0.0316095762 0.0294182599 0.1154332235 r
+  _113_/Y (AOAI211X2H7L)           0.0013696500 0.0199161842 0.0182296559 0.1336628795 f
+  G89BF (out)                                 0.0199161842 0.0000000000 0.1336628795 f
+  data arrival time                                                 0.1336628795
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1336628795
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1336628795
+
+
+  Startpoint: DFF_9.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G96BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_9.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_9.Q_reg_p/Q (DFFQX1H7R)      0.0006901670 0.0237051584 0.0702946037 0.0702946037 f
+  _096_/Z (NOR2BX1P4H7L)           0.0033808919 0.0295180175 0.0444321409 0.1147267446 f
+  _168_/Y (NAND2X0P5H7R)           0.0000000000 0.0147561189 0.0190169439 0.1337436885 r
+  G96BF (out)                                 0.0147561189 0.0000000000 0.1337436885 r
+  data arrival time                                                 0.1337436885
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1337436885
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1337436885
+
+
+  Startpoint: DFF_1.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G87BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_1.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_1.Q_reg_p/Q (DFFQX1H7R)      0.0006524210 0.0213774536 0.0957746953 0.0957746953 r
+  _079_/Z (NOR2BX1P4H7L)           0.0017932961 0.0171259493 0.0165425539 0.1123172492 f
+  _137_/Y (NAND2BX0P5H7R)          0.0011854280 0.0300339144 0.0252175629 0.1375348121 r
+  G87BF (out)                                 0.0300339144 0.0000000000 0.1375348121 r
+  data arrival time                                                 0.1375348121
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1375348121
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1375348121
+
+
+  Startpoint: DFF_4.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G101BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_4.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_4.Q_reg_p/Q (DFFQX1H7R)      0.0010577880 0.0274375156 0.0737425834 0.0737425834 f
+  _125_/Y (NAND2X0P5H7R)           0.0012533100 0.0322235227 0.0292855501 0.1030281335 r
+  _126_/Y (NOR2X0P5H7R)            0.0018545550 0.0300573111 0.0291599631 0.1321880966 f
+  _144_/Y (NAND2X0P5H7R)           0.0000000000 0.0149453860 0.0191473514 0.1513354480 r
+  G101BF (out)                                0.0149453860 0.0000000000 0.1513354480 r
+  data arrival time                                                 0.1513354480
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1513354480
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1513354480
+
+
+  Startpoint: DFF_10.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G90 (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_10.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_10.Q_reg_p/Q (DFFQX1H7R)     0.0035847679 0.0481130518 0.0927701965 0.0927701965 f
+  _095_/Y (OAI211X6H7L)            0.0018009471 0.0252856724 0.0259193778 0.1186895743 r
+  _165_/Y (OA221X4H7L)             0.0000000000 0.0150306346 0.0480314568 0.1667210311 r
+  G90 (out)                                   0.0150306346 0.0000000000 0.1667210311 r
+  data arrival time                                                 0.1667210311
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1667210311
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1667210311
+
+
+  Startpoint: DFF_3.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G88BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_3.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_3.Q_reg_p/Q (DFFQX1H7R)      0.0026132700 0.0414475091 0.1113156453 0.1113156453 r
+  _072_/Z (NOR2BX8H7L)             0.0034884051 0.0160323847 0.0135557726 0.1248714179 f
+  _113_/Y (AOAI211X2H7L)           0.0012888500 0.0182030555 0.0169361979 0.1418076158 r
+  _116_/Y (AOI211X3H7L)            0.0040463870 0.0398552790 0.0297729522 0.1715805680 f
+  _155_/Y (INVX0P5H7R)             0.0000000000 0.0148376767 0.0168094337 0.1883900017 r
+  G88BF (out)                                 0.0148376767 0.0000000000 0.1883900017 r
+  data arrival time                                                 0.1883900017
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1883900017
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1883900017
+
+
+  Startpoint: DFF_0.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G86BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_0.Q_reg_p/CK (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 r
+  DFF_0.Q_reg_p/Q (DFFQX1H7R)      0.0013013091 0.0299099162 0.0760265961 0.0760265961 f
+  _083_/Y (NAND3X1P4H7L)           0.0015129200 0.0308549814 0.0279726386 0.1039992347 r
+  _104_/Y (AOI211X2H7L)            0.0020688639 0.0198863838 0.0188063830 0.1228056177 f
+  _141_/Y (AOI21X1P4H7L)           0.0024875710 0.0637469813 0.0501475856 0.1729532033 r
+  _154_/Y (INVX0P5H7R)             0.0000000000 0.0182153024 0.0164041221 0.1893573254 f
+  G86BF (out)                                 0.0182153024 0.0000000000 0.1893573254 f
+  data arrival time                                                 0.1893573254
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1893573254
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1893573254
+
+
+  Startpoint: DFF_14.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G106BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_14.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_14.Q_reg_p/Q (DFFQX1H7R)     0.0047272118 0.0620117038 0.1253201216 0.1253201216 r
+  _092_/Y (AOI21X2H7L)             0.0037395398 0.0476908311 0.0425808430 0.1679009646 f
+  _148_/Y (NAND2BX0P5H7R)          0.0000000000 0.0133522740 0.0439555794 0.2118565440 f
+  G106BF (out)                                0.0133522740 0.0000000000 0.2118565440 f
+  data arrival time                                                 0.2118565440
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.2118565440
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.2118565440
+
+
+  Startpoint: DFF_13.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Endpoint: G105BF (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  DFF_13.Q_reg_p/CK (DFFQX1H7R)               0.0000000000 0.0000000000 0.0000000000 r
+  DFF_13.Q_reg_p/Q (DFFQX1H7R)     0.0013584769 0.0304903276 0.0765627772 0.0765627772 f
+  _069_/Y (NAND4X2H7L)             0.0006798510 0.0252142772 0.0249926895 0.1015554667 r
+  _076_/Y (AO22X3H7L)              0.0047853333 0.0392094329 0.0612977743 0.1628532410 r
+  _077_/Y (INVX2P5H7L)             0.0070485300 0.0344263464 0.0294723809 0.1923256218 f
+  _147_/Y (NAND2X0P5H7R)           0.0000000000 0.0164787136 0.0202038288 0.2125294507 r
+  G105BF (out)                                0.0164787136 0.0000000000 0.2125294507 r
+  data arrival time                                                 0.2125294507
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.2125294507
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.2125294507
+
+
+1

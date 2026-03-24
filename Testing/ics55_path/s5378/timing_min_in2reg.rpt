@@ -1,0 +1,2703 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_reg
+	-transition_time
+	-capacitance
+	-pba_mode path
+	-sort_by slack
+Design : s5378
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 15:41:07 2026
+****************************************
+
+
+  Startpoint: n3069gat (input port clocked by CK)
+  Endpoint: DFF_1.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3069gat (in)                    0.0038471168 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_1.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_1.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3065gat (input port clocked by CK)
+  Endpoint: DFF_10.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3065gat (in)                    0.0037439719 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_10.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_10.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3067gat (input port clocked by CK)
+  Endpoint: DFF_11.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3067gat (in)                    0.0037225129 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_11.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_11.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3066gat (input port clocked by CK)
+  Endpoint: DFF_12.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3066gat (in)                    0.0037225131 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_12.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_12.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3073gat (input port clocked by CK)
+  Endpoint: DFF_13.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3073gat (in)                    0.0037467517 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_13.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_13.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3068gat (input port clocked by CK)
+  Endpoint: DFF_14.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3068gat (in)                    0.0037439717 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_14.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_14.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3070gat (input port clocked by CK)
+  Endpoint: DFF_2.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3070gat (in)                    0.0038471171 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_2.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_2.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3065gat (input port clocked by CK)
+  Endpoint: DFF_22.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3065gat (in)                    0.0037439719 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_22.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_22.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3067gat (input port clocked by CK)
+  Endpoint: DFF_23.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3067gat (in)                    0.0037225129 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_23.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_23.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3066gat (input port clocked by CK)
+  Endpoint: DFF_24.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3066gat (in)                    0.0037225131 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_24.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_24.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3073gat (input port clocked by CK)
+  Endpoint: DFF_25.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3073gat (in)                    0.0037467517 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_25.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_25.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3068gat (input port clocked by CK)
+  Endpoint: DFF_26.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3068gat (in)                    0.0037439717 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_26.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_26.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3072gat (input port clocked by CK)
+  Endpoint: DFF_3.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3072gat (in)                    0.0038471166 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_3.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_3.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3070gat (input port clocked by CK)
+  Endpoint: DFF_38.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3070gat (in)                    0.0038471171 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_38.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_38.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3069gat (input port clocked by CK)
+  Endpoint: DFF_39.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3069gat (in)                    0.0038471168 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_39.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_39.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3071gat (input port clocked by CK)
+  Endpoint: DFF_4.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3071gat (in)                    0.0038519609 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_4.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_4.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3071gat (input port clocked by CK)
+  Endpoint: DFF_40.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3071gat (in)                    0.0038519609 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_40.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_40.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3072gat (input port clocked by CK)
+  Endpoint: DFF_41.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3072gat (in)                    0.0038471166 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_41.Q_reg_p/D (DFFQX1H7R)                0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_41.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3069gat (input port clocked by CK)
+  Endpoint: DFF_5.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3069gat (in)                    0.0038471168 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_5.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_5.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3070gat (input port clocked by CK)
+  Endpoint: DFF_6.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3070gat (in)                    0.0038471171 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_6.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_6.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3072gat (input port clocked by CK)
+  Endpoint: DFF_7.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3072gat (in)                    0.0038471166 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_7.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_7.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3071gat (input port clocked by CK)
+  Endpoint: DFF_8.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3071gat (in)                    0.0038519609 0.0000000000 0.0000000000 0.0000000000 f
+  DFF_8.Q_reg_p/D (DFFQX1H7R)                 0.0000000000 0.0000000000 0.0000000000 f
+  data arrival time                                                 0.0000000000
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_8.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      0.0008802472 0.0008802472
+  data required time                                                0.0008802472
+  -----------------------------------------------------------------------------
+  data required time                                                0.0008802472
+  data arrival time                                                 0.0000000000
+  -----------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.0008802472
+
+
+  Startpoint: n3099gat (input port clocked by CK)
+  Endpoint: DFF_18.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3099gat (in)                    0.0006063900 0.0000000000 0.0000000000 0.0000000000 r
+  _549_/Z (NOR2BX1H7L)             0.0014084179 0.0115868580 0.0101416735 0.0101416735 f
+  DFF_18.Q_reg_p/D (DFFQX1H7R)                0.0115868580 0.0000000000 0.0101416735 f
+  data arrival time                                                 0.0101416735
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_18.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0021911962 -0.0021911962
+  data required time                                                -0.0021911962
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0021911962
+  data arrival time                                                 -0.0101416735
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0123328697
+
+
+  Startpoint: n3099gat (input port clocked by CK)
+  Endpoint: DFF_19.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3099gat (in)                    0.0006063900 0.0000000000 0.0000000000 0.0000000000 r
+  _549_/Z (NOR2BX1H7L)             0.0014084179 0.0115868580 0.0101416735 0.0101416735 f
+  DFF_19.Q_reg_p/D (DFFQX1H7R)                0.0115868580 0.0000000000 0.0101416735 f
+  data arrival time                                                 0.0101416735
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_19.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0021911962 -0.0021911962
+  data required time                                                -0.0021911962
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0021911962
+  data arrival time                                                 -0.0101416735
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0123328697
+
+
+  Startpoint: n3087gat (input port clocked by CK)
+  Endpoint: DFF_139.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3087gat (in)                    0.0116308155 0.0000000000 0.0000000000 0.0000000000 f
+  _476_/Y (INVX5H7L)               0.0052586547 0.0213451888 0.0142864324 0.0142864324 r
+  _483_/Y (NOR3X0P5H7R)            0.0007042090 0.0211175699 0.0205828883 0.0348693207 f
+  DFF_139.Q_reg_p/D (DFFQX1H7R)               0.0211175699 0.0000000000 0.0348693207 f
+  data arrival time                                                 0.0348693207
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_139.Q_reg_p/CK (DFFQX1H7R)                                    0.0000000000 r
+  library hold time                                      -0.0047175968 -0.0047175968
+  data required time                                                -0.0047175968
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0047175968
+  data arrival time                                                 -0.0348693207
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0395869166
+
+
+  Startpoint: n3065gat (input port clocked by CK)
+  Endpoint: DFF_48.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3065gat (in)                    0.0037439719 0.0000000000 0.0000000000 0.0000000000 f
+  _612_/Y (AO22X0P7H7R)            0.0007042090 0.0204216335 0.0423655063 0.0423655063 f
+  DFF_48.Q_reg_p/D (DFFQX1H7R)                0.0204216335 0.0000000000 0.0423655063 f
+  data arrival time                                                 0.0423655063
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_48.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0045331176 -0.0045331176
+  data required time                                                -0.0045331176
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0045331176
+  data arrival time                                                 -0.0423655063
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0468986258
+
+
+  Startpoint: n3067gat (input port clocked by CK)
+  Endpoint: DFF_49.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3067gat (in)                    0.0037225129 0.0000000000 0.0000000000 0.0000000000 f
+  _613_/Y (AO22X0P7H7R)            0.0007042090 0.0204216335 0.0423655063 0.0423655063 f
+  DFF_49.Q_reg_p/D (DFFQX1H7R)                0.0204216335 0.0000000000 0.0423655063 f
+  data arrival time                                                 0.0423655063
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_49.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0045331176 -0.0045331176
+  data required time                                                -0.0045331176
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0045331176
+  data arrival time                                                 -0.0423655063
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0468986258
+
+
+  Startpoint: n3066gat (input port clocked by CK)
+  Endpoint: DFF_50.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3066gat (in)                    0.0037225131 0.0000000000 0.0000000000 0.0000000000 f
+  _614_/Y (AO22X0P7H7R)            0.0007042090 0.0204216335 0.0423655063 0.0423655063 f
+  DFF_50.Q_reg_p/D (DFFQX1H7R)                0.0204216335 0.0000000000 0.0423655063 f
+  data arrival time                                                 0.0423655063
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_50.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0045331176 -0.0045331176
+  data required time                                                -0.0045331176
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0045331176
+  data arrival time                                                 -0.0423655063
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0468986258
+
+
+  Startpoint: n3068gat (input port clocked by CK)
+  Endpoint: DFF_54.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3068gat (in)                    0.0037439717 0.0000000000 0.0000000000 0.0000000000 f
+  _630_/Y (AO22X0P7H7R)            0.0007042090 0.0204216335 0.0423655063 0.0423655063 f
+  DFF_54.Q_reg_p/D (DFFQX1H7R)                0.0204216335 0.0000000000 0.0423655063 f
+  data arrival time                                                 0.0423655063
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_54.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0045331176 -0.0045331176
+  data required time                                                -0.0045331176
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0045331176
+  data arrival time                                                 -0.0423655063
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0468986258
+
+
+  Startpoint: n3067gat (input port clocked by CK)
+  Endpoint: DFF_73.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3067gat (in)                    0.0037225129 0.0000000000 0.0000000000 0.0000000000 f
+  _686_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_73.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_73.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3066gat (input port clocked by CK)
+  Endpoint: DFF_74.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3066gat (in)                    0.0037225131 0.0000000000 0.0000000000 0.0000000000 f
+  _687_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_74.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_74.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3071gat (input port clocked by CK)
+  Endpoint: DFF_75.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3071gat (in)                    0.0038519609 0.0000000000 0.0000000000 0.0000000000 f
+  _688_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_75.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_75.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3072gat (input port clocked by CK)
+  Endpoint: DFF_76.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3072gat (in)                    0.0038471166 0.0000000000 0.0000000000 0.0000000000 f
+  _689_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_76.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_76.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3068gat (input port clocked by CK)
+  Endpoint: DFF_77.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3068gat (in)                    0.0037439717 0.0000000000 0.0000000000 0.0000000000 f
+  _690_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_77.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_77.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3070gat (input port clocked by CK)
+  Endpoint: DFF_78.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3070gat (in)                    0.0038471171 0.0000000000 0.0000000000 0.0000000000 f
+  _691_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_78.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_78.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3069gat (input port clocked by CK)
+  Endpoint: DFF_79.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3069gat (in)                    0.0038471168 0.0000000000 0.0000000000 0.0000000000 f
+  _692_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_79.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_79.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3073gat (input port clocked by CK)
+  Endpoint: DFF_80.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3073gat (in)                    0.0037467517 0.0000000000 0.0000000000 0.0000000000 f
+  _693_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_80.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_80.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3065gat (input port clocked by CK)
+  Endpoint: DFF_72.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3065gat (in)                    0.0037439719 0.0000000000 0.0000000000 0.0000000000 f
+  _685_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0291970596 0.0431298651 0.0431298651 f
+  DFF_72.Q_reg_p/D (DFFQX1H7R)                0.0291970596 0.0000000000 0.0431298651 f
+  data arrival time                                                 0.0431298651
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_72.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0068261023 -0.0068261023
+  data required time                                                -0.0068261023
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0068261023
+  data arrival time                                                 -0.0431298651
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0499559678
+
+
+  Startpoint: n3073gat (input port clocked by CK)
+  Endpoint: DFF_52.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3073gat (in)                    0.0037467517 0.0000000000 0.0000000000 0.0000000000 f
+  _624_/Y (AOI22X0P5H7R)           0.0005143020 0.0329760835 0.0226525534 0.0226525534 r
+  _625_/Y (OAI21X0P5H7R)           0.0007042090 0.0232067034 0.0243668389 0.0470193923 f
+  DFF_52.Q_reg_p/D (DFFQX1H7R)                0.0232067034 0.0000000000 0.0470193923 f
+  data arrival time                                                 0.0470193923
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_52.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0052713836 -0.0052713836
+  data required time                                                -0.0052713836
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0052713836
+  data arrival time                                                 -0.0470193923
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0522907749
+
+
+  Startpoint: n3072gat (input port clocked by CK)
+  Endpoint: DFF_53.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3072gat (in)                    0.0038471166 0.0000000000 0.0000000000 0.0000000000 f
+  _628_/Y (AOI22X0P5H7R)           0.0005143020 0.0329760835 0.0226525534 0.0226525534 r
+  _629_/Y (OAI21X0P5H7R)           0.0007042090 0.0232067034 0.0243668389 0.0470193923 f
+  DFF_53.Q_reg_p/D (DFFQX1H7R)                0.0232067034 0.0000000000 0.0470193923 f
+  data arrival time                                                 0.0470193923
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_53.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0052713836 -0.0052713836
+  data required time                                                -0.0052713836
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0052713836
+  data arrival time                                                 -0.0470193923
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0522907749
+
+
+  Startpoint: n3070gat (input port clocked by CK)
+  Endpoint: DFF_55.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3070gat (in)                    0.0038471171 0.0000000000 0.0000000000 0.0000000000 f
+  _633_/Y (AOI22X0P5H7R)           0.0005143020 0.0329760835 0.0226525534 0.0226525534 r
+  _634_/Y (OAI21X0P5H7R)           0.0007042090 0.0232067034 0.0243668389 0.0470193923 f
+  DFF_55.Q_reg_p/D (DFFQX1H7R)                0.0232067034 0.0000000000 0.0470193923 f
+  data arrival time                                                 0.0470193923
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_55.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0052713836 -0.0052713836
+  data required time                                                -0.0052713836
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0052713836
+  data arrival time                                                 -0.0470193923
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0522907749
+
+
+  Startpoint: n3069gat (input port clocked by CK)
+  Endpoint: DFF_56.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3069gat (in)                    0.0038471168 0.0000000000 0.0000000000 0.0000000000 f
+  _637_/Y (AOI22X0P5H7R)           0.0005143020 0.0329760835 0.0226525534 0.0226525534 r
+  _638_/Y (OAI21X0P5H7R)           0.0007042090 0.0232067034 0.0243668389 0.0470193923 f
+  DFF_56.Q_reg_p/D (DFFQX1H7R)                0.0232067034 0.0000000000 0.0470193923 f
+  data arrival time                                                 0.0470193923
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_56.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0052713836 -0.0052713836
+  data required time                                                -0.0052713836
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0052713836
+  data arrival time                                                 -0.0470193923
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0522907749
+
+
+  Startpoint: n3065gat (input port clocked by CK)
+  Endpoint: DFF_42.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3065gat (in)                    0.0037439719 0.0000000000 0.0000000000 0.0000000000 f
+  _584_/Y (MUX2X0P5H7L)            0.0007042090 0.0218155161 0.0493473262 0.0493473262 f
+  DFF_42.Q_reg_p/D (DFFQX1H7R)                0.0218155161 0.0000000000 0.0493473262 f
+  data arrival time                                                 0.0493473262
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_42.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0049026078 -0.0049026078
+  data required time                                                -0.0049026078
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0049026078
+  data arrival time                                                 -0.0493473262
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0542499349
+
+
+  Startpoint: n3068gat (input port clocked by CK)
+  Endpoint: DFF_46.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3068gat (in)                    0.0037439717 0.0000000000 0.0000000000 0.0000000000 f
+  _596_/Y (MUX2X0P5H7L)            0.0007042090 0.0218155161 0.0493473262 0.0493473262 f
+  DFF_46.Q_reg_p/D (DFFQX1H7R)                0.0218155161 0.0000000000 0.0493473262 f
+  data arrival time                                                 0.0493473262
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_46.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0049026078 -0.0049026078
+  data required time                                                -0.0049026078
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0049026078
+  data arrival time                                                 -0.0493473262
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0542499349
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_28.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _559_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_28.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_28.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_29.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _560_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_29.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_29.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_30.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _561_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_30.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_30.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3080gat (input port clocked by CK)
+  Endpoint: DFF_31.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3080gat (in)                    0.0010444800 0.0000000000 0.0000000000 0.0000000000 f
+  _562_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_31.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_31.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_32.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _563_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_32.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_32.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_34.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _564_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_34.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_34.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_35.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _565_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_35.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_35.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_36.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _566_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  DFF_36.Q_reg_p/D (DFFQX1H7R)                0.0270278994 0.0000000000 0.0480615422 f
+  data arrival time                                                 0.0480615422
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_36.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0062663481 -0.0062663481
+  data required time                                                -0.0062663481
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0062663481
+  data arrival time                                                 -0.0480615422
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0543278903
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_0.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _377_/Y (AO22X0P7H7R)            0.0020571249 0.0339938141 0.0531466454 0.0531466454 f
+  DFF_0.Q_reg_p/D (DFFQX1H7R)                 0.0339938141 0.0000000000 0.0531466454 f
+  data arrival time                                                 0.0531466454
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_0.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      -0.0080639105 -0.0080639105
+  data required time                                                -0.0080639105
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0080639105
+  data arrival time                                                 -0.0531466454
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0612105578
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_33.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _377_/Y (AO22X0P7H7R)            0.0020571249 0.0339938141 0.0531466454 0.0531466454 f
+  DFF_33.Q_reg_p/D (DFFQX1H7R)                0.0339938141 0.0000000000 0.0531466454 f
+  data arrival time                                                 0.0531466454
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_33.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0080639105 -0.0080639105
+  data required time                                                -0.0080639105
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0080639105
+  data arrival time                                                 -0.0531466454
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0612105578
+
+
+  Startpoint: n3067gat (input port clocked by CK)
+  Endpoint: DFF_43.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3067gat (in)                    0.0037225129 0.0000000000 0.0000000000 0.0000000000 f
+  _587_/Y (MUX2X0P5H7R)            0.0007042090 0.0246639140 0.0574822575 0.0574822575 f
+  DFF_43.Q_reg_p/D (DFFQX1H7R)                0.0246639140 0.0000000000 0.0574822575 f
+  data arrival time                                                 0.0574822575
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_43.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0056563192 -0.0056563192
+  data required time                                                -0.0056563192
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0056563192
+  data arrival time                                                 -0.0574822575
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0631385744
+
+
+  Startpoint: n3066gat (input port clocked by CK)
+  Endpoint: DFF_44.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3066gat (in)                    0.0037225131 0.0000000000 0.0000000000 0.0000000000 f
+  _589_/Y (MUX2X0P5H7R)            0.0007042090 0.0246639140 0.0574822575 0.0574822575 f
+  DFF_44.Q_reg_p/D (DFFQX1H7R)                0.0246639140 0.0000000000 0.0574822575 f
+  data arrival time                                                 0.0574822575
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_44.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0056563192 -0.0056563192
+  data required time                                                -0.0056563192
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0056563192
+  data arrival time                                                 -0.0574822575
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0631385744
+
+
+  Startpoint: n3073gat (input port clocked by CK)
+  Endpoint: DFF_45.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3073gat (in)                    0.0037467517 0.0000000000 0.0000000000 0.0000000000 f
+  _594_/Y (MUX2X0P5H7R)            0.0007042090 0.0246639140 0.0574822575 0.0574822575 f
+  DFF_45.Q_reg_p/D (DFFQX1H7R)                0.0246639140 0.0000000000 0.0574822575 f
+  data arrival time                                                 0.0574822575
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_45.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0056563192 -0.0056563192
+  data required time                                                -0.0056563192
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0056563192
+  data arrival time                                                 -0.0574822575
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0631385744
+
+
+  Startpoint: n3071gat (input port clocked by CK)
+  Endpoint: DFF_51.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3071gat (in)                    0.0038792852 0.0000000000 0.0000000000 0.0000000000 r
+  _619_/Y (AO221X0P7H7R)           0.0007097700 0.0240343343 0.0498551801 0.0498551801 r
+  DFF_51.Q_reg_p/D (DFFQX1H7R)                0.0240343343 0.0000000000 0.0498551801 r
+  data arrival time                                                 0.0498551801
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_51.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0180626642 -0.0180626642
+  data required time                                                -0.0180626642
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0180626642
+  data arrival time                                                 -0.0498551801
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0679178461
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_96.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  DFF_96.Q_reg_p/D (DFFQX1H7R)                0.0327365361 0.0000000000 0.0693598986 f
+  data arrival time                                                 0.0693598986
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_96.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0077394680 -0.0077394680
+  data required time                                                -0.0077394680
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0077394680
+  data arrival time                                                 -0.0693598986
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0770993680
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_132.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _472_/Y (NOR3X0P5H7R)            0.0007042090 0.0313857049 0.0322851688 0.0733957440 f
+  DFF_132.Q_reg_p/D (DFFQX1H7R)               0.0313857049 0.0000000000 0.0733957440 f
+  data arrival time                                                 0.0733957440
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_132.Q_reg_p/CK (DFFQX1H7R)                                    0.0000000000 r
+  library hold time                                      -0.0073908842 -0.0073908842
+  data required time                                                -0.0073908842
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0073908842
+  data arrival time                                                 -0.0733957440
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0807866305
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_142.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _488_/Y (NOR3X0P5H7R)            0.0007042090 0.0313857049 0.0322851688 0.0733957440 f
+  DFF_142.Q_reg_p/D (DFFQX1H7R)               0.0313857049 0.0000000000 0.0733957440 f
+  data arrival time                                                 0.0733957440
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_142.Q_reg_p/CK (DFFQX1H7R)                                    0.0000000000 r
+  library hold time                                      -0.0073908842 -0.0073908842
+  data required time                                                -0.0073908842
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0073908842
+  data arrival time                                                 -0.0733957440
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0807866305
+
+
+  Startpoint: n3090gat (input port clocked by CK)
+  Endpoint: DFF_92.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3090gat (in)                    0.0006677450 0.0000000000 0.0000000000 0.0000000000 r
+  _726_/Y (NAND4BX0P5H7R)          0.0005483220 0.0329727195 0.0344153643 0.0344153643 r
+  _727_/Y (OR2X0P5H7L)             0.0007097700 0.0193125904 0.0327960327 0.0672113970 r
+  DFF_92.Q_reg_p/D (DFFQX1H7R)                0.0193125904 0.0000000000 0.0672113970 r
+  data arrival time                                                 0.0672113970
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_92.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0171305388 -0.0171305388
+  data required time                                                -0.0171305388
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0171305388
+  data arrival time                                                 -0.0672113970
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0843419358
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_69.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _459_/Y (NAND2BX0P5H7R)          0.0012702669 0.0396070331 0.0457335413 0.0457335413 f
+  _673_/Y (AND3X0P5H7L)            0.0007042090 0.0173707437 0.0440058038 0.0897393450 f
+  DFF_69.Q_reg_p/D (DFFQX1H7R)                0.0173707437 0.0000000000 0.0897393450 f
+  data arrival time                                                 0.0897393450
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_69.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0037243881 -0.0037243881
+  data required time                                                -0.0037243881
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0037243881
+  data arrival time                                                 -0.0897393450
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0934637338
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_131.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _459_/Y (NAND2BX0P5H7R)          0.0012702669 0.0396070331 0.0457335413 0.0457335413 f
+  _460_/Y (OAI211X1P4H7L)          0.0017321771 0.0335342996 0.0317027420 0.0774362832 r
+  _461_/Z (NOR2BX1H7L)             0.0007042090 0.0154328663 0.0141994655 0.0916357487 f
+  DFF_131.Q_reg_p/D (DFFQX1H7R)               0.0154328663 0.0000000000 0.0916357487 f
+  data arrival time                                                 0.0916357487
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_131.Q_reg_p/CK (DFFQX1H7R)                                    0.0000000000 r
+  library hold time                                      -0.0032106957 -0.0032106957
+  data required time                                                -0.0032106957
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0032106957
+  data arrival time                                                 -0.0916357487
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0948464423
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_168.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _459_/Y (NAND2BX0P5H7R)          0.0012702669 0.0396070331 0.0457335413 0.0457335413 f
+  _460_/Y (OAI211X1P4H7L)          0.0017321771 0.0335342996 0.0317027420 0.0774362832 r
+  _525_/Z (NOR2BX1H7L)             0.0007042090 0.0154328663 0.0141994655 0.0916357487 f
+  DFF_168.Q_reg_p/D (DFFQX1H7R)               0.0154328663 0.0000000000 0.0916357487 f
+  data arrival time                                                 0.0916357487
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_168.Q_reg_p/CK (DFFQX1H7R)                                    0.0000000000 r
+  library hold time                                      -0.0032106957 -0.0032106957
+  data required time                                                -0.0032106957
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0032106957
+  data arrival time                                                 -0.0916357487
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0948464423
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_82.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _563_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _702_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_82.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_82.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_83.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _559_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _703_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_83.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_83.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_84.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _560_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _704_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_84.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_84.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_85.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _561_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _705_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_85.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_85.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3080gat (input port clocked by CK)
+  Endpoint: DFF_86.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3080gat (in)                    0.0010444800 0.0000000000 0.0000000000 0.0000000000 f
+  _562_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _706_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_86.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_86.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_88.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _564_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _708_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_88.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_88.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_89.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _565_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _709_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_89.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_89.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_90.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _566_/Y (AO22X0P7H7R)            0.0013529160 0.0270278994 0.0480615422 0.0480615422 f
+  _716_/Y (NAND2BX0P5H7R)          0.0007042090 0.0277575906 0.0469356850 0.0949972272 f
+  DFF_90.Q_reg_p/D (DFFQX1H7R)                0.0277575906 0.0000000000 0.0949972272 f
+  data arrival time                                                 0.0949972272
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_90.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064546457 -0.0064546457
+  data required time                                                -0.0064546457
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064546457
+  data arrival time                                                 -0.0949972272
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1014518738
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_70.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _459_/Y (NAND2BX0P5H7R)          0.0012702669 0.0396070331 0.0457335413 0.0457335413 f
+  _460_/Y (OAI211X1P4H7L)          0.0017321771 0.0335342996 0.0317027420 0.0774362832 r
+  _674_/Y (NOR3X0P5H7R)            0.0007042090 0.0205612741 0.0228360742 0.1002723575 f
+  DFF_70.Q_reg_p/D (DFFQX1H7R)                0.0205612741 0.0000000000 0.1002723575 f
+  data arrival time                                                 0.1002723575
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_70.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0045701340 -0.0045701340
+  data required time                                                -0.0045701340
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0045701340
+  data arrival time                                                 -0.1002723575
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1048424914
+
+
+  Startpoint: n3095gat (input port clocked by CK)
+  Endpoint: DFF_87.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3095gat (in)                    0.0142658409 0.0000000000 0.0000000000 0.0000000000 f
+  _377_/Y (AO22X0P7H7R)            0.0020571249 0.0339938141 0.0531466454 0.0531466454 f
+  _707_/Y (NAND2BX0P5H7R)          0.0007042090 0.0278113056 0.0489564985 0.1021031439 f
+  DFF_87.Q_reg_p/D (DFFQX1H7R)                0.0278113056 0.0000000000 0.1021031439 f
+  data arrival time                                                 0.1021031439
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_87.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0064685070 -0.0064685070
+  data required time                                                -0.0064685070
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0064685070
+  data arrival time                                                 -0.1021031439
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1085716486
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_95.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _738_/Y (NAND2X0P5H7R)           0.0007097700 0.0248985048 0.0254075527 0.0947674513 r
+  DFF_95.Q_reg_p/D (DFFQX1H7R)                0.0248985048 0.0000000000 0.0947674513 r
+  data arrival time                                                 0.0947674513
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_95.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0183684938 -0.0183684938
+  data required time                                                -0.0183684938
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183684938
+  data arrival time                                                 -0.0947674513
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1131359488
+
+
+  Startpoint: n3083gat (input port clocked by CK)
+  Endpoint: DFF_9.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3083gat (in)                    0.0041589099 0.0000000000 0.0000000000 0.0000000000 r
+  _711_/Y (XNOR2X0P5H7R)           0.0010583600 0.0306474064 0.0401100740 0.0401100740 r
+  _715_/Y (XNOR2X0P5H7R)           0.0012240720 0.0334785543 0.0508727506 0.0909828246 r
+  DFF_9.Q_reg_p/D (DFFQX1H7R)                 0.0334785543 0.0000000000 0.0909828246 r
+  data arrival time                                                 0.0909828246
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_9.Q_reg_p/CK (DFFQX1H7R)                                      0.0000000000 r
+  library hold time                                      -0.0227891430 -0.0227891430
+  data required time                                                -0.0227891430
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0227891430
+  data arrival time                                                 -0.0909828246
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1137719676
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_100.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _402_/Y (NAND3X0P5H7R)           0.0007097700 0.0269786678 0.0271321684 0.0964920670 r
+  DFF_100.Q_reg_p/D (DFFQX1H7R)               0.0269786678 0.0000000000 0.0964920670 r
+  data arrival time                                                 0.0964920670
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_100.Q_reg_p/CK (DFFQX1H7R)                                    0.0000000000 r
+  library hold time                                      -0.0194402430 -0.0194402430
+  data required time                                                -0.0194402430
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0194402430
+  data arrival time                                                 -0.0964920670
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1159323081
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_97.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _739_/Y (INVX0P5H7R)             0.0010656830 0.0277051963 0.0269677341 0.0963276327 r
+  _740_/Y (AOI21X0P5H7R)           0.0007042090 0.0173558779 0.0194447860 0.1157724187 f
+  DFF_97.Q_reg_p/D (DFFQX1H7R)                0.0173558779 0.0000000000 0.1157724187 f
+  data arrival time                                                 0.1157724187
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_97.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0037204477 -0.0037204477
+  data required time                                                -0.0037204477
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0037204477
+  data arrival time                                                 -0.1157724187
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1194928661
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_98.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _739_/Y (INVX0P5H7R)             0.0010656830 0.0277051963 0.0269677341 0.0963276327 r
+  _743_/Y (NOR2X0P5H7R)            0.0007042090 0.0185280852 0.0199832916 0.1163109243 f
+  DFF_98.Q_reg_p/D (DFFQX1H7R)                0.0185280852 0.0000000000 0.1163109243 f
+  data arrival time                                                 0.1163109243
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_98.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0040311757 -0.0040311757
+  data required time                                                -0.0040311757
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0040311757
+  data arrival time                                                 -0.1163109243
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1203420982
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_58.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _651_/Y (NAND2X1P4H7L)           0.0027678940 0.0400604717 0.0337872356 0.1031471342 r
+  _652_/Z (NOR2BX1H7L)             0.0007042090 0.0170277320 0.0149262771 0.1180734113 f
+  DFF_58.Q_reg_p/D (DFFQX1H7R)                0.0170277320 0.0000000000 0.1180734113 f
+  data arrival time                                                 0.1180734113
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_58.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0036334626 -0.0036334626
+  data required time                                                -0.0036334626
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0036334626
+  data arrival time                                                 -0.1180734113
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1217068732
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_93.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _731_/Y (NAND4BX0P5H7R)          0.0007097700 0.0337948538 0.0317762941 0.1011361927 r
+  DFF_93.Q_reg_p/D (DFFQX1H7R)                0.0337948538 0.0000000000 0.1011361927 r
+  data arrival time                                                 0.1011361927
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_93.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0229521077 -0.0229521077
+  data required time                                                -0.0229521077
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0229521077
+  data arrival time                                                 -0.1011361927
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1240883023
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_63.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _660_/Y (NAND2X1P4H7L)           0.0026920019 0.0368338488 0.0318225250 0.1011824235 r
+  _661_/Y (INVX0P5H7R)             0.0007042090 0.0191069506 0.0202812925 0.1214637160 f
+  DFF_63.Q_reg_p/D (DFFQX1H7R)                0.0191069506 0.0000000000 0.1214637160 f
+  data arrival time                                                 0.1214637160
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_63.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0041846214 -0.0041846214
+  data required time                                                -0.0041846214
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0041846214
+  data arrival time                                                 -0.1214637160
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1256483346
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_64.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _660_/Y (NAND2X1P4H7L)           0.0026920019 0.0368338488 0.0318225250 0.1011824235 r
+  _662_/Y (AOI21X0P5H7R)           0.0007042090 0.0199151821 0.0215587988 0.1227412224 f
+  DFF_64.Q_reg_p/D (DFFQX1H7R)                0.0199151821 0.0000000000 0.1227412224 f
+  data arrival time                                                 0.1227412224
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_64.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0043988675 -0.0043988675
+  data required time                                                -0.0043988675
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0043988675
+  data arrival time                                                 -0.1227412224
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1271400899
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_65.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _660_/Y (NAND2X1P4H7L)           0.0026920019 0.0368338488 0.0318225250 0.1011824235 r
+  _666_/Y (NOR2X0P5H7R)            0.0007042090 0.0210291147 0.0223595500 0.1235419735 f
+  DFF_65.Q_reg_p/D (DFFQX1H7R)                0.0210291147 0.0000000000 0.1235419735 f
+  data arrival time                                                 0.1235419735
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_65.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0046941489 -0.0046941489
+  data required time                                                -0.0046941489
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0046941489
+  data arrival time                                                 -0.1235419735
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1282361150
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_66.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _660_/Y (NAND2X1P4H7L)           0.0026920019 0.0368338488 0.0318225250 0.1011824235 r
+  _669_/Y (NOR2X0P5H7R)            0.0007042090 0.0210291147 0.0223595500 0.1235419735 f
+  DFF_66.Q_reg_p/D (DFFQX1H7R)                0.0210291147 0.0000000000 0.1235419735 f
+  data arrival time                                                 0.1235419735
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_66.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0046941489 -0.0046941489
+  data required time                                                -0.0046941489
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0046941489
+  data arrival time                                                 -0.1235419735
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1282361150
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_67.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _660_/Y (NAND2X1P4H7L)           0.0026920019 0.0368338488 0.0318225250 0.1011824235 r
+  _671_/Y (NOR2X0P5H7R)            0.0007042090 0.0210291147 0.0223595500 0.1235419735 f
+  DFF_67.Q_reg_p/D (DFFQX1H7R)                0.0210291147 0.0000000000 0.1235419735 f
+  data arrival time                                                 0.1235419735
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_67.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0046941489 -0.0046941489
+  data required time                                                -0.0046941489
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0046941489
+  data arrival time                                                 -0.1235419735
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1282361150
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_61.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _651_/Y (NAND2X1P4H7L)           0.0027678940 0.0400604717 0.0337872356 0.1031471342 r
+  _656_/Y (INVX0P5H7R)             0.0007042090 0.0199814588 0.0209777802 0.1241249144 f
+  DFF_61.Q_reg_p/D (DFFQX1H7R)                0.0199814588 0.0000000000 0.1241249144 f
+  data arrival time                                                 0.1241249144
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_61.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0044164360 -0.0044164360
+  data required time                                                -0.0044164360
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0044164360
+  data arrival time                                                 -0.1241249144
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1285413504
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_59.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _651_/Y (NAND2X1P4H7L)           0.0027678940 0.0400604717 0.0337872356 0.1031471342 r
+  _653_/Y (AOI21X0P5H7R)           0.0007042090 0.0208197944 0.0223060250 0.1254531592 f
+  DFF_59.Q_reg_p/D (DFFQX1H7R)                0.0208197944 0.0000000000 0.1254531592 f
+  data arrival time                                                 0.1254531592
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_59.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0046386626 -0.0046386626
+  data required time                                                -0.0046386626
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0046386626
+  data arrival time                                                 -0.1254531592
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1300918162
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_60.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _651_/Y (NAND2X1P4H7L)           0.0027678940 0.0400604717 0.0337872356 0.1031471342 r
+  _655_/Y (NOR2X0P5H7R)            0.0007042090 0.0219131336 0.0231994689 0.1263466030 f
+  DFF_60.Q_reg_p/D (DFFQX1H7R)                0.0219131336 0.0000000000 0.1263466030 f
+  data arrival time                                                 0.1263466030
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_60.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0049284846 -0.0049284846
+  data required time                                                -0.0049284846
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0049284846
+  data arrival time                                                 -0.1263466030
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1312750876
+
+
+  Startpoint: n3100gat (input port clocked by CK)
+  Endpoint: DFF_62.Q_reg_p
+               (rising edge-triggered flip-flop clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3100gat (in)                    0.0012888910 0.0000000000 0.0000000000 0.0000000000 f
+  _400_/Y (AOI2BB1X1P4H7L)         0.0025742659 0.0651950166 0.0411105752 0.0411105752 r
+  _401_/Y (AOI211X3H7L)            0.0042381869 0.0327365361 0.0282493234 0.0693598986 f
+  _651_/Y (NAND2X1P4H7L)           0.0027678940 0.0400604717 0.0337872356 0.1031471342 r
+  _659_/Y (NOR2X0P5H7R)            0.0007042090 0.0219131336 0.0231994689 0.1263466030 f
+  DFF_62.Q_reg_p/D (DFFQX1H7R)                0.0219131336 0.0000000000 0.1263466030 f
+  data arrival time                                                 0.1263466030
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  DFF_62.Q_reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0049284846 -0.0049284846
+  data required time                                                -0.0049284846
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0049284846
+  data arrival time                                                 -0.1263466030
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1312750876
+
+
+1

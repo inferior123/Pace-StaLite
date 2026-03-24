@@ -1,0 +1,46 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-transition_time
+	-capacitance
+	-pba_mode path
+	-sort_by slack
+Design : simple
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 16:41:19 2026
+****************************************
+
+
+  Startpoint: f2 (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: out (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  f2/CK (DFFQX1H7L)                           0.0000000000 0.0000000000 0.0000000000 r
+  f2/Q (DFFQX1H7L)                 0.0007957380 0.0207588691 0.0803544670 0.0803544670 r
+  u5/Y (INVX0P5H7L)                0.0007953530 0.0139492601 0.0136182532 0.0939727202 f
+  u6/Y (INVX0P5H7L)                0.0000000000 0.0067554736 0.0101332963 0.1041060165 r
+  out (out)                                   0.0067554736 0.0000000000 0.1041060165 r
+  data arrival time                                                 0.1041060165
+
+  clock clk (rise edge)                                  10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1041060165
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8958940506
+
+
+1

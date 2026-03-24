@@ -1,0 +1,111 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-transition_time
+	-capacitance
+	-pba_mode path
+	-sort_by slack
+Design : serdes_top
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 15:41:17 2026
+****************************************
+
+
+  Startpoint: data_8b_out_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: parallel_data_out[0]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: min  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  data_8b_out_reg_p/CK (DFFQX1H7R)                    0.0000000000 0.0000000000 0.0000000000 r
+  data_8b_out_reg_p/Q (DFFQX1H7R)          0.0016556700 0.0251028668 0.0715858117 0.0715858117 f
+  _7_/Y (AND2X1H7L)                        0.0007042090 0.0122342203 0.0314031765 0.1029889882 f
+  parallel_data_out[0]_reg_p/D (DFFQX1H7R)            0.0122342203 0.0000000000 0.1029889882 f
+  data arrival time                                                         0.1029889882
+
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  clock reconvergence pessimism                                  0.0000000000 0.0000000000
+  parallel_data_out[0]_reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                              -0.0023627989 -0.0023627989
+  data required time                                                        -0.0023627989
+  -------------------------------------------------------------------------------------
+  data required time                                                        -0.0023627989
+  data arrival time                                                         -0.1029889882
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               0.1053517908
+
+
+  Startpoint: decode_data.temp_3b_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: decode_data.temp_3b_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: min  (recalculated)
+
+  Point                                            Cap      Trans       Incr       Path
+  ----------------------------------------------------------------------------------------
+  clock clk (rise edge)                                             0.0000000000 0.0000000000
+  clock network delay (propagated)                                  0.0000000000 0.0000000000
+  decode_data.temp_3b_0__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  decode_data.temp_3b_0__reg_p/Q (DFFQX1H7R)  0.0013034220 0.0299313683 0.0760464221 0.0760464221 f
+  _6_/Y (AND2X1H7L)                           0.0007042090 0.0128820706 0.0355755985 0.1116220206 f
+  decode_data.temp_3b_0__reg_p/D (DFFQX1H7R)             0.0128820706 0.0000000000 0.1116220206 f
+  data arrival time                                                            0.1116220206
+
+  clock clk (rise edge)                                             0.0000000000 0.0000000000
+  clock network delay (propagated)                                  0.0000000000 0.0000000000
+  clock reconvergence pessimism                                     0.0000000000 0.0000000000
+  decode_data.temp_3b_0__reg_p/CK (DFFQX1H7R)                                  0.0000000000 r
+  library hold time                                                 -0.0025345311 -0.0025345311
+  data required time                                                           -0.0025345311
+  ----------------------------------------------------------------------------------------
+  data required time                                                           -0.0025345311
+  data arrival time                                                            -0.1116220206
+  ----------------------------------------------------------------------------------------
+  slack (MET)                                                                  0.1141565517
+
+
+  Startpoint: data_8b_out_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: data_8b_out_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  data_8b_out_reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  data_8b_out_reg_p/Q (DFFQX1H7R)  0.0016556700 0.0251028668 0.0715858117 0.0715858117 f
+  _5_/Y (MUX2X3H7L)                0.0007042090 0.0215967465 0.0500184745 0.1216042861 f
+  data_8b_out_reg_p/D (DFFQX1H7R)             0.0215967465 0.0000000000 0.1216042861 f
+  data arrival time                                                 0.1216042861
+
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  data_8b_out_reg_p/CK (DFFQX1H7R)                                  0.0000000000 r
+  library hold time                                      -0.0048446162 -0.0048446162
+  data required time                                                -0.0048446162
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0048446162
+  data arrival time                                                 -0.1216042861
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1264488995
+
+
+1

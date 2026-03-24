@@ -1,0 +1,768 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_reg
+	-transition_time
+	-capacitance
+	-pba_mode path
+	-sort_by slack
+Design : spi
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 15:41:07 2026
+****************************************
+
+
+  Startpoint: miso (input port clocked by raw_clk)
+  Endpoint: data_rx[0]_reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  miso (in)                        0.0005715990 0.0000000000 0.0000000000 0.0000000000 f
+  _129_/Y (MUX2X0P5H7L)            0.0007042090 0.0218328647 0.0469680429 0.0469680429 f
+  data_rx[0]_reg_p/D (DFFQX1H7R)              0.0218328647 0.0000000000 0.0469680429 f
+  data arrival time                                                 0.0469680429
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  data_rx[0]_reg_p/CK (DFFQX1H7R)                                   0.0000000000 r
+  library hold time                                      -0.0049072066 -0.0049072066
+  data required time                                                -0.0049072066
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0049072066
+  data arrival time                                                 -0.0469680429
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0518752486
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: state_0__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  start (in)                       0.0081688724 0.0000000000 0.0000000000 0.0000000000 f
+  _141_/Y (AOI2BB1X0P5H7R)         0.0007042090 0.0260487050 0.0522614904 0.0522614904 f
+  state_0__reg_p/D (DFFQX1H7R)                0.0260487050 0.0000000000 0.0522614904 f
+  data arrival time                                                 0.0522614904
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  state_0__reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0060136658 -0.0060136658
+  data required time                                                -0.0060136658
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0060136658
+  data arrival time                                                 -0.0522614904
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0582751557
+
+
+  Startpoint: width_16 (input port clocked by raw_clk)
+  Endpoint: state_1__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  width_16 (in)                    0.0115651479 0.0000000000 0.0000000000 0.0000000000 r
+  _142_/Z (NOR2BX1P4H7L)           0.0005322120 0.0048253005 0.0073925080 0.0073925080 f
+  _143_/Y (AOI21X0P5H7R)           0.0005900070 0.0272145011 0.0205329955 0.0279255025 r
+  _145_/Y (OAI21X0P5H7R)           0.0007042090 0.0305932108 0.0345851965 0.0625106990 f
+  state_1__reg_p/D (DFFQX1H7R)                0.0305932108 0.0000000000 0.0625106990 f
+  data arrival time                                                 0.0625106990
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  state_1__reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0071863807 -0.0071863807
+  data required time                                                -0.0071863807
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0071863807
+  data arrival time                                                 -0.0625106990
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0696970820
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: mosi_reg_p (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  start (in)                       0.0081688724 0.0000000000 0.0000000000 0.0000000000 f
+  _138_/Y (AOAI211X0P5H7R)         0.0005806790 0.0523064621 0.0428486541 0.0428486541 r
+  _139_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0307593681 0.0334107652 0.0762594193 f
+  mosi_reg_p/D (DFFQX1H7R)                    0.0307593681 0.0000000000 0.0762594193 f
+  data arrival time                                                 0.0762594193
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  mosi_reg_p/CK (DFFQX1H7R)                                         0.0000000000 r
+  library hold time                                      -0.0072292578 -0.0072292578
+  data required time                                                -0.0072292578
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0072292578
+  data arrival time                                                 -0.0762594193
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0834886804
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_10__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _150_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _155_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_10__reg_p/D (DFFQX1H7R)           0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_10__reg_p/CK (DFFQX1H7R)                                0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_11__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _156_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _160_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_11__reg_p/D (DFFQX1H7R)           0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_11__reg_p/CK (DFFQX1H7R)                                0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_12__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _161_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _165_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_12__reg_p/D (DFFQX1H7R)           0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_12__reg_p/CK (DFFQX1H7R)                                0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_13__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _166_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _170_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_13__reg_p/D (DFFQX1H7R)           0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_13__reg_p/CK (DFFQX1H7R)                                0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_14__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _171_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _175_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_14__reg_p/D (DFFQX1H7R)           0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_14__reg_p/CK (DFFQX1H7R)                                0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_15__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _176_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _180_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_15__reg_p/D (DFFQX1H7R)           0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_15__reg_p/CK (DFFQX1H7R)                                0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_8__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _195_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _199_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_8__reg_p/D (DFFQX1H7R)            0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_8__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: tx_buffer_9__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _200_/Y (NAND2BX0P5H7R)          0.0005699330 0.0227060672 0.0285593811 0.0285593811 r
+  _204_/Y (AOAI211X0P5H7R)         0.0007042090 0.0500234924 0.0501789153 0.0787382945 f
+  tx_buffer_9__reg_p/D (DFFQX1H7R)            0.0500234924 0.0000000000 0.0787382945 f
+  data arrival time                                                 0.0787382945
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_9__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0122135719 -0.0122135719
+  data required time                                                -0.0122135719
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0122135719
+  data arrival time                                                 -0.0787382945
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0909518674
+
+
+  Startpoint: data_tx[0] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_0__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  data_tx[0] (in)                  0.0013669120 0.0000000000 0.0000000000 0.0000000000 f
+  _146_/Z (NOR2BX1H7L)             0.0006038440 0.0135523723 0.0256139990 0.0256139990 f
+  _149_/Y (MUX2X0P5H7R)            0.0007042090 0.0246607605 0.0608698651 0.0864838660 f
+  tx_buffer_0__reg_p/D (DFFQX1H7R)            0.0246607605 0.0000000000 0.0864838660 f
+  data arrival time                                                 0.0864838660
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_0__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0056555057 -0.0056555057
+  data required time                                                -0.0056555057
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0056555057
+  data arrival time                                                 -0.0864838660
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0921393707
+
+
+  Startpoint: data_tx[1] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_1__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  data_tx[1] (in)                  0.0013484630 0.0000000000 0.0000000000 0.0000000000 r
+  _181_/Y (MUX2X0P5H7R)            0.0006042700 0.0231264401 0.0446315557 0.0446315557 r
+  _182_/Y (MUX2X0P5H7R)            0.0007097700 0.0248015951 0.0520442352 0.0966757908 r
+  tx_buffer_1__reg_p/D (DFFQX1H7R)            0.0248015951 0.0000000000 0.0966757908 r
+  data arrival time                                                 0.0966757908
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_1__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0183185618 -0.0183185618
+  data required time                                                -0.0183185618
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183185618
+  data arrival time                                                 -0.0966757908
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1149943545
+
+
+  Startpoint: data_tx[2] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_2__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  data_tx[2] (in)                  0.0013484630 0.0000000000 0.0000000000 0.0000000000 r
+  _183_/Y (MUX2X0P5H7R)            0.0006042700 0.0231264401 0.0446315557 0.0446315557 r
+  _184_/Y (MUX2X0P5H7R)            0.0007097700 0.0248015951 0.0520442352 0.0966757908 r
+  tx_buffer_2__reg_p/D (DFFQX1H7R)            0.0248015951 0.0000000000 0.0966757908 r
+  data arrival time                                                 0.0966757908
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_2__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0183185618 -0.0183185618
+  data required time                                                -0.0183185618
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183185618
+  data arrival time                                                 -0.0966757908
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1149943545
+
+
+  Startpoint: data_tx[3] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_3__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  data_tx[3] (in)                  0.0013484630 0.0000000000 0.0000000000 0.0000000000 r
+  _185_/Y (MUX2X0P5H7R)            0.0006042700 0.0231264401 0.0446315557 0.0446315557 r
+  _186_/Y (MUX2X0P5H7R)            0.0007097700 0.0248015951 0.0520442352 0.0966757908 r
+  tx_buffer_3__reg_p/D (DFFQX1H7R)            0.0248015951 0.0000000000 0.0966757908 r
+  data arrival time                                                 0.0966757908
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_3__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0183185618 -0.0183185618
+  data required time                                                -0.0183185618
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183185618
+  data arrival time                                                 -0.0966757908
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1149943545
+
+
+  Startpoint: data_tx[4] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_4__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  data_tx[4] (in)                  0.0013484630 0.0000000000 0.0000000000 0.0000000000 r
+  _187_/Y (MUX2X0P5H7R)            0.0006042700 0.0231264401 0.0446315557 0.0446315557 r
+  _188_/Y (MUX2X0P5H7R)            0.0007097700 0.0248015951 0.0520442352 0.0966757908 r
+  tx_buffer_4__reg_p/D (DFFQX1H7R)            0.0248015951 0.0000000000 0.0966757908 r
+  data arrival time                                                 0.0966757908
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_4__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0183185618 -0.0183185618
+  data required time                                                -0.0183185618
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183185618
+  data arrival time                                                 -0.0966757908
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1149943545
+
+
+  Startpoint: data_tx[5] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_5__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  data_tx[5] (in)                  0.0013484630 0.0000000000 0.0000000000 0.0000000000 r
+  _189_/Y (MUX2X0P5H7R)            0.0006042700 0.0231264401 0.0446315557 0.0446315557 r
+  _190_/Y (MUX2X0P5H7R)            0.0007097700 0.0248015951 0.0520442352 0.0966757908 r
+  tx_buffer_5__reg_p/D (DFFQX1H7R)            0.0248015951 0.0000000000 0.0966757908 r
+  data arrival time                                                 0.0966757908
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_5__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0183185618 -0.0183185618
+  data required time                                                -0.0183185618
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183185618
+  data arrival time                                                 -0.0966757908
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1149943545
+
+
+  Startpoint: data_tx[6] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_6__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  data_tx[6] (in)                  0.0013484630 0.0000000000 0.0000000000 0.0000000000 r
+  _191_/Y (MUX2X0P5H7R)            0.0006042700 0.0231264401 0.0446315557 0.0446315557 r
+  _192_/Y (MUX2X0P5H7R)            0.0007097700 0.0248015951 0.0520442352 0.0966757908 r
+  tx_buffer_6__reg_p/D (DFFQX1H7R)            0.0248015951 0.0000000000 0.0966757908 r
+  data arrival time                                                 0.0966757908
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_6__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0183185618 -0.0183185618
+  data required time                                                -0.0183185618
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183185618
+  data arrival time                                                 -0.0966757908
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1149943545
+
+
+  Startpoint: data_tx[7] (input port clocked by raw_clk)
+  Endpoint: tx_buffer_7__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  data_tx[7] (in)                  0.0013484630 0.0000000000 0.0000000000 0.0000000000 r
+  _193_/Y (MUX2X0P5H7R)            0.0006042700 0.0231264401 0.0446315557 0.0446315557 r
+  _194_/Y (MUX2X0P5H7R)            0.0007097700 0.0248015951 0.0520442352 0.0966757908 r
+  tx_buffer_7__reg_p/D (DFFQX1H7R)            0.0248015951 0.0000000000 0.0966757908 r
+  data arrival time                                                 0.0966757908
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  tx_buffer_7__reg_p/CK (DFFQX1H7R)                                 0.0000000000 r
+  library hold time                                      -0.0183185618 -0.0183185618
+  data required time                                                -0.0183185618
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0183185618
+  data arrival time                                                 -0.0966757908
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1149943545
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: count_0__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _105_/Y (OAI21BX0P5H7R)          0.0029377379 0.0779049322 0.0539723411 0.0539723411 f
+  _106_/Y (NAND2X0P5H7R)           0.0005143020 0.0346893147 0.0353044793 0.0892768204 r
+  _107_/Y (OAI21X0P5H7R)           0.0007042090 0.0236755945 0.0248107165 0.1140875369 f
+  count_0__reg_p/D (DFFQX1H7R)                0.0236755945 0.0000000000 0.1140875369 f
+  data arrival time                                                 0.1140875369
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  count_0__reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0053956769 -0.0053956769
+  data required time                                                -0.0053956769
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0053956769
+  data arrival time                                                 -0.1140875369
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1194832176
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: count_4__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _105_/Y (OAI21BX0P5H7R)          0.0029377379 0.0779049322 0.0539723411 0.0539723411 f
+  _124_/Y (NAND2X0P5H7R)           0.0004979250 0.0344491825 0.0350801870 0.0890525281 r
+  _125_/Y (AOAI211X0P5H7R)         0.0007042090 0.0252306573 0.0259021968 0.1149547249 f
+  count_4__reg_p/D (DFFQX1H7R)                0.0252306573 0.0000000000 0.1149547249 f
+  data arrival time                                                 0.1149547249
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  count_4__reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0058025680 -0.0058025680
+  data required time                                                -0.0058025680
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0058025680
+  data arrival time                                                 -0.1149547249
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1207572967
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: count_1__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _105_/Y (OAI21BX0P5H7R)          0.0029377379 0.0779049322 0.0539723411 0.0539723411 f
+  _111_/Y (OAI2BB1X0P5H7R)         0.0007042090 0.0303930026 0.0631653816 0.1171377227 f
+  count_1__reg_p/D (DFFQX1H7R)                0.0303930026 0.0000000000 0.1171377227 f
+  data arrival time                                                 0.1171377227
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  count_1__reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0071347165 -0.0071347165
+  data required time                                                -0.0071347165
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0071347165
+  data arrival time                                                 -0.1171377227
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1242724359
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: count_2__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _105_/Y (OAI21BX0P5H7R)          0.0029377379 0.0779049322 0.0539723411 0.0539723411 f
+  _115_/Y (AO22X0P7H7R)            0.0007042090 0.0226283949 0.0762124136 0.1301847547 f
+  count_2__reg_p/D (DFFQX1H7R)                0.0226283949 0.0000000000 0.1301847547 f
+  data arrival time                                                 0.1301847547
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  count_2__reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0051180860 -0.0051180860
+  data required time                                                -0.0051180860
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0051180860
+  data arrival time                                                 -0.1301847547
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1353028417
+
+
+  Startpoint: start (input port clocked by raw_clk)
+  Endpoint: count_3__reg_p
+               (rising edge-triggered flip-flop clocked by raw_clk)
+  Path Group: raw_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  start (in)                       0.0084802555 0.0000000000 0.0000000000 0.0000000000 r
+  _105_/Y (OAI21BX0P5H7R)          0.0029377379 0.0779049322 0.0539723411 0.0539723411 f
+  _119_/Y (AO22X0P7H7R)            0.0007042090 0.0226283949 0.0762124136 0.1301847547 f
+  count_3__reg_p/D (DFFQX1H7R)                0.0226283949 0.0000000000 0.1301847547 f
+  data arrival time                                                 0.1301847547
+
+  clock raw_clk (rise edge)                              0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  count_3__reg_p/CK (DFFQX1H7R)                                     0.0000000000 r
+  library hold time                                      -0.0051180860 -0.0051180860
+  data required time                                                -0.0051180860
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0051180860
+  data arrival time                                                 -0.1301847547
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1353028417
+
+
+1

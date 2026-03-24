@@ -1,0 +1,671 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-sort_by slack
+Design : r8051
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:04 2026
+****************************************
+
+
+  Startpoint: rom_addr[0]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[0]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[0]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[0]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _48_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[0]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[0]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[10]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[10]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[10]_reg_p/CK (DFFRQX2H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[10]_reg_p/Q (DFFRQX2H7R)                   0.0911712646
+                                                                 0.0911712646 r
+  _47_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[10]_reg_p/D (DFFRQX2H7R)                   0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[10]_reg_p/CK (DFFRQX2H7R)                             10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[11]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[11]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[11]_reg_p/CK (DFFRQX2H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[11]_reg_p/Q (DFFRQX2H7R)                   0.0911712646
+                                                                 0.0911712646 r
+  _46_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[11]_reg_p/D (DFFRQX2H7R)                   0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[11]_reg_p/CK (DFFRQX2H7R)                             10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[12]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[12]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[12]_reg_p/CK (DFFRQX2H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[12]_reg_p/Q (DFFRQX2H7R)                   0.0911712646
+                                                                 0.0911712646 r
+  _45_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[12]_reg_p/D (DFFRQX2H7R)                   0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[12]_reg_p/CK (DFFRQX2H7R)                             10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[13]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[13]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[13]_reg_p/CK (DFFRQX2H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[13]_reg_p/Q (DFFRQX2H7R)                   0.0911712646
+                                                                 0.0911712646 r
+  _44_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[13]_reg_p/D (DFFRQX2H7R)                   0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[13]_reg_p/CK (DFFRQX2H7R)                             10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[14]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[14]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[14]_reg_p/CK (DFFRQX2H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[14]_reg_p/Q (DFFRQX2H7R)                   0.0911712646
+                                                                 0.0911712646 r
+  _43_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[14]_reg_p/D (DFFRQX2H7R)                   0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[14]_reg_p/CK (DFFRQX2H7R)                             10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[15]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[15]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[15]_reg_p/CK (DFFRQX2H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[15]_reg_p/Q (DFFRQX2H7R)                   0.0911712646
+                                                                 0.0911712646 r
+  _42_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[15]_reg_p/D (DFFRQX2H7R)                   0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[15]_reg_p/CK (DFFRQX2H7R)                             10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[1]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[1]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[1]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[1]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _41_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[1]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[1]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[2]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[2]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[2]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[2]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _40_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[2]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[2]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[3]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[3]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[3]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[3]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _39_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[3]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[3]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[4]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[4]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[4]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[4]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _38_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[4]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[4]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[5]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[5]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[5]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[5]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _37_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[5]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[5]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[6]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[6]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[6]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[6]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _36_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[6]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[6]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[7]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[7]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[7]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[7]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _35_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[7]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[7]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[8]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[8]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[8]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[8]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _34_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[8]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[8]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+  Startpoint: rom_addr[9]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: rom_addr[9]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  rom_addr[9]_reg_p/CK (DFFRQX2H7R)                   0.0000000000
+                                                                 0.0000000000 r
+  rom_addr[9]_reg_p/Q (DFFRQX2H7R)                    0.0911712646
+                                                                 0.0911712646 r
+  _33_/Z (NOR2BX0P5H7L)                               0.0494776964
+                                                                 0.1406489611 r
+  rom_addr[9]_reg_p/D (DFFRQX2H7R)                    0.0000000000
+                                                                 0.1406489611 r
+  data arrival time                                              0.1406489611
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  rom_addr[9]_reg_p/CK (DFFRQX2H7R)                              10.0000000000 r
+  library setup time                                  -0.0619207919
+                                                                 9.9380788803
+  data required time                                             9.9380788803
+  ------------------------------------------------------------------------------
+  data required time                                             9.9380788803
+  data arrival time                                              -0.1406489611
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7974300385
+
+
+1

@@ -1,0 +1,244 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-sort_by slack
+Design : serv_top
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 21:00:46 2026
+****************************************
+
+
+  Startpoint: i_rdata0 (input port clocked by clk)
+  Endpoint: o_rf_rreq (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 r
+  i_rdata0 (in)                        0.0000000000
+                                                  0.0000000000 r
+  _0622_/Y (XOR2X0P5H7R)               0.0808965862
+                                                  0.0808965862 f
+  _0628_/Y (XNOR2X0P5H7R)              0.0915465653
+                                                  0.1724431515 r
+  _0637_/Y (OAI211X0P7H7L)             0.0371283591
+                                                  0.2095715106 f
+  _0646_/Y (MUX2X3H7L)                 0.0619932115
+                                                  0.2715647221 f
+  _0716_/Y (XOR2X3H7L)                 0.0701072514
+                                                  0.3416719735 r
+  _0717_/Y (OAI21X2H7L)                0.0241594613
+                                                  0.3658314347 f
+  _1149_/Y (OAO211X3H7L)               0.0954630673
+                                                  0.4612945020 f
+  _1150_/Y (NAND2X0P5H7R)              0.0195981562
+                                                  0.4808926582 r
+  o_rf_rreq (out)                      0.0000000000
+                                                  0.4808926582 r
+  data arrival time                               0.4808926582
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               -0.4808926582
+  ---------------------------------------------------------------
+  slack (MET)                                     9.5191078186
+
+
+  Startpoint: i_rdata0 (input port clocked by clk)
+  Endpoint: o_rf_wreq (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  i_rdata0 (in)                        0.0000000000
+                                                  0.0000000000 f
+  _0622_/Y (XOR2X0P5H7R)               0.0654606223
+                                                  0.0654606223 r
+  _0623_/Y (XOR2X0P5H7R)               0.0952195674
+                                                  0.1606801897 f
+  _0627_/Y (OAI32X0P5H7R)              0.0423961580
+                                                  0.2030763477 r
+  _0646_/Y (MUX2X3H7L)                 0.0648704618
+                                                  0.2679468095 r
+  _0716_/Y (XOR2X3H7L)                 0.0770974159
+                                                  0.3450442255 f
+  _1160_/Y (OAI31X0P5H7R)              0.0484528840
+                                                  0.3934971094 r
+  o_rf_wreq (out)                      0.0000000000
+                                                  0.3934971094 r
+  data arrival time                               0.3934971094
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               -0.3934971094
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6065025330
+
+
+  Startpoint: i_rdata0 (input port clocked by clk)
+  Endpoint: o_wdata1 (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 r
+  i_rdata0 (in)                        0.0000000000
+                                                  0.0000000000 r
+  _0629_/Y (INVX0P5H7R)                0.0350625217
+                                                  0.0350625217 f
+  _0756_/Y (OAI21X0P5H7R)              0.0699757934
+                                                  0.1050383151 r
+  _0757_/Y (XNOR2X0P5H7R)              0.1093444526
+                                                  0.2143827677 f
+  _0771_/Y (AOI21X1P4H7L)              0.0620718002
+                                                  0.2764545679 r
+  _0787_/Y (NAND2X0P5H7R)              0.0579147339
+                                                  0.3343693018 f
+  _1209_/Y (OAI2BB1X0P5H7R)            0.0237558782
+                                                  0.3581251800 r
+  o_wdata1 (out)                       0.0000000000
+                                                  0.3581251800 r
+  data arrival time                               0.3581251800
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               -0.3581251800
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6418752670
+
+
+  Startpoint: i_rdata1 (input port clocked by clk)
+  Endpoint: o_wdata0 (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  i_rdata1 (in)                        0.0000000000
+                                                  0.0000000000 f
+  _0645_/Y (MUX2X3H7L)                 0.0611093044
+                                                  0.0611093044 f
+  _1196_/Y (XNOR2X3H7L)                0.0774806291
+                                                  0.1385899335 r
+  _1197_/Y (MUX2X3H7L)                 0.0519097894
+                                                  0.1904997230 f
+  _1201_/Y (OAI221X2H7L)               0.0446505845
+                                                  0.2351503074 r
+  _1202_/Y (OAI211X0P7H7R)             0.0583813787
+                                                  0.2935316861 f
+  _1208_/Y (AOI221X1H7L)               0.0613191724
+                                                  0.3548508584 r
+  o_wdata0 (out)                       0.0000000000
+                                                  0.3548508584 r
+  data arrival time                               0.3548508584
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               -0.3548508584
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6451492310
+
+
+  Startpoint: i_rst (input port clocked by clk)
+  Endpoint: o_ibus_cyc (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  i_rst (in)                           0.0000000000
+                                                  0.0000000000 f
+  _1146_/Z (NOR2BX1H7L)                0.0118931355
+                                                  0.0118931355 r
+  o_ibus_cyc (out)                     0.0000000000
+                                                  0.0118931355 r
+  data arrival time                               0.0118931355
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               -0.0118931355
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9881067276
+
+
+1

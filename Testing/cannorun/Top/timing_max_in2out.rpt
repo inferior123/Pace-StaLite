@@ -1,0 +1,50 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-sort_by slack
+Design : top
+Version: U-2022.12-SP3
+Date   : Fri Feb  6 15:43:26 2026
+****************************************
+
+
+  Startpoint: clk_12mhz (input port clocked by clk)
+  Endpoint: xclk (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 r
+  clk_12mhz (in)                       0.0000000000
+                                                  0.0000000000 r
+  xclk (out)                           0.0000000000
+                                                  0.0000000000 r
+  data arrival time                               0.0000000000
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               0.0000000000
+  ---------------------------------------------------------------
+  slack (MET)                                     10.0000000000
+
+
+1

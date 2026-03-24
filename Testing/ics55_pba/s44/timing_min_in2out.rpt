@@ -1,0 +1,45 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-transition_time
+	-capacitance
+	-pba_mode exhaustive
+	-sort_by slack
+Design : s44
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 19:36:51 2026
+****************************************
+
+
+  Startpoint: addr[2] (input port clocked by config_clk)
+  Endpoint: out (output port clocked by config_clk)
+  Path Group: config_clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  addr[2] (in)                     0.0016801500 0.0000000000 0.0000000000 0.0000000000 r
+  _74_/Y (MUX4X0P7H7L)             0.0000000000 0.0167399179 0.0436362028 0.0436362028 r
+  out (out)                                   0.0167399179 0.0000000000 0.0436362028 r
+  data arrival time                                                 0.0436362028
+
+  clock config_clk (rise edge)                           0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0436362028
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0436362028
+
+
+1

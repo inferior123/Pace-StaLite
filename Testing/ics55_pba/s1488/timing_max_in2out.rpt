@@ -1,0 +1,591 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-transition_time
+	-capacitance
+	-pba_mode exhaustive
+	-sort_by slack
+Design : s1488
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 19:36:44 2026
+****************************************
+
+
+  Startpoint: v5 (input port clocked by CK)
+  Endpoint: v13_D_8 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  v5 (in)                          0.0198175739 0.0000000000 0.0000000000 0.0000000000 r
+  _554_/Z (NOR2BX6H7L)             0.0041942410 0.0367177501 0.0422901064 0.0422901064 r
+  _645_/Y (AOI21X0P7H7L)           0.0009301590 0.0298632924 0.0272324234 0.0695225298 f
+  _646_/Y (OAI21X1H7L)             0.0009696830 0.0461711735 0.0390938297 0.1086163595 r
+  _647_/Y (AOI31X1P4H7L)           0.0008040340 0.0345784016 0.0311252698 0.1397416294 f
+  _648_/Y (AO221X0P5H7L)           0.0000000000 0.0235652067 0.0721309185 0.2118725479 f
+  v13_D_8 (out)                               0.0235652067 0.0000000000 0.2118725479 f
+  data arrival time                                                 0.2118725479
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.2118725479
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.7881278992
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_7 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v0 (in)                          0.0104864733 0.0000000000 0.0000000000 0.0000000000 f
+  _498_/Y (NAND2BX6H7L)            0.0025077751 0.0187081303 0.0380761400 0.0380761400 f
+  _581_/Y (OR2X1P4H7L)             0.0020812000 0.0269841161 0.0548232123 0.0928993523 f
+  _633_/Y (AOI211X1P4H7L)          0.0010654100 0.0617802627 0.0570907146 0.1499900669 r
+  _634_/Y (NOR3X1P4H7L)            0.0008981950 0.0229735542 0.0180835277 0.1680735946 f
+  _635_/Y (AOI21X0P7H7L)           0.0000000000 0.0205017049 0.0224889219 0.1905625165 r
+  v13_D_7 (out)                               0.0205017049 0.0000000000 0.1905625165 r
+  data arrival time                                                 0.1905625165
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1905625165
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8094377518
+
+
+  Startpoint: v4 (input port clocked by CK)
+  Endpoint: v13_D_13 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v4 (in)                          0.0185022224 0.0000000000 0.0000000000 0.0000000000 f
+  _340_/Y (AND2X12H7L)             0.0093231145 0.0193119887 0.0356035307 0.0356035307 f
+  _541_/Y (AOAI211X0P5H7R)         0.0009236700 0.0597252287 0.0539330766 0.0895366073 r
+  _543_/Y (AOI21X1P4H7L)           0.0009559550 0.0276028439 0.0280603543 0.1175969616 f
+  _547_/Y (NOR3X1P4H7L)            0.0009873880 0.0544931814 0.0461797044 0.1637766659 r
+  _552_/Y (AOAI211X1P4H7L)         0.0000000000 0.0136873359 0.0202848613 0.1840615273 f
+  v13_D_13 (out)                              0.0136873359 0.0000000000 0.1840615273 f
+  data arrival time                                                 0.1840615273
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1840615273
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8159389496
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_11 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v0 (in)                          0.0104864733 0.0000000000 0.0000000000 0.0000000000 f
+  _513_/Y (NAND2X1P4H7L)           0.0035205230 0.0439524688 0.0261496957 0.0261496957 r
+  _514_/Y (OAI211X1P4H7L)          0.0019549951 0.0495606884 0.0418425202 0.0679922178 f
+  _522_/Y (NAND3BX1P4H7L)          0.0010222601 0.0297557246 0.0552067086 0.1231989264 f
+  _523_/Y (AOI21X1P4H7L)           0.0010289400 0.0348922275 0.0363617986 0.1595607251 r
+  _526_/Y (OAI211X1P4H7L)          0.0000000000 0.0157769918 0.0235563666 0.1831170917 f
+  v13_D_11 (out)                              0.0157769918 0.0000000000 0.1831170917 f
+  data arrival time                                                 0.1831170917
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1831170917
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8168830872
+
+
+  Startpoint: v4 (input port clocked by CK)
+  Endpoint: v13_D_10 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v4 (in)                          0.0185022224 0.0000000000 0.0000000000 0.0000000000 f
+  _340_/Y (AND2X12H7L)             0.0093231145 0.0193119887 0.0356035307 0.0356035307 f
+  _511_/Y (AOAI211X0P5H7R)         0.0010583700 0.0683857352 0.0581422970 0.0937458277 r
+  _512_/Y (OAI21X1P4H7L)           0.0009352910 0.0313327909 0.0269874185 0.1207332462 f
+  _517_/Y (AOI22X1P4H7L)           0.0007893600 0.0373999290 0.0408686697 0.1616019160 r
+  _518_/Y (OAI22X0P7H7L)           0.0000000000 0.0196113624 0.0204308629 0.1820327789 f
+  v13_D_10 (out)                              0.0196113624 0.0000000000 0.1820327789 f
+  data arrival time                                                 0.1820327789
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1820327789
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8179674149
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_14 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v0 (in)                          0.0104864733 0.0000000000 0.0000000000 0.0000000000 f
+  _498_/Y (NAND2BX6H7L)            0.0025077751 0.0187081303 0.0380761400 0.0380761400 f
+  _553_/Y (AOI21X0P5H7R)           0.0008325600 0.0449778512 0.0424724594 0.0805485994 r
+  _557_/Y (OA221X1P4H7L)           0.0009507480 0.0273114219 0.0777155012 0.1582641006 r
+  _562_/Y (OAI211X1H7L)            0.0000000000 0.0159322433 0.0236979723 0.1819620728 f
+  v13_D_14 (out)                              0.0159322433 0.0000000000 0.1819620728 f
+  data arrival time                                                 0.1819620728
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1819620728
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8180379868
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_12 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v0 (in)                          0.0104864733 0.0000000000 0.0000000000 0.0000000000 f
+  _513_/Y (NAND2X1P4H7L)           0.0035205230 0.0439524688 0.0261496957 0.0261496957 r
+  _529_/Y (OAI21X0P5H7R)           0.0009527830 0.0377380624 0.0379616544 0.0641113520 f
+  _530_/Y (NAND2X1H7L)             0.0010046000 0.0245693438 0.0240313634 0.0881427154 r
+  _531_/Y (AOI21X1P4H7L)           0.0008250440 0.0215120092 0.0207828209 0.1089255363 f
+  _536_/Y (OA31X0P7H7L)            0.0000000000 0.0239471402 0.0724216551 0.1813471913 f
+  v13_D_12 (out)                              0.0239471402 0.0000000000 0.1813471913 f
+  data arrival time                                                 0.1813471913
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1813471913
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8186531067
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_18 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v0 (in)                          0.0104864733 0.0000000000 0.0000000000 0.0000000000 f
+  _498_/Y (NAND2BX6H7L)            0.0025077751 0.0187081303 0.0380761400 0.0380761400 f
+  _581_/Y (OR2X1P4H7L)             0.0020812000 0.0269841161 0.0548232123 0.0928993523 f
+  _582_/Y (OAI21X1P4H7L)           0.0010293500 0.0234490372 0.0206302851 0.1135296375 r
+  _583_/Y (OAI211X1P4H7L)          0.0008619380 0.0313893184 0.0297763795 0.1433060169 f
+  _585_/Y (AOI21X1H7L)             0.0000000000 0.0204248969 0.0293761641 0.1726821810 r
+  v13_D_18 (out)                              0.0204248969 0.0000000000 0.1726821810 r
+  data arrival time                                                 0.1726821810
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1726821810
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8273181915
+
+
+  Startpoint: v2 (input port clocked by CK)
+  Endpoint: v13_D_24 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v2 (in)                          0.0304786768 0.0000000000 0.0000000000 0.0000000000 f
+  _597_/Y (NOR2X1H7R)              0.0016008820 0.0533494316 0.0361321270 0.0361321270 r
+  _608_/Y (OAI21X0P5H7R)           0.0010005300 0.0402237922 0.0410241932 0.0771563202 f
+  _610_/Y (OAI22X1P4H7L)           0.0007107270 0.0525225438 0.0433267057 0.1204830259 r
+  _617_/Y (AO221X0P5H7L)           0.0000000000 0.0155437067 0.0511185378 0.1716015637 r
+  v13_D_24 (out)                              0.0155437067 0.0000000000 0.1716015637 r
+  data arrival time                                                 0.1716015637
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1716015637
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8283987045
+
+
+  Startpoint: v6 (input port clocked by CK)
+  Endpoint: v13_D_23 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  v6 (in)                          0.0125037897 0.0000000000 0.0000000000 0.0000000000 r
+  _360_/Z (NOR2BX1P4H7L)           0.0023055919 0.0606529713 0.0520227589 0.0520227589 r
+  _603_/Y (NAND3X0P5H7R)           0.0007781170 0.0490171723 0.0501199253 0.1021426842 f
+  _604_/Y (AOAI211X0P5H7R)         0.0009164810 0.0362496898 0.0326603577 0.1348030418 r
+  _605_/Z (NOR2BX1H7L)             0.0000000000 0.0147768408 0.0337892920 0.1685923338 r
+  v13_D_23 (out)                              0.0147768408 0.0000000000 0.1685923338 r
+  data arrival time                                                 0.1685923338
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1685923338
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8314075470
+
+
+  Startpoint: v2 (input port clocked by CK)
+  Endpoint: v13_D_6 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  v2 (in)                          0.0303937104 0.0000000000 0.0000000000 0.0000000000 r
+  _618_/Y (NOR3BX0P5H7R)           0.0008016830 0.0744066462 0.0676692426 0.0676692426 r
+  _619_/Y (OAI21X0P5H7L)           0.0009304320 0.0323041305 0.0347854719 0.1024547145 f
+  _620_/Y (OAI211X0P7H7L)          0.0009796760 0.0311551988 0.0270142630 0.1294689775 r
+  _626_/Y (AOAI211X1P4H7L)         0.0000000000 0.0183612350 0.0253430456 0.1548120230 f
+  v13_D_6 (out)                               0.0183612350 0.0000000000 0.1548120230 f
+  data arrival time                                                 0.1548120230
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1548120230
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8451881409
+
+
+  Startpoint: v6 (input port clocked by CK)
+  Endpoint: v13_D_19 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  v6 (in)                          0.0125037897 0.0000000000 0.0000000000 0.0000000000 r
+  _586_/Y (NAND2BX0P5H7R)          0.0010625100 0.0348030627 0.0243429989 0.0243429989 f
+  _587_/Y (NOR3X1P4H7L)            0.0007695240 0.0488037318 0.0399656594 0.0643086582 r
+  _588_/Y (AOI31X0P5H7R)           0.0007042180 0.0274535939 0.0251674503 0.0894761086 f
+  _591_/Y (OAI32X0P5H7L)           0.0000000000 0.0672881082 0.0549737066 0.1444498152 r
+  v13_D_19 (out)                              0.0672881082 0.0000000000 0.1444498152 r
+  data arrival time                                                 0.1444498152
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1444498152
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8555498123
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_9 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  v0 (in)                          0.0104954410 0.0000000000 0.0000000000 0.0000000000 r
+  _513_/Y (NAND2X1P4H7L)           0.0035172040 0.0444669351 0.0280254763 0.0280254763 f
+  _650_/Y (NOR2X0P5H7R)            0.0008054400 0.0442761071 0.0415353850 0.0695608631 r
+  _651_/Y (AOI21X0P5H7R)           0.0007051060 0.0253551360 0.0237827227 0.0933435857 f
+  _656_/Y (OAOI211X0P5H7R)         0.0000000000 0.0415842384 0.0504975617 0.1438411474 r
+  v13_D_9 (out)                               0.0415842384 0.0000000000 0.1438411474 r
+  data arrival time                                                 0.1438411474
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1438411474
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8561592102
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_15 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v0 (in)                          0.0104864733 0.0000000000 0.0000000000 0.0000000000 f
+  _477_/Y (OAI21X0P7H7L)           0.0016026270 0.0690870360 0.0468050987 0.0468050987 r
+  _563_/Y (NAND2X0P5H7R)           0.0007568960 0.0346305072 0.0385287702 0.0853338689 f
+  _566_/Y (AOI211X0P5H7R)          0.0000000000 0.0498890094 0.0577314049 0.1430652738 r
+  v13_D_15 (out)                              0.0498890094 0.0000000000 0.1430652738 r
+  data arrival time                                                 0.1430652738
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1430652738
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8569345474
+
+
+  Startpoint: v0 (input port clocked by CK)
+  Endpoint: v13_D_17 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v0 (in)                          0.0104864733 0.0000000000 0.0000000000 0.0000000000 f
+  _513_/Y (NAND2X1P4H7L)           0.0035205230 0.0439524688 0.0261496957 0.0261496957 r
+  _576_/Y (NAND3X0P5H7L)           0.0010222601 0.0443690270 0.0372225791 0.0633722767 f
+  _577_/Y (AOI21X1P4H7L)           0.0009873880 0.0351113454 0.0396470875 0.1030193642 r
+  _578_/Y (AOAI211X1P4H7L)         0.0009527830 0.0195762888 0.0249769315 0.1279962957 f
+  _579_/Y (NAND2X1H7L)             0.0000000000 0.0096340403 0.0123425275 0.1403388232 r
+  v13_D_17 (out)                              0.0096340403 0.0000000000 0.1403388232 r
+  data arrival time                                                 0.1403388232
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1403388232
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8596611023
+
+
+  Startpoint: v2 (input port clocked by CK)
+  Endpoint: v13_D_16 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  v2 (in)                          0.0303937104 0.0000000000 0.0000000000 0.0000000000 r
+  _368_/Y (NAND3X1P4H7L)           0.0017389000 0.0393595695 0.0281709917 0.0281709917 f
+  _568_/Y (OAI32X1P4H7L)           0.0007862600 0.0818062052 0.0594079606 0.0875789523 r
+  _569_/Y (AND3X0P5H7L)            0.0000000000 0.0174726974 0.0512004495 0.1387794018 r
+  v13_D_16 (out)                              0.0174726974 0.0000000000 0.1387794018 r
+  data arrival time                                                 0.1387794018
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1387794018
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8612203598
+
+
+  Startpoint: v6 (input port clocked by CK)
+  Endpoint: v13_D_20 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v6 (in)                          0.0124876434 0.0000000000 0.0000000000 0.0000000000 f
+  _329_/Z (NOR2BX4H7L)             0.0025187149 0.0175751187 0.0313692205 0.0313692205 f
+  _592_/Y (OR3X1P4H7L)             0.0008938850 0.0259430595 0.0715662688 0.1029354930 f
+  _593_/Y (NOR3X0P7H7L)            0.0000000000 0.0298171137 0.0277562439 0.1306917369 r
+  v13_D_20 (out)                              0.0298171137 0.0000000000 0.1306917369 r
+  data arrival time                                                 0.1306917369
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1306917369
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8693084717
+
+
+  Startpoint: v5 (input port clocked by CK)
+  Endpoint: v13_D_21 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  v5 (in)                          0.0198175739 0.0000000000 0.0000000000 0.0000000000 r
+  _352_/Y (NAND2X16H7L)            0.0128862429 0.0202389956 0.0164806675 0.0164806675 f
+  _595_/Y (OAI31X1P4H7L)           0.0007862600 0.0621260256 0.0522484481 0.0687291175 r
+  _596_/Y (AND3X0P5H7L)            0.0000000000 0.0166374370 0.0484088808 0.1171379983 r
+  v13_D_21 (out)                              0.0166374370 0.0000000000 0.1171379983 r
+  data arrival time                                                 0.1171379983
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1171379983
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8828620911
+
+
+  Startpoint: v2 (input port clocked by CK)
+  Endpoint: v13_D_22 (output port clocked by CK)
+  Path Group: CK
+  Path Type: max  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  v2 (in)                          0.0304786768 0.0000000000 0.0000000000 0.0000000000 f
+  _597_/Y (NOR2X1H7R)              0.0016008820 0.0533494316 0.0361321270 0.0361321270 r
+  _598_/Y (AOI22X0P5H7R)           0.0007467050 0.0414646380 0.0374404863 0.0735726133 f
+  _601_/Y (OAI22X0P5H7R)           0.0000000000 0.0439556800 0.0418945327 0.1154671460 r
+  v13_D_22 (out)                              0.0439556800 0.0000000000 0.1154671460 r
+  data arrival time                                                 0.1154671460
+
+  clock CK (rise edge)                                   10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  output external delay                                  0.0000000000 10.0000000000
+  data required time                                                10.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                10.0000000000
+  data arrival time                                                 -0.1154671460
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.8845329285
+
+
+1

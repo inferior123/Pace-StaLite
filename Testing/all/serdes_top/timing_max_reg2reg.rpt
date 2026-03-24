@@ -1,0 +1,138 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-sort_by slack
+Design : serdes_top
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 21:01:14 2026
+****************************************
+
+
+  Startpoint: decode_data.temp_3b_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: data_8b_out_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  decode_data.temp_3b_0__reg_p/CK (DFFQX1H7R)         0.0000000000
+                                                                 0.0000000000 r
+  decode_data.temp_3b_0__reg_p/Q (DFFQX1H7R)          0.1056188941
+                                                                 0.1056188941 r
+  _5_/Y (MUX2X3H7L)                                   0.0445358902
+                                                                 0.1501547843 r
+  data_8b_out_reg_p/D (DFFQX1H7R)                     0.0000000000
+                                                                 0.1501547843 r
+  data arrival time                                              0.1501547843
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  data_8b_out_reg_p/CK (DFFQX1H7R)                               10.0000000000 r
+  library setup time                                  -0.0322019756
+                                                                 9.9677982330
+  data required time                                             9.9677982330
+  ------------------------------------------------------------------------------
+  data required time                                             9.9677982330
+  data arrival time                                              -0.1501547843
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.8176431656
+
+
+  Startpoint: decode_data.temp_3b_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: decode_data.temp_3b_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  decode_data.temp_3b_0__reg_p/CK (DFFQX1H7R)         0.0000000000
+                                                                 0.0000000000 r
+  decode_data.temp_3b_0__reg_p/Q (DFFQX1H7R)          0.1056188866
+                                                                 0.1056188866 r
+  _6_/Y (AND2X1H7L)                                   0.0394400433
+                                                                 0.1450589299 r
+  decode_data.temp_3b_0__reg_p/D (DFFQX1H7R)          0.0000000000
+                                                                 0.1450589299 r
+  data arrival time                                              0.1450589299
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  decode_data.temp_3b_0__reg_p/CK (DFFQX1H7R)                    10.0000000000 r
+  library setup time                                  -0.0320722312
+                                                                 9.9679279327
+  data required time                                             9.9679279327
+  ------------------------------------------------------------------------------
+  data required time                                             9.9679279327
+  data arrival time                                              -0.1450589299
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.8228693008
+
+
+  Startpoint: data_8b_out_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: parallel_data_out[0]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  data_8b_out_reg_p/CK (DFFQX1H7R)                    0.0000000000
+                                                                 0.0000000000 r
+  data_8b_out_reg_p/Q (DFFQX1H7R)                     0.1002526805
+                                                                 0.1002526805 r
+  _7_/Y (AND2X1H7L)                                   0.0364946648
+                                                                 0.1367473453 r
+  parallel_data_out[0]_reg_p/D (DFFQX1H7R)            0.0000000000
+                                                                 0.1367473453 r
+  data arrival time                                              0.1367473453
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  parallel_data_out[0]_reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                                  -0.0320345610
+                                                                 9.9679651260
+  data required time                                             9.9679651260
+  ------------------------------------------------------------------------------
+  data required time                                             9.9679651260
+  data arrival time                                              -0.1367473453
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.8312177658
+
+
+1

@@ -1,0 +1,2762 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-sort_by slack
+Design : spm
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:58:42 2026
+****************************************
+
+
+  Startpoint: genblk1[1].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: csa0.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[1].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[1].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _274_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _275_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  csa0.y_reg_p/D (DFFRQX2H7R)                         0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  csa0.y_reg_p/CK (DFFRQX2H7R)                                   10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[10].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[10].csa.sum_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[10].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[10].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _203_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _204_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[10].csa.sum_reg_p/D (DFFRQX2H7R)            0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[10].csa.sum_reg_p/CK (DFFRQX2H7R)                      10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[11].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[10].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[11].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[11].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _211_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _212_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[10].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[10].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[12].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[11].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[12].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[12].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _218_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _219_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[11].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[11].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[13].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[12].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[13].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[13].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _225_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _226_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[12].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[12].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[14].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[13].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[14].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[14].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _232_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _233_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[13].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[13].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[15].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[14].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[15].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[15].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _239_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _240_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[14].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[14].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[16].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[15].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[16].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[16].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _246_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _247_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[15].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[15].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[17].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[16].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[17].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[17].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _253_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _254_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[16].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[16].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[18].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[17].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[18].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[18].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _260_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _261_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[17].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[17].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[19].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[18].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[19].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[19].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _267_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _268_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[18].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[18].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[20].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[19].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[20].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[20].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _281_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _282_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[19].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[19].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[2].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[1].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[2].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[2].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _351_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _352_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[1].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[1].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[21].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[20].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[21].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[21].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _288_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _289_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[20].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[20].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[22].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[21].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[22].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[22].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _295_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _296_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[21].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[21].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[23].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[22].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[23].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[23].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _302_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _303_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[22].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[22].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[24].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[23].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[24].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[24].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _309_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _310_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[23].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[23].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[25].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[24].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[25].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[25].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _316_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _317_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[24].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[24].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[26].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[25].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[26].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[26].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _323_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _324_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[25].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[25].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[27].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[26].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[27].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[27].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _330_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _331_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[26].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[26].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[28].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[27].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[28].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[28].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _337_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _338_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[27].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[27].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[29].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[28].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[29].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[29].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _344_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _345_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[28].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[28].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[30].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[29].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[30].csa.sc_reg_p/CK (DFFRQX2H7R)            0.0000000000
+                                                                 0.0000000000 r
+  genblk1[30].csa.sc_reg_p/Q (DFFRQX2H7R)             0.1083922833
+                                                                 0.1083922833 r
+  _358_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _359_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[29].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[29].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[3].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[2].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[3].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[3].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _365_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _366_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[2].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[2].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[4].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[3].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[4].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[4].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _372_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _373_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[3].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[3].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[5].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[4].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[5].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[5].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _379_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _380_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[4].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[4].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[6].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[5].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[6].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[6].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _386_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _387_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[5].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[5].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[7].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[6].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[7].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[7].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _393_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _394_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[6].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[6].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[8].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[7].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[8].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[8].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _400_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _401_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[7].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[7].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: genblk1[9].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[8].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[9].csa.sc_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[9].csa.sc_reg_p/Q (DFFRQX2H7R)              0.1083922833
+                                                                 0.1083922833 r
+  _407_/Y (XOR2X4H7L)                                 0.0783829838
+                                                                 0.1867752671 f
+  _408_/Y (XNOR2X4H7L)                                0.0625110120
+                                                                 0.2492862791 f
+  genblk1[8].csa.y_reg_p/D (DFFRQX2H7R)               0.0000000000
+                                                                 0.2492862791 f
+  data arrival time                                              0.2492862791
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[8].csa.y_reg_p/CK (DFFRQX2H7R)                         10.0000000000 r
+  library setup time                                  -0.0681402162
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2492862791
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6825733185
+
+
+  Startpoint: csa0.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: p_reg_p (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  csa0.sc_reg_p/CK (DFFRQX2H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  csa0.sc_reg_p/Q (DFFRQX2H7R)                        0.1062460244
+                                                                 0.1062460244 r
+  _196_/Y (XOR2X4H7L)                                 0.0780897141
+                                                                 0.1843357384 f
+  _197_/Y (XNOR2X4H7L)                                0.0625077188
+                                                                 0.2468434572 f
+  p_reg_p/D (DFFRQX2H7R)                              0.0000000000
+                                                                 0.2468434572 f
+  data arrival time                                              0.2468434572
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  p_reg_p/CK (DFFRQX2H7R)                                        10.0000000000 r
+  library setup time                                  -0.0681401789
+                                                                 9.9318599701
+  data required time                                             9.9318599701
+  ------------------------------------------------------------------------------
+  data required time                                             9.9318599701
+  data arrival time                                              -0.2468434572
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6850166321
+
+
+  Startpoint: csa0.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: csa0.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  csa0.sc_reg_p/CK (DFFRQX2H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  csa0.sc_reg_p/Q (DFFRQX2H7R)                        0.0976181254
+                                                                 0.0976181254 f
+  _194_/Y (AOAI211X0P5H7R)                            0.0538256243
+                                                                 0.1514437497 r
+  _195_/Y (OAI21X0P5H7R)                              0.0434721410
+                                                                 0.1949158907 f
+  csa0.sc_reg_p/D (DFFRQX2H7R)                        0.0000000000
+                                                                 0.1949158907 f
+  data arrival time                                              0.1949158907
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  csa0.sc_reg_p/CK (DFFRQX2H7R)                                  10.0000000000 r
+  library setup time                                  -0.0776082426
+                                                                 9.9223918915
+  data required time                                             9.9223918915
+  ------------------------------------------------------------------------------
+  data required time                                             9.9223918915
+  data arrival time                                              -0.1949158907
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7274761200
+
+
+  Startpoint: genblk1[10].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[10].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[10].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[10].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _200_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _201_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[10].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[10].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[11].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[11].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[11].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[11].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _208_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _209_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[11].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[11].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[12].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[12].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[12].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[12].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _215_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _216_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[12].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[12].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[13].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[13].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[13].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[13].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _222_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _223_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[13].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[13].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[14].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[14].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[14].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[14].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _229_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _230_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[14].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[14].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[15].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[15].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[15].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[15].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _236_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _237_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[15].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[15].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[16].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[16].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[16].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[16].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _243_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _244_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[16].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[16].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[17].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[17].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[17].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[17].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _250_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _251_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[17].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[17].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[18].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[18].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[18].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[18].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _257_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _258_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[18].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[18].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[19].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[19].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[19].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[19].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _264_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _265_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[19].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[19].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[1].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[1].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[1].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[1].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _271_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _272_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[1].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[1].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[20].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[20].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[20].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[20].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _278_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _279_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[20].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[20].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[21].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[21].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[21].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[21].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _285_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _286_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[21].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[21].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[22].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[22].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[22].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[22].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _292_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _293_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[22].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[22].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[23].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[23].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[23].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[23].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _299_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _300_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[23].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[23].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[24].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[24].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[24].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[24].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _306_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _307_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[24].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[24].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[25].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[25].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[25].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[25].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _313_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _314_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[25].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[25].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[26].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[26].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[26].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[26].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _320_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _321_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[26].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[26].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[27].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[27].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[27].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[27].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _327_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _328_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[27].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[27].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[28].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[28].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[28].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[28].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _334_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _335_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[28].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[28].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[29].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[29].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[29].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[29].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _341_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _342_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[29].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[29].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[2].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[2].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[2].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[2].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _348_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _349_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[2].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[2].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[30].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[30].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[30].csa.y_reg_p/CK (DFFRQX2H7R)             0.0000000000
+                                                                 0.0000000000 r
+  genblk1[30].csa.y_reg_p/Q (DFFRQX2H7R)              0.1038124710
+                                                                 0.1038124710 f
+  _355_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _356_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[30].csa.sc_reg_p/D (DFFRQX2H7R)             0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[30].csa.sc_reg_p/CK (DFFRQX2H7R)                       10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[3].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[3].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[3].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[3].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _362_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _363_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[3].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[3].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[4].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[4].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[4].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[4].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _369_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _370_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[4].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[4].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[5].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[5].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[5].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[5].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _376_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _377_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[5].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[5].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[6].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[6].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[6].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[6].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _383_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _384_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[6].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[6].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[7].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[7].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[7].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[7].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _390_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _391_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[7].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[7].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[8].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[8].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[8].csa.y_reg_p/CK (DFFRQX2H7R)              0.0000000000
+                                                                 0.0000000000 r
+  genblk1[8].csa.y_reg_p/Q (DFFRQX2H7R)               0.1038124710
+                                                                 0.1038124710 f
+  _397_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _398_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[8].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[8].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: genblk1[10].csa.sum_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[9].csa.sc_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  genblk1[10].csa.sum_reg_p/CK (DFFRQX2H7R)           0.0000000000
+                                                                 0.0000000000 r
+  genblk1[10].csa.sum_reg_p/Q (DFFRQX2H7R)            0.1038124710
+                                                                 0.1038124710 f
+  _404_/Y (OAI211X1P4H7L)                             0.0470212251
+                                                                 0.1508336961 r
+  _405_/Y (OAI2BB1X0P5H7R)                            0.0375571549
+                                                                 0.1883908510 f
+  genblk1[9].csa.sc_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1883908510 f
+  data arrival time                                              0.1883908510
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[9].csa.sc_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0740780160
+                                                                 9.9259223938
+  data required time                                             9.9259223938
+  ------------------------------------------------------------------------------
+  data required time                                             9.9259223938
+  data arrival time                                              -0.1883908510
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7375307083
+
+
+  Startpoint: tcmp.z_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: genblk1[30].csa.y_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  tcmp.z_reg_p/CK (DFFRQX2H7R)                        0.0000000000
+                                                                 0.0000000000 r
+  tcmp.z_reg_p/Q (DFFRQX2H7R)                         0.1050724164
+                                                                 0.1050724164 r
+  _413_/Y (XNOR2X0P5H7R)                              0.0720474944
+                                                                 0.1771199107 f
+  genblk1[30].csa.y_reg_p/D (DFFRQX2H7R)              0.0000000000
+                                                                 0.1771199107 f
+  data arrival time                                              0.1771199107
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  genblk1[30].csa.y_reg_p/CK (DFFRQX2H7R)                        10.0000000000 r
+  library setup time                                  -0.0710577816
+                                                                 9.9289426804
+  data required time                                             9.9289426804
+  ------------------------------------------------------------------------------
+  data required time                                             9.9289426804
+  data arrival time                                              -0.1771199107
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7518224716
+
+
+  Startpoint: tcmp.z_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: tcmp.z_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  tcmp.z_reg_p/CK (DFFRQX2H7R)         0.0000000000
+                                                  0.0000000000 r
+  tcmp.z_reg_p/Q (DFFRQX2H7R)          0.0966470093
+                                                  0.0966470093 f
+  _412_/Y (NAND2BX0P5H7R)              0.0570443273
+                                                  0.1536913365 f
+  tcmp.z_reg_p/D (DFFRQX2H7R)          0.0000000000
+                                                  0.1536913365 f
+  data arrival time                               0.1536913365
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  tcmp.z_reg_p/CK (DFFRQX2H7R)                    10.0000000000 r
+  library setup time                   -0.0732869506
+                                                  9.9267129898
+  data required time                              9.9267129898
+  ---------------------------------------------------------------
+  data required time                              9.9267129898
+  data arrival time                               -0.1536913365
+  ---------------------------------------------------------------
+  slack (MET)                                     9.7730216980
+
+
+1

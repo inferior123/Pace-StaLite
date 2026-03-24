@@ -1,0 +1,249 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_reg
+	-sort_by slack
+Design : arbiter
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:49 2026
+****************************************
+
+
+  Startpoint: rst (input port clocked by clk)
+  Endpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  rst (in)                             0.0000000000
+                                                  0.0000000000 f
+  _149_/Y (OAO211X0P5H7L)              0.0682801753
+                                                  0.0682801753 f
+  token_0__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0682801753 f
+  data arrival time                               0.0682801753
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0423196591
+                                                  9.9576807022
+  data required time                              9.9576807022
+  ---------------------------------------------------------------
+  data required time                              9.9576807022
+  data arrival time                               -0.0682801753
+  ---------------------------------------------------------------
+  slack (MET)                                     9.8894004822
+
+
+  Startpoint: rst (input port clocked by clk)
+  Endpoint: token_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  rst (in)                             0.0000000000
+                                                  0.0000000000 f
+  _170_/Y (AOI211X1P4H7L)              0.0457062535
+                                                  0.0457062535 r
+  token_2__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0457062535 r
+  data arrival time                               0.0457062535
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  token_2__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0375849307
+                                                  9.9624147415
+  data required time                              9.9624147415
+  ---------------------------------------------------------------
+  data required time                              9.9624147415
+  data arrival time                               -0.0457062535
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9167089462
+
+
+  Startpoint: rst (input port clocked by clk)
+  Endpoint: token_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  rst (in)                             0.0000000000
+                                                  0.0000000000 f
+  _162_/Y (OAOI211X1H7L)               0.0420816764
+                                                  0.0420816764 r
+  token_1__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0420816764 r
+  data arrival time                               0.0420816764
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  token_1__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0382376797
+                                                  9.9617624283
+  data required time                              9.9617624283
+  ---------------------------------------------------------------
+  data required time                              9.9617624283
+  data arrival time                               -0.0420816764
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9196805954
+
+
+  Startpoint: rst (input port clocked by clk)
+  Endpoint: token_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  rst (in)                             0.0000000000
+                                                  0.0000000000 f
+  _196_/Y (AOI21X1H7L)                 0.0263014492
+                                                  0.0263014492 r
+  token_5__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0263014492 r
+  data arrival time                               0.0263014492
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  token_5__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0346096493
+                                                  9.9653902054
+  data required time                              9.9653902054
+  ---------------------------------------------------------------
+  data required time                              9.9653902054
+  data arrival time                               -0.0263014492
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9390888214
+
+
+  Startpoint: rst (input port clocked by clk)
+  Endpoint: token_4__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  rst (in)                             0.0000000000
+                                                  0.0000000000 f
+  _189_/Y (AOI21X1H7L)                 0.0263014492
+                                                  0.0263014492 r
+  token_4__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0263014492 r
+  data arrival time                               0.0263014492
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  token_4__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0346083790
+                                                  9.9653911591
+  data required time                              9.9653911591
+  ---------------------------------------------------------------
+  data required time                              9.9653911591
+  data arrival time                               -0.0263014492
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9390897751
+
+
+  Startpoint: rst (input port clocked by clk)
+  Endpoint: token_3__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  rst (in)                             0.0000000000
+                                                  0.0000000000 f
+  _181_/Y (AOI21X1H7L)                 0.0263014492
+                                                  0.0263014492 r
+  token_3__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0263014492 r
+  data arrival time                               0.0263014492
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  token_3__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0345691554
+                                                  9.9654312134
+  data required time                              9.9654312134
+  ---------------------------------------------------------------
+  data required time                              9.9654312134
+  data arrival time                               -0.0263014492
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9391298294
+
+
+1

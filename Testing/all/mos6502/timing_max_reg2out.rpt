@@ -1,0 +1,67 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : mos6502
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:04 2026
+****************************************
+
+
+  Startpoint: state_3__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: WE (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  state_3__reg_p/CK (DFFSQX2H7R)                      0.0000000000
+                                                                 0.0000000000 r
+  state_3__reg_p/Q (DFFSQX2H7R)                       0.3346101642
+                                                                 0.3346101642 f
+  _1788_/Y (NAND2BX6H7L)                              0.1058765948
+                                                                 0.4404867589 f
+  _1809_/Y (BUFX1P4H7L)                               0.0833108723
+                                                                 0.5237976313 f
+  _2647_/Y (NAND4X0P5H7R)                             0.0380765200
+                                                                 0.5618741512 r
+  _2648_/Y (OAO211X0P5H7R)                            0.0731266737
+                                                                 0.6350008249 r
+  _2649_/Y (OAOI211X0P5H7R)                           0.0390365124
+                                                                 0.6740373373 f
+  _2650_/Y (AOI21X0P5H7R)                             0.0719778538
+                                                                 0.7460151911 r
+  _2651_/Y (BUFX1P4H7L)                               0.1230050921
+                                                                 0.8690202832 r
+  _1441_/Y (NAND2X0P5H7R)                             0.0322298408
+                                                                 0.9012501240 f
+  WE (out)                                            0.0000000000
+                                                                 0.9012501240 f
+  data arrival time                                              0.9012501240
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  output external delay                               0.0000000000
+                                                                 10.0000000000
+  data required time                                             10.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             10.0000000000
+  data arrival time                                              -0.9012501240
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.0987501144
+
+
+1

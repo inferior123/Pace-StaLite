@@ -1,0 +1,684 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-transition_time
+	-capacitance
+	-pba_mode exhaustive
+	-sort_by slack
+Design : s5378
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 19:36:38 2026
+****************************************
+
+
+  Startpoint: n3087gat (input port clocked by CK)
+  Endpoint: n3105gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3087gat (in)                    0.0116635431 0.0000000000 0.0000000000 0.0000000000 r
+  _754_/Y (OAI31X0P5H7R)           0.0000000000 0.0183282346 0.0182487518 0.0182487518 f
+  n3105gat (out)                              0.0183282346 0.0000000000 0.0182487518 f
+  data arrival time                                                 0.0182487518
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0182487518
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0182487518
+
+
+  Startpoint: n3093gat (input port clocked by CK)
+  Endpoint: n3151gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3093gat (in)                    0.0135700377 0.0000000000 0.0000000000 0.0000000000 f
+  _751_/Y (NAND3X0P5H7R)           0.0010572230 0.0360819250 0.0226255022 0.0226255022 r
+  _946_/Y (NAND2BX0P5H7R)          0.0000000000 0.0166805089 0.0201020874 0.0427275896 f
+  n3151gat (out)                              0.0166805089 0.0000000000 0.0427275896 f
+  data arrival time                                                 0.0427275896
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0427275896
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0427275896
+
+
+  Startpoint: n3092gat (input port clocked by CK)
+  Endpoint: n3104gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3092gat (in)                    0.0006251650 0.0000000000 0.0000000000 0.0000000000 r
+  _477_/Y (NOR2X1P4H7L)            0.0014281720 0.0098407567 0.0093016168 0.0093016168 f
+  _752_/Y (OAI221X0P5H7R)          0.0000000000 0.0369245261 0.0350404009 0.0443420187 r
+  n3104gat (out)                              0.0369245261 0.0000000000 0.0443420187 r
+  data arrival time                                                 0.0443420187
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0443420187
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0443420187
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3135gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _854_/Y (OAI22X0P5H7L)           0.0000000000 0.0220203921 0.0181096792 0.0983938724 f
+  n3135gat (out)                              0.0220203921 0.0000000000 0.0983938724 f
+  data arrival time                                                 0.0983938724
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.0983938724
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.0983938724
+
+
+  Startpoint: n3087gat (input port clocked by CK)
+  Endpoint: n3125gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3087gat (in)                    0.0116308155 0.0000000000 0.0000000000 0.0000000000 f
+  _825_/Y (OAI221X0P5H7R)          0.0008967450 0.0670091286 0.0493249074 0.0493249074 r
+  _826_/Y (AOI211X2H7L)            0.0011361050 0.0255480558 0.0207077041 0.0700326115 f
+  _827_/Y (OAI21X0P5H7R)           0.0000000000 0.0282163415 0.0300659686 0.1000985801 r
+  n3125gat (out)                              0.0282163415 0.0000000000 0.1000985801 r
+  data arrival time                                                 0.1000985801
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1000985801
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1000985801
+
+
+  Startpoint: n3098gat (input port clocked by CK)
+  Endpoint: n3140gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3098gat (in)                    0.0005057440 0.0000000000 0.0000000000 0.0000000000 r
+  _872_/Y (NOR2X0P5H7R)            0.0006315610 0.0113489777 0.0101748034 0.0101748034 f
+  _873_/Y (OAI211X0P7H7R)          0.0006213030 0.0240750536 0.0201086123 0.0302834157 r
+  _875_/Y (AOAI211X0P5H7R)         0.0004991290 0.0226058234 0.0287035089 0.0589869246 f
+  _876_/Y (AOI31X0P5H7R)           0.0006615160 0.0265273508 0.0249576494 0.0839445740 r
+  _880_/Y (OAI211X0P7H7L)          0.0000000000 0.0152640846 0.0187889338 0.1027335078 f
+  n3140gat (out)                              0.0152640846 0.0000000000 0.1027335078 f
+  data arrival time                                                 0.1027335078
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1027335078
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1027335078
+
+
+  Startpoint: n3098gat (input port clocked by CK)
+  Endpoint: n3139gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3098gat (in)                    0.0005057440 0.0000000000 0.0000000000 0.0000000000 r
+  _872_/Y (NOR2X0P5H7R)            0.0006315610 0.0113489777 0.0101748034 0.0101748034 f
+  _873_/Y (OAI211X0P7H7R)          0.0006213030 0.0240750536 0.0201086123 0.0302834157 r
+  _875_/Y (AOAI211X0P5H7R)         0.0004991290 0.0226058234 0.0287035089 0.0589869246 f
+  _876_/Y (AOI31X0P5H7R)           0.0006615160 0.0265273508 0.0249576494 0.0839445740 r
+  _880_/Y (OAI211X0P7H7L)          0.0000000000 0.0152640846 0.0187889338 0.1027335078 f
+  n3139gat (out)                              0.0152640846 0.0000000000 0.1027335078 f
+  data arrival time                                                 0.1027335078
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1027335078
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1027335078
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3137gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _860_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3137gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3136gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _857_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3136gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3134gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _851_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3134gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3133gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _848_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3133gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3132gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _845_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3132gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3131gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _842_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3131gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3130gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _839_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3130gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3088gat (input port clocked by CK)
+  Endpoint: n3129gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3088gat (in)                    0.0138811450 0.0000000000 0.0000000000 0.0000000000 f
+  _832_/Y (NAND2X0P5H7R)           0.0006057060 0.0195548367 0.0143752126 0.0143752126 r
+  _833_/Y (OA21X1P4H7L)            0.0047387537 0.0585079864 0.0659089833 0.0802841932 r
+  _836_/Y (OAI22X0P5H7R)           0.0000000000 0.0241260733 0.0257223994 0.1060065925 f
+  n3129gat (out)                              0.0241260733 0.0000000000 0.1060065925 f
+  data arrival time                                                 0.1060065925
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1060065925
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1060065925
+
+
+  Startpoint: n3083gat (input port clocked by CK)
+  Endpoint: n3117gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3083gat (in)                    0.0041589099 0.0000000000 0.0000000000 0.0000000000 r
+  _711_/Y (XNOR2X0P5H7R)           0.0010583600 0.0306474064 0.0401100740 0.0401100740 r
+  _715_/Y (XNOR2X0P5H7R)           0.0012240720 0.0334785543 0.0508727506 0.0909828246 r
+  _788_/Y (OAI21X0P5H7R)           0.0000000000 0.0138796838 0.0172121674 0.1081949919 f
+  n3117gat (out)                              0.0138796838 0.0000000000 0.1081949919 f
+  data arrival time                                                 0.1081949919
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1081949919
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1081949919
+
+
+  Startpoint: n3087gat (input port clocked by CK)
+  Endpoint: n3124gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3087gat (in)                    0.0116635431 0.0000000000 0.0000000000 0.0000000000 r
+  _814_/Y (AOAI211X0P5H7R)         0.0005863440 0.0464904010 0.0417605899 0.0417605899 f
+  _815_/Y (OAI221X1H7L)            0.0006418840 0.0259606540 0.0255495645 0.0673101544 r
+  _816_/Y (AOI2BB1X1P4H7L)         0.0011361050 0.0150527824 0.0147031844 0.0820133388 f
+  _817_/Y (OAI21X0P5H7R)           0.0000000000 0.0280931666 0.0275265872 0.1095399261 r
+  n3124gat (out)                              0.0280931666 0.0000000000 0.1095399261 r
+  data arrival time                                                 0.1095399261
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1095399261
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1095399261
+
+
+  Startpoint: n3086gat (input port clocked by CK)
+  Endpoint: n3120gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3086gat (in)                    0.0107971122 0.0000000000 0.0000000000 0.0000000000 f
+  _783_/Y (AOAI211X4H7L)           0.0046508815 0.0271209385 0.0169739276 0.0169739276 r
+  _796_/Y (OA22X0P5H7R)            0.0005534320 0.0213068258 0.0455732793 0.0625472069 r
+  _797_/Y (OA221X1P4H7L)           0.0011634449 0.0238983054 0.0442326143 0.1067798212 r
+  _798_/Y (OAI21X0P5H7R)           0.0000000000 0.0116925165 0.0226606205 0.1294404417 f
+  n3120gat (out)                              0.0116925165 0.0000000000 0.1294404417 f
+  data arrival time                                                 0.1294404417
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1294404417
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1294404417
+
+
+  Startpoint: n3086gat (input port clocked by CK)
+  Endpoint: n3118gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  n3086gat (in)                    0.0107971122 0.0000000000 0.0000000000 0.0000000000 f
+  _783_/Y (AOAI211X4H7L)           0.0046508815 0.0271209385 0.0169739276 0.0169739276 r
+  _790_/Y (OA22X0P5H7R)            0.0005534320 0.0213068258 0.0455732793 0.0625472069 r
+  _791_/Y (OA221X1P4H7L)           0.0011634449 0.0238983054 0.0442326143 0.1067798212 r
+  _792_/Y (OAI21X0P5H7R)           0.0000000000 0.0116925165 0.0226606205 0.1294404417 f
+  n3118gat (out)                              0.0116925165 0.0000000000 0.1294404417 f
+  data arrival time                                                 0.1294404417
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1294404417
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1294404417
+
+
+  Startpoint: n3086gat (input port clocked by CK)
+  Endpoint: n3123gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3086gat (in)                    0.0109603452 0.0000000000 0.0000000000 0.0000000000 r
+  _787_/Y (OAI21BX0P7H7R)          0.0058484338 0.1244095042 0.0799595863 0.0799595863 f
+  _807_/Y (OAI21X0P5H7R)           0.0000000000 0.0407554395 0.0521103740 0.1320699602 r
+  n3123gat (out)                              0.0407554395 0.0000000000 0.1320699602 r
+  data arrival time                                                 0.1320699602
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1320699602
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1320699602
+
+
+  Startpoint: n3086gat (input port clocked by CK)
+  Endpoint: n3122gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3086gat (in)                    0.0109603452 0.0000000000 0.0000000000 0.0000000000 r
+  _787_/Y (OAI21BX0P7H7R)          0.0058484338 0.1244095042 0.0799595863 0.0799595863 f
+  _804_/Y (OAI21X0P5H7R)           0.0000000000 0.0407554395 0.0521103740 0.1320699602 r
+  n3122gat (out)                              0.0407554395 0.0000000000 0.1320699602 r
+  data arrival time                                                 0.1320699602
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1320699602
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1320699602
+
+
+  Startpoint: n3086gat (input port clocked by CK)
+  Endpoint: n3121gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3086gat (in)                    0.0109603452 0.0000000000 0.0000000000 0.0000000000 r
+  _787_/Y (OAI21BX0P7H7R)          0.0058484338 0.1244095042 0.0799595863 0.0799595863 f
+  _801_/Y (OAI21X0P5H7R)           0.0000000000 0.0407554395 0.0521103740 0.1320699602 r
+  n3121gat (out)                              0.0407554395 0.0000000000 0.1320699602 r
+  data arrival time                                                 0.1320699602
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1320699602
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1320699602
+
+
+  Startpoint: n3086gat (input port clocked by CK)
+  Endpoint: n3119gat (output port clocked by CK)
+  Path Group: CK
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 r
+  n3086gat (in)                    0.0109603452 0.0000000000 0.0000000000 0.0000000000 r
+  _787_/Y (OAI21BX0P7H7R)          0.0058484338 0.1244095042 0.0799595863 0.0799595863 f
+  _795_/Y (OAI21X0P5H7R)           0.0000000000 0.0407554395 0.0521103740 0.1320699602 r
+  n3119gat (out)                              0.0407554395 0.0000000000 0.1320699602 r
+  data arrival time                                                 0.1320699602
+
+  clock CK (rise edge)                                   0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  output external delay                                  0.0000000000 0.0000000000
+  data required time                                                0.0000000000
+  -----------------------------------------------------------------------------
+  data required time                                                0.0000000000
+  data arrival time                                                 -0.1320699602
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1320699602
+
+
+1

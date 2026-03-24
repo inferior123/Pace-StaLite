@@ -1,0 +1,232 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-sort_by slack
+Design : ascon
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 21:00:55 2026
+****************************************
+
+
+  Startpoint: core.ascon_core_ctrl_reg_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: core.ready_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  core.ascon_core_ctrl_reg_2__reg_p/CK (DFFRQX2H7R)   0.0000000000
+                                                                 0.0000000000 r
+  core.ascon_core_ctrl_reg_2__reg_p/Q (DFFRQX2H7R)    0.1053972542
+                                                                 0.1053972542 f
+  _29_/Y (OAI21X0P5H7R)                               0.0652208626
+                                                                 0.1706181169 r
+  _32_/Y (AOI31X0P5H7R)                               0.0627533793
+                                                                 0.2333714962 f
+  _33_/Z (NOR2BX1H7L)                                 0.0421636999
+                                                                 0.2755351961 r
+  core.ready_reg_p/D (DFFRQX2H7R)                     0.0000000000
+                                                                 0.2755351961 r
+  data arrival time                                              0.2755351961
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  core.ready_reg_p/CK (DFFRQX2H7R)                               10.0000000000 r
+  library setup time                                  -0.0613626465
+                                                                 9.9386377335
+  data required time                                             9.9386377335
+  ------------------------------------------------------------------------------
+  data required time                                             9.9386377335
+  data arrival time                                              -0.2755351961
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6631021500
+
+
+  Startpoint: core.ascon_core_ctrl_reg_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: core.ascon_core_ctrl_reg_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  core.ascon_core_ctrl_reg_2__reg_p/CK (DFFRQX2H7R)   0.0000000000
+                                                                 0.0000000000 r
+  core.ascon_core_ctrl_reg_2__reg_p/Q (DFFRQX2H7R)    0.1053972542
+                                                                 0.1053972542 f
+  _25_/Y (NOR2X0P5H7R)                                0.0441249162
+                                                                 0.1495221704 r
+  _26_/Y (NAND3BX0P5H7R)                              0.0593166500
+                                                                 0.2088388205 f
+  _28_/Y (NAND2X0P5H7R)                               0.0395222753
+                                                                 0.2483610958 r
+  core.ascon_core_ctrl_reg_1__reg_p/D (DFFRQX2H7R)    0.0000000000
+                                                                 0.2483610958 r
+  data arrival time                                              0.2483610958
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  core.ascon_core_ctrl_reg_1__reg_p/CK (DFFRQX2H7R)              10.0000000000 r
+  library setup time                                  -0.0602423064
+                                                                 9.9397573471
+  data required time                                             9.9397573471
+  ------------------------------------------------------------------------------
+  data required time                                             9.9397573471
+  data arrival time                                              -0.2483610958
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6913967133
+
+
+  Startpoint: core.ascon_core_ctrl_reg_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: core.ascon_core_ctrl_reg_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  core.ascon_core_ctrl_reg_2__reg_p/CK (DFFRQX2H7R)   0.0000000000
+                                                                 0.0000000000 r
+  core.ascon_core_ctrl_reg_2__reg_p/Q (DFFRQX2H7R)    0.1053972542
+                                                                 0.1053972542 f
+  _29_/Y (OAI21X0P5H7R)                               0.0652208477
+                                                                 0.1706181020 r
+  _30_/Y (NAND2X0P5H7R)                               0.0447818190
+                                                                 0.2153999209 f
+  core.ascon_core_ctrl_reg_2__reg_p/D (DFFRQX2H7R)    0.0000000000
+                                                                 0.2153999209 f
+  data arrival time                                              0.2153999209
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  core.ascon_core_ctrl_reg_2__reg_p/CK (DFFRQX2H7R)              10.0000000000 r
+  library setup time                                  -0.0767030716
+                                                                 9.9232969284
+  data required time                                             9.9232969284
+  ------------------------------------------------------------------------------
+  data required time                                             9.9232969284
+  data arrival time                                              -0.2153999209
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7078971863
+
+
+  Startpoint: core.ready_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: core.next_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  core.ready_reg_p/CK (DFFRQX2H7R)                    0.0000000000
+                                                                 0.0000000000 r
+  core.ready_reg_p/Q (DFFRQX2H7R)                     0.1033056304
+                                                                 0.1033056304 r
+  _38_/Y (NAND3BX0P5H7R)                              0.0466118976
+                                                                 0.1499175280 f
+  _39_/Y (NOR3BX0P7H7L)                               0.0567526370
+                                                                 0.2066701651 r
+  core.next_reg_p/D (DFFRQX2H7R)                      0.0000000000
+                                                                 0.2066701651 r
+  data arrival time                                              0.2066701651
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  core.next_reg_p/CK (DFFRQX2H7R)                                10.0000000000 r
+  library setup time                                  -0.0659267083
+                                                                 9.9340734482
+  data required time                                             9.9340734482
+  ------------------------------------------------------------------------------
+  data required time                                             9.9340734482
+  data arrival time                                              -0.2066701651
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7274026871
+
+
+  Startpoint: core.ascon_core_ctrl_reg_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: core.ascon_core_ctrl_reg_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  core.ascon_core_ctrl_reg_2__reg_p/CK (DFFRQX2H7R)   0.0000000000
+                                                                 0.0000000000 r
+  core.ascon_core_ctrl_reg_2__reg_p/Q (DFFRQX2H7R)    0.1145302728
+                                                                 0.1145302728 r
+  _24_/Y (AND2X1H7L)                                  0.0450183079
+                                                                 0.1595485806 r
+  core.ascon_core_ctrl_reg_0__reg_p/D (DFFRQX2H7R)    0.0000000000
+                                                                 0.1595485806 r
+  data arrival time                                              0.1595485806
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  core.ascon_core_ctrl_reg_0__reg_p/CK (DFFRQX2H7R)              10.0000000000 r
+  library setup time                                  -0.0572268404
+                                                                 9.9427728653
+  data required time                                             9.9427728653
+  ------------------------------------------------------------------------------
+  data required time                                             9.9427728653
+  data arrival time                                              -0.1595485806
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7832241058
+
+
+1

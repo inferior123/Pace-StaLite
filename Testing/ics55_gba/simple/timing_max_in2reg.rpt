@@ -1,0 +1,46 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_reg
+	-transition_time
+	-capacitance
+	-sort_by slack
+Design : simple
+Version: U-2022.12-SP3
+Date   : Wed Feb 25 16:27:44 2026
+****************************************
+
+
+  Startpoint: inp1 (input port clocked by clk)
+  Endpoint: f1 (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  input external delay                                   0.0000000000 0.0000000000 f
+  inp1 (in)                        0.0009006420 0.0000000000 0.0000000000 0.0000000000 f
+  u1/Y (NAND2BX0P5H7L)             0.0006778810 0.0214022044 0.0312413909 0.0312413909 f
+  u4/Y (NOR2X0P5H7L)               0.0008155270 0.0402273908 0.0333210118 0.0645624027 r
+  f1/D (DFFQX1H7L)                            0.0402273908 0.0000000000 0.0645624027 r
+  data arrival time                                                 0.0645624027
+
+  clock clk (rise edge)                                  10.0000000000 10.0000000000
+  clock network delay (propagated)                       0.0000000000 10.0000000000
+  clock reconvergence pessimism                          0.0000000000 10.0000000000
+  f1/CK (DFFQX1H7L)                                                 10.0000000000 r
+  library setup time                                     -0.0272283424 9.9727716446
+  data required time                                                9.9727716446
+  -----------------------------------------------------------------------------
+  data required time                                                9.9727716446
+  data arrival time                                                 -0.0645624027
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       9.9082088470
+
+
+1

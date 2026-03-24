@@ -1,0 +1,19 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-transition_time
+	-capacitance
+	-pba_mode path
+	-sort_by slack
+Design : zipdiv
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 15:41:06 2026
+****************************************
+
+No constrained paths.
+
+1

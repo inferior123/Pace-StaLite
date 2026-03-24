@@ -1,0 +1,93 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-sort_by slack
+Design : PPU
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:00 2026
+****************************************
+
+
+  Startpoint: read (input port clocked by clk)
+  Endpoint: vram_r (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 r
+  read (in)                            0.0000000000
+                                                  0.0000000000 r
+  _12978_/Y (AO22X0P7H7R)              0.0499259196
+                                                  0.0499259196 r
+  vram_r (out)                         0.0000000000
+                                                  0.0499259196 r
+  data arrival time                               0.0499259196
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0499259196
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0499259196
+
+
+  Startpoint: write (input port clocked by clk)
+  Endpoint: vram_w (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  write (in)                           0.0000000000
+                                                  0.0000000000 f
+  _08124_/Y (NAND2X0P5H7R)             0.0373610556
+                                                  0.0373610556 r
+  _12980_/Y (NOR3X0P5H7R)              0.0310248360
+                                                  0.0683858916 f
+  _12981_/Z (NOR2BX1H7L)               0.0305438638
+                                                  0.0989297554 f
+  vram_w (out)                         0.0000000000
+                                                  0.0989297554 f
+  data arrival time                               0.0989297554
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0989297554
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0989297554
+
+
+1

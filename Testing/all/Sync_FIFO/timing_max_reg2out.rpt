@@ -1,0 +1,95 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : Sync_FIFO
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 21:00:15 2026
+****************************************
+
+
+  Startpoint: fifo_counter[3]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: buf_empty (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  fifo_counter[3]_reg_p/CK (DFFRQX2H7R)               0.0000000000
+                                                                 0.0000000000 r
+  fifo_counter[3]_reg_p/Q (DFFRQX2H7R)                0.1320404857
+                                                                 0.1320404857 f
+  _185_/Y (OR4X3H7L)                                  0.1301325709
+                                                                 0.2621730566 f
+  _246_/Y (INVX0P5H7R)                                0.0181714892
+                                                                 0.2803445458 r
+  buf_empty (out)                                     0.0000000000
+                                                                 0.2803445458 r
+  data arrival time                                              0.2803445458
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  output external delay                               0.0000000000
+                                                                 10.0000000000
+  data required time                                             10.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             10.0000000000
+  data arrival time                                              -0.2803445458
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7196550369
+
+
+  Startpoint: fifo_counter[2]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: buf_full (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  fifo_counter[2]_reg_p/CK (DFFRQX2H7R)               0.0000000000
+                                                                 0.0000000000 r
+  fifo_counter[2]_reg_p/Q (DFFRQX2H7R)                0.1273741275
+                                                                 0.1273741275 f
+  _173_/Y (OR2X8H7L)                                  0.0741511583
+                                                                 0.2015252858 f
+  _247_/Y (NOR2X0P5H7R)                               0.0218305290
+                                                                 0.2233558148 r
+  buf_full (out)                                      0.0000000000
+                                                                 0.2233558148 r
+  data arrival time                                              0.2233558148
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  output external delay                               0.0000000000
+                                                                 10.0000000000
+  data required time                                             10.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             10.0000000000
+  data arrival time                                              -0.2233558148
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7766437531
+
+
+1

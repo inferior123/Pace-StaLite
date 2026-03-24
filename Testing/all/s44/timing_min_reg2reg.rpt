@@ -1,0 +1,1327 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-sort_by slack
+Design : s44
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 21:01:08 2026
+****************************************
+
+
+  Startpoint: config_out[2]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[2]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[2]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[2]_reg_p/Q (DFFQX1H7R)                   0.0743816793
+                                                                 0.0743816793 f
+  _43_/Y (MUX2X0P5H7R)                                0.0624720901
+                                                                 0.1368537694 f
+  config_out[2]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1368537694 f
+  data arrival time                                              0.1368537694
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[2]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1368537694
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1423666030
+
+
+  Startpoint: config_out[6]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[6]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[6]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[6]_reg_p/Q (DFFQX1H7R)                   0.0743816793
+                                                                 0.0743816793 f
+  _47_/Y (MUX2X0P5H7R)                                0.0624720901
+                                                                 0.1368537694 f
+  config_out[6]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1368537694 f
+  data arrival time                                              0.1368537694
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[6]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1368537694
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1423666030
+
+
+  Startpoint: config_out[0]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[0]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[0]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[0]_reg_p/Q (DFFQX1H7R)                   0.0745059550
+                                                                 0.0745059550 f
+  _41_/Y (MUX2X0P5H7R)                                0.0625069737
+                                                                 0.1370129287 f
+  config_out[0]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1370129287 f
+  data arrival time                                              0.1370129287
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[0]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1370129287
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1425257623
+
+
+  Startpoint: config_out[4]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[4]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[4]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[4]_reg_p/Q (DFFQX1H7R)                   0.0745059550
+                                                                 0.0745059550 f
+  _45_/Y (MUX2X0P5H7R)                                0.0625069737
+                                                                 0.1370129287 f
+  config_out[4]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1370129287 f
+  data arrival time                                              0.1370129287
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[4]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1370129287
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1425257623
+
+
+  Startpoint: config_out[1]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[1]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[1]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[1]_reg_p/Q (DFFQX1H7R)                   0.0746348649
+                                                                 0.0746348649 f
+  _42_/Y (MUX2X0P5H7R)                                0.0625431389
+                                                                 0.1371780038 f
+  config_out[1]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1371780038 f
+  data arrival time                                              0.1371780038
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[1]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1371780038
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1426908374
+
+
+  Startpoint: config_out[5]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[5]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[5]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[5]_reg_p/Q (DFFQX1H7R)                   0.0746348649
+                                                                 0.0746348649 f
+  _46_/Y (MUX2X0P5H7R)                                0.0625431389
+                                                                 0.1371780038 f
+  config_out[5]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1371780038 f
+  data arrival time                                              0.1371780038
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[5]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1371780038
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1426908374
+
+
+  Startpoint: config_out[3]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[3]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[3]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[3]_reg_p/Q (DFFQX1H7R)                   0.0746853426
+                                                                 0.0746853426 f
+  _44_/Y (MUX2X0P5H7R)                                0.0625573024
+                                                                 0.1372426450 f
+  config_out[3]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1372426450 f
+  data arrival time                                              0.1372426450
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[3]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1372426450
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1427554786
+
+
+  Startpoint: config_out[7]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: config_out[7]_reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  config_out[7]_reg_p/CK (DFFQX1H7R)                  0.0000000000
+                                                                 0.0000000000 r
+  config_out[7]_reg_p/Q (DFFQX1H7R)                   0.0746853426
+                                                                 0.0746853426 f
+  _48_/Y (MUX2X0P5H7R)                                0.0625573024
+                                                                 0.1372426450 f
+  config_out[7]_reg_p/D (DFFQX1H7R)                   0.0000000000
+                                                                 0.1372426450 f
+  data arrival time                                              0.1372426450
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  config_out[7]_reg_p/CK (DFFQX1H7R)                             0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1372426450
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1427554786
+
+
+  Startpoint: second_lut.mem_2__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_2__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_2__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_2__reg_p/Q (DFFQX1H7R)               0.0798228681
+                                                                 0.0798228681 f
+  _77_/Y (MUX2X0P5H7R)                                0.0639997423
+                                                                 0.1438226104 f
+  second_lut.mem_2__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1438226104 f
+  data arrival time                                              0.1438226104
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_2__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1438226104
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1493354440
+
+
+  Startpoint: second_lut.mem_6__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_6__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_6__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_6__reg_p/Q (DFFQX1H7R)               0.0798228681
+                                                                 0.0798228681 f
+  _81_/Y (MUX2X0P5H7R)                                0.0639997423
+                                                                 0.1438226104 f
+  second_lut.mem_6__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1438226104 f
+  data arrival time                                              0.1438226104
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_6__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1438226104
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1493354440
+
+
+  Startpoint: second_lut.mem_0__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_0__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_0__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_0__reg_p/Q (DFFQX1H7R)               0.0799153745
+                                                                 0.0799153745 f
+  _75_/Y (MUX2X0P5H7R)                                0.0640258342
+                                                                 0.1439412087 f
+  second_lut.mem_0__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1439412087 f
+  data arrival time                                              0.1439412087
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_0__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1439412087
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1494540423
+
+
+  Startpoint: second_lut.mem_4__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_4__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_4__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_4__reg_p/Q (DFFQX1H7R)               0.0799153745
+                                                                 0.0799153745 f
+  _79_/Y (MUX2X0P5H7R)                                0.0640258342
+                                                                 0.1439412087 f
+  second_lut.mem_4__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1439412087 f
+  data arrival time                                              0.1439412087
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_4__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1439412087
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1494540423
+
+
+  Startpoint: second_lut.mem_1__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_1__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_1__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_1__reg_p/Q (DFFQX1H7R)               0.0800112858
+                                                                 0.0800112858 f
+  _76_/Y (MUX2X0P5H7R)                                0.0640528873
+                                                                 0.1440641731 f
+  second_lut.mem_1__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1440641731 f
+  data arrival time                                              0.1440641731
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_1__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1440641731
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1495770067
+
+
+  Startpoint: second_lut.mem_5__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_5__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_5__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_5__reg_p/Q (DFFQX1H7R)               0.0800112858
+                                                                 0.0800112858 f
+  _80_/Y (MUX2X0P5H7R)                                0.0640528873
+                                                                 0.1440641731 f
+  second_lut.mem_5__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1440641731 f
+  data arrival time                                              0.1440641731
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_5__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1440641731
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1495770067
+
+
+  Startpoint: first_lut.config_out_2__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_2__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_2__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_2__reg_p/Q (DFFQX1H7R)         0.0800237209
+                                                                 0.0800237209 f
+  _51_/Y (MUX2X0P5H7R)                                0.0640563965
+                                                                 0.1440801173 f
+  first_lut.config_out_2__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1440801173 f
+  data arrival time                                              0.1440801173
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_2__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1440801173
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1495929509
+
+
+  Startpoint: first_lut.mem_2__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_2__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_2__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_2__reg_p/Q (DFFQX1H7R)                0.0800237209
+                                                                 0.0800237209 f
+  _59_/Y (MUX2X0P5H7R)                                0.0640563965
+                                                                 0.1440801173 f
+  first_lut.mem_2__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1440801173 f
+  data arrival time                                              0.1440801173
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_2__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1440801173
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1495929509
+
+
+  Startpoint: second_lut.mem_3__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_3__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_3__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_3__reg_p/Q (DFFQX1H7R)               0.0800488517
+                                                                 0.0800488517 f
+  _78_/Y (MUX2X0P5H7R)                                0.0640634820
+                                                                 0.1441123337 f
+  second_lut.mem_3__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1441123337 f
+  data arrival time                                              0.1441123337
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_3__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1441123337
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1496251673
+
+
+  Startpoint: second_lut.mem_7__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: second_lut.mem_7__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_7__reg_p/CK (DFFQX1H7R)              0.0000000000
+                                                                 0.0000000000 r
+  second_lut.mem_7__reg_p/Q (DFFQX1H7R)               0.0800488591
+                                                                 0.0800488591 f
+  _82_/Y (MUX2X0P5H7R)                                0.0640634894
+                                                                 0.1441123486 f
+  second_lut.mem_7__reg_p/D (DFFQX1H7R)               0.0000000000
+                                                                 0.1441123486 f
+  data arrival time                                              0.1441123486
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  second_lut.mem_7__reg_p/CK (DFFQX1H7R)                         0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1441123486
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1496251822
+
+
+  Startpoint: first_lut.config_out_0__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_0__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_0__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_0__reg_p/Q (DFFQX1H7R)         0.0801231787
+                                                                 0.0801231787 f
+  _49_/Y (MUX2X0P5H7R)                                0.0640844479
+                                                                 0.1442076266 f
+  first_lut.config_out_0__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1442076266 f
+  data arrival time                                              0.1442076266
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_0__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1442076266
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1497204602
+
+
+  Startpoint: first_lut.mem_0__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_0__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_0__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_0__reg_p/Q (DFFQX1H7R)                0.0801231787
+                                                                 0.0801231787 f
+  _57_/Y (MUX2X0P5H7R)                                0.0640844479
+                                                                 0.1442076266 f
+  first_lut.mem_0__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1442076266 f
+  data arrival time                                              0.1442076266
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_0__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1442076266
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1497204602
+
+
+  Startpoint: first_lut.config_out_1__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_1__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_1__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_1__reg_p/Q (DFFQX1H7R)         0.0802166983
+                                                                 0.0802166983 f
+  _50_/Y (MUX2X0P5H7R)                                0.0641108230
+                                                                 0.1443275213 f
+  first_lut.config_out_1__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1443275213 f
+  data arrival time                                              0.1443275213
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_1__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1443275213
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1498403549
+
+
+  Startpoint: first_lut.mem_1__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_1__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_1__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_1__reg_p/Q (DFFQX1H7R)                0.0802166983
+                                                                 0.0802166983 f
+  _58_/Y (MUX2X0P5H7R)                                0.0641108230
+                                                                 0.1443275213 f
+  first_lut.mem_1__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1443275213 f
+  data arrival time                                              0.1443275213
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_1__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1443275213
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1498403549
+
+
+  Startpoint: first_lut.config_out_3__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_3__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_3__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_3__reg_p/Q (DFFQX1H7R)         0.0802559331
+                                                                 0.0802559331 f
+  _52_/Y (MUX2X0P5H7R)                                0.0641218945
+                                                                 0.1443778276 f
+  first_lut.config_out_3__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1443778276 f
+  data arrival time                                              0.1443778276
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_3__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1443778276
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1498906612
+
+
+  Startpoint: first_lut.mem_3__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_3__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_3__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_3__reg_p/Q (DFFQX1H7R)                0.0802559331
+                                                                 0.0802559331 f
+  _60_/Y (MUX2X0P5H7R)                                0.0641218945
+                                                                 0.1443778276 f
+  first_lut.mem_3__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1443778276 f
+  data arrival time                                              0.1443778276
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_3__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1443778276
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1498906612
+
+
+  Startpoint: first_lut.config_out_6__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_6__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_6__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_6__reg_p/Q (DFFQX1H7R)         0.0806477815
+                                                                 0.0806477815 f
+  _55_/Y (MUX2X0P5H7R)                                0.0642324239
+                                                                 0.1448802054 f
+  first_lut.config_out_6__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1448802054 f
+  data arrival time                                              0.1448802054
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_6__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1448802054
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1503930390
+
+
+  Startpoint: first_lut.mem_6__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_6__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_6__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_6__reg_p/Q (DFFQX1H7R)                0.0806477815
+                                                                 0.0806477815 f
+  _63_/Y (MUX2X0P5H7R)                                0.0642324239
+                                                                 0.1448802054 f
+  first_lut.mem_6__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1448802054 f
+  data arrival time                                              0.1448802054
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_6__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1448802054
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1503930390
+
+
+  Startpoint: first_lut.config_out_7__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_7__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_7__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_7__reg_p/Q (DFFQX1H7R)         0.0807262883
+                                                                 0.0807262883 f
+  _56_/Y (MUX2X0P5H7R)                                0.0642545745
+                                                                 0.1449808627 f
+  first_lut.config_out_7__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1449808627 f
+  data arrival time                                              0.1449808627
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_7__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1449808627
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1504936963
+
+
+  Startpoint: first_lut.mem_7__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_7__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_7__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_7__reg_p/Q (DFFQX1H7R)                0.0807262883
+                                                                 0.0807262883 f
+  _64_/Y (MUX2X0P5H7R)                                0.0642545745
+                                                                 0.1449808627 f
+  first_lut.mem_7__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1449808627 f
+  data arrival time                                              0.1449808627
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_7__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1449808627
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1504936963
+
+
+  Startpoint: first_lut.config_out_4__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_4__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_4__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_4__reg_p/Q (DFFQX1H7R)         0.0807824880
+                                                                 0.0807824880 f
+  _53_/Y (MUX2X0P5H7R)                                0.0642704219
+                                                                 0.1450529099 f
+  first_lut.config_out_4__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1450529099 f
+  data arrival time                                              0.1450529099
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_4__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1450529099
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1505657434
+
+
+  Startpoint: first_lut.mem_4__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_4__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_4__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_4__reg_p/Q (DFFQX1H7R)                0.0807824880
+                                                                 0.0807824880 f
+  _61_/Y (MUX2X0P5H7R)                                0.0642704219
+                                                                 0.1450529099 f
+  first_lut.mem_4__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1450529099 f
+  data arrival time                                              0.1450529099
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_4__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1450529099
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1505657434
+
+
+  Startpoint: first_lut.config_out_5__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.config_out_5__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_5__reg_p/CK (DFFQX1H7R)        0.0000000000
+                                                                 0.0000000000 r
+  first_lut.config_out_5__reg_p/Q (DFFQX1H7R)         0.0808333009
+                                                                 0.0808333009 f
+  _54_/Y (MUX2X0P5H7R)                                0.0642847568
+                                                                 0.1451180577 f
+  first_lut.config_out_5__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                                 0.1451180577 f
+  data arrival time                                              0.1451180577
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.config_out_5__reg_p/CK (DFFQX1H7R)                   0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1451180577
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1506308913
+
+
+  Startpoint: first_lut.mem_5__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Endpoint: first_lut.mem_5__reg_p
+               (rising edge-triggered flip-flop clocked by config_clk)
+  Last common pin: config_clk
+  Path Group: config_clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_5__reg_p/CK (DFFQX1H7R)               0.0000000000
+                                                                 0.0000000000 r
+  first_lut.mem_5__reg_p/Q (DFFQX1H7R)                0.0808333009
+                                                                 0.0808333009 f
+  _62_/Y (MUX2X0P5H7R)                                0.0642847568
+                                                                 0.1451180577 f
+  first_lut.mem_5__reg_p/D (DFFQX1H7R)                0.0000000000
+                                                                 0.1451180577 f
+  data arrival time                                              0.1451180577
+
+  clock config_clk (rise edge)                        0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  first_lut.mem_5__reg_p/CK (DFFQX1H7R)                          0.0000000000 r
+  library hold time                                   -0.0055128401
+                                                                 -0.0055128401
+  data required time                                             -0.0055128401
+  ------------------------------------------------------------------------------
+  data required time                                             -0.0055128401
+  data arrival time                                              -0.1451180577
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1506308913
+
+
+1

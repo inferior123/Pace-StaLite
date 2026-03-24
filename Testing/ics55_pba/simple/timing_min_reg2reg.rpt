@@ -1,0 +1,77 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-transition_time
+	-capacitance
+	-pba_mode exhaustive
+	-sort_by slack
+Design : simple
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 19:36:42 2026
+****************************************
+
+
+  Startpoint: f1 (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: f2 (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  f1/CK (DFFQX1H7L)                           0.0000000000 0.0000000000 0.0000000000 r
+  f1/Q (DFFQX1H7L)                 0.0011097509 0.0243293382 0.0616872348 0.0616872348 f
+  u2/Y (INVX0P5H7L)                0.0005932920 0.0181026962 0.0186681859 0.0803554207 r
+  u3/Y (INVX0P5H7L)                0.0007450130 0.0128477085 0.0127038360 0.0930592567 f
+  f2/D (DFFQX1H7L)                            0.0128477085 0.0000000000 0.0930592567 f
+  data arrival time                                                 0.0930592567
+
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  f2/CK (DFFQX1H7L)                                                 0.0000000000 r
+  library hold time                                      -0.0086888820 -0.0086888820
+  data required time                                                -0.0086888820
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0086888820
+  data arrival time                                                 -0.0930592567
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1017481387
+
+
+  Startpoint: f1 (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: f1 (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: min  (recalculated)
+
+  Point                                 Cap      Trans       Incr       Path
+  -----------------------------------------------------------------------------
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  f1/CK (DFFQX1H7L)                           0.0000000000 0.0000000000 0.0000000000 r
+  f1/Q (DFFQX1H7L)                 0.0011159310 0.0239479803 0.0828339309 0.0828339309 r
+  u4/Y (NOR2X0P5H7L)               0.0007450130 0.0149902347 0.0150300190 0.0978639498 f
+  f1/D (DFFQX1H7L)                            0.0149902347 0.0000000000 0.0978639498 f
+  data arrival time                                                 0.0978639498
+
+  clock clk (rise edge)                                  0.0000000000 0.0000000000
+  clock network delay (propagated)                       0.0000000000 0.0000000000
+  clock reconvergence pessimism                          0.0000000000 0.0000000000
+  f1/CK (DFFQX1H7L)                                                 0.0000000000 r
+  library hold time                                      -0.0084924195 -0.0084924195
+  data required time                                                -0.0084924195
+  -----------------------------------------------------------------------------
+  data required time                                                -0.0084924195
+  data arrival time                                                 -0.0978639498
+  -----------------------------------------------------------------------------
+  slack (MET)                                                       0.1063563675
+
+
+1

@@ -1,0 +1,894 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_reg
+	-sort_by slack
+Design : cpu
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:11 2026
+****************************************
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_3__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3338_/Y (AOAI211X0P5H7R)            0.0723890066
+                                                  0.3409350216 f
+  PC_3__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.3409350216 f
+  data arrival time                               0.3409350216
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_3__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0541416109
+                                                  9.9458580017
+  data required time                              9.9458580017
+  ---------------------------------------------------------------
+  data required time                              9.9458580017
+  data arrival time                               -0.3409350216
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6049232483
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_6__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3349_/Y (AOAI211X0P5H7R)            0.0723890066
+                                                  0.3409350216 f
+  PC_6__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.3409350216 f
+  data arrival time                               0.3409350216
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_6__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0541416109
+                                                  9.9458580017
+  data required time                              9.9458580017
+  ---------------------------------------------------------------
+  data required time                              9.9458580017
+  data arrival time                               -0.3409350216
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6049232483
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_8__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3356_/Y (AOAI211X0P5H7R)            0.0723890066
+                                                  0.3409350216 f
+  PC_8__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.3409350216 f
+  data arrival time                               0.3409350216
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_8__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0541416109
+                                                  9.9458580017
+  data required time                              9.9458580017
+  ---------------------------------------------------------------
+  data required time                              9.9458580017
+  data arrival time                               -0.3409350216
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6049232483
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_13__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3313_/Y (OAI211X0P7H7L)             0.0490094125
+                                                  0.3175554276 f
+  PC_13__reg_p/D (DFFQX1H7R)           0.0000000000
+                                                  0.3175554276 f
+  data arrival time                               0.3175554276
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_13__reg_p/CK (DFFQX1H7R)                     10.0000000000 r
+  library setup time                   -0.0512723252
+                                                  9.9487276077
+  data required time                              9.9487276077
+  ---------------------------------------------------------------
+  data required time                              9.9487276077
+  data arrival time                               -0.3175554276
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6311721802
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_10__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3295_/Y (OAI211X1H7L)               0.0454621017
+                                                  0.3140081167 f
+  PC_10__reg_p/D (DFFQX1H7R)           0.0000000000
+                                                  0.3140081167 f
+  data arrival time                               0.3140081167
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_10__reg_p/CK (DFFQX1H7R)                     10.0000000000 r
+  library setup time                   -0.0500626341
+                                                  9.9499378204
+  data required time                              9.9499378204
+  ---------------------------------------------------------------
+  data required time                              9.9499378204
+  data arrival time                               -0.3140081167
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6359291077
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_11__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3302_/Y (OAI211X1H7L)               0.0454621017
+                                                  0.3140081167 f
+  PC_11__reg_p/D (DFFQX1H7R)           0.0000000000
+                                                  0.3140081167 f
+  data arrival time                               0.3140081167
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_11__reg_p/CK (DFFQX1H7R)                     10.0000000000 r
+  library setup time                   -0.0500626341
+                                                  9.9499378204
+  data required time                              9.9499378204
+  ---------------------------------------------------------------
+  data required time                              9.9499378204
+  data arrival time                               -0.3140081167
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6359291077
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_9__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3359_/Y (AOAI211X1H7L)              0.0443677008
+                                                  0.3129137158 f
+  PC_9__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.3129137158 f
+  data arrival time                               0.3129137158
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_9__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0493215919
+                                                  9.9506788254
+  data required time                              9.9506788254
+  ---------------------------------------------------------------
+  data required time                              9.9506788254
+  data arrival time                               -0.3129137158
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6377649307
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_14__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3318_/Y (AOAI211X1H7L)              0.0443677008
+                                                  0.3129137158 f
+  PC_14__reg_p/D (DFFQX1H7R)           0.0000000000
+                                                  0.3129137158 f
+  data arrival time                               0.3129137158
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_14__reg_p/CK (DFFQX1H7R)                     10.0000000000 r
+  library setup time                   -0.0493215919
+                                                  9.9506788254
+  data required time                              9.9506788254
+  ---------------------------------------------------------------
+  data required time                              9.9506788254
+  data arrival time                               -0.3129137158
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6377649307
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_15__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3322_/Y (AOAI211X1H7L)              0.0443677008
+                                                  0.3129137158 f
+  PC_15__reg_p/D (DFFQX1H7R)           0.0000000000
+                                                  0.3129137158 f
+  data arrival time                               0.3129137158
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_15__reg_p/CK (DFFQX1H7R)                     10.0000000000 r
+  library setup time                   -0.0493215919
+                                                  9.9506788254
+  data required time                              9.9506788254
+  ---------------------------------------------------------------
+  data required time                              9.9506788254
+  data arrival time                               -0.3129137158
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6377649307
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_12__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3294_/Y (BUFX0P5H7R)                0.1449932903
+                                                  0.2685460150 r
+  _3308_/Y (AOAI211X1P4H7L)            0.0414839089
+                                                  0.3100299239 f
+  PC_12__reg_p/D (DFFQX1H7R)           0.0000000000
+                                                  0.3100299239 f
+  data arrival time                               0.3100299239
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_12__reg_p/CK (DFFQX1H7R)                     10.0000000000 r
+  library setup time                   -0.0483796373
+                                                  9.9516201019
+  data required time                              9.9516201019
+  ---------------------------------------------------------------
+  data required time                              9.9516201019
+  data arrival time                               -0.3100299239
+  ---------------------------------------------------------------
+  slack (MET)                                     9.6415901184
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3284_/Y (OA211X0P7H7L)              0.0832453817
+                                                  0.2067981064 r
+  PC_0__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.2067981064 r
+  data arrival time                               0.2067981064
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_0__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0341367573
+                                                  9.9658632278
+  data required time                              9.9658632278
+  ---------------------------------------------------------------
+  data required time                              9.9658632278
+  data arrival time                               -0.2067981064
+  ---------------------------------------------------------------
+  slack (MET)                                     9.7590646744
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3335_/Y (OAI211X0P7H7L)             0.0528873354
+                                                  0.1764400601 f
+  PC_2__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.1764400601 f
+  data arrival time                               0.1764400601
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_2__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0550841689
+                                                  9.9449157715
+  data required time                              9.9449157715
+  ---------------------------------------------------------------
+  data required time                              9.9449157715
+  data arrival time                               -0.1764400601
+  ---------------------------------------------------------------
+  slack (MET)                                     9.7684755325
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_4__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3341_/Y (OAI211X0P7H7L)             0.0528873354
+                                                  0.1764400601 f
+  PC_4__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.1764400601 f
+  data arrival time                               0.1764400601
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_4__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0550841689
+                                                  9.9449157715
+  data required time                              9.9449157715
+  ---------------------------------------------------------------
+  data required time                              9.9449157715
+  data arrival time                               -0.1764400601
+  ---------------------------------------------------------------
+  slack (MET)                                     9.7684755325
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3346_/Y (OAI211X0P7H7L)             0.0528873354
+                                                  0.1764400601 f
+  PC_5__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.1764400601 f
+  data arrival time                               0.1764400601
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_5__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0550841689
+                                                  9.9449157715
+  data required time                              9.9449157715
+  ---------------------------------------------------------------
+  data required time                              9.9449157715
+  data arrival time                               -0.1764400601
+  ---------------------------------------------------------------
+  slack (MET)                                     9.7684755325
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_7__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3283_/Y (AOI31X0P5H7R)              0.1235527247
+                                                  0.1235527247 r
+  _3353_/Y (OAI211X0P7H7L)             0.0528873354
+                                                  0.1764400601 f
+  PC_7__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.1764400601 f
+  data arrival time                               0.1764400601
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_7__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0550841689
+                                                  9.9449157715
+  data required time                              9.9449157715
+  ---------------------------------------------------------------
+  data required time                              9.9449157715
+  data arrival time                               -0.1764400601
+  ---------------------------------------------------------------
+  slack (MET)                                     9.7684755325
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: state_4__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _2092_/Y (INVX0P5H7R)                0.0240552425
+                                                  0.0240552425 r
+  _2159_/Y (OAI211X0P7H7R)             0.0461934954
+                                                  0.0702487379 f
+  _2160_/Y (OR2X0P5H7L)                0.0574293435
+                                                  0.1276780814 f
+  state_4__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.1276780814 f
+  data arrival time                               0.1276780814
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  state_4__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0403681062
+                                                  9.9596319199
+  data required time                              9.9596319199
+  ---------------------------------------------------------------
+  data required time                              9.9596319199
+  data arrival time                               -0.1276780814
+  ---------------------------------------------------------------
+  slack (MET)                                     9.8319540024
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: state_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _2126_/Y (AOI21X0P5H7R)              0.0373353027
+                                                  0.0373353027 r
+  _2128_/Y (OAI211X1H7L)               0.0433004685
+                                                  0.0806357712 f
+  state_2__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0806357712 f
+  data arrival time                               0.0806357712
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  state_2__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0620170012
+                                                  9.9379825592
+  data required time                              9.9379825592
+  ---------------------------------------------------------------
+  data required time                              9.9379825592
+  data arrival time                               -0.0806357712
+  ---------------------------------------------------------------
+  slack (MET)                                     9.8573474884
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: state_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _2109_/Y (AOI21X0P5H7R)              0.0373353027
+                                                  0.0373353027 r
+  _2111_/Y (OAI211X1H7L)               0.0384576954
+                                                  0.0757929981 f
+  state_1__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0757929981 f
+  data arrival time                               0.0757929981
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  state_1__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0620170012
+                                                  9.9379825592
+  data required time                              9.9379825592
+  ---------------------------------------------------------------
+  data required time                              9.9379825592
+  data arrival time                               -0.0757929981
+  ---------------------------------------------------------------
+  slack (MET)                                     9.8621902466
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: state_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _2092_/Y (INVX0P5H7R)                0.0240552425
+                                                  0.0240552425 r
+  _2093_/Y (OAI211X0P7H7L)             0.0343464687
+                                                  0.0584017113 f
+  state_0__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0584017113 f
+  data arrival time                               0.0584017113
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  state_0__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0457960293
+                                                  9.9542036057
+  data required time                              9.9542036057
+  ---------------------------------------------------------------
+  data required time                              9.9542036057
+  data arrival time                               -0.0584017113
+  ---------------------------------------------------------------
+  slack (MET)                                     9.8958024979
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: state_3__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _2143_/Y (NOR3X0P5H7R)               0.0540224761
+                                                  0.0540224761 r
+  state_3__reg_p/D (DFFQX1H7R)         0.0000000000
+                                                  0.0540224761 r
+  data arrival time                               0.0540224761
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  state_3__reg_p/CK (DFFQX1H7R)                   10.0000000000 r
+  library setup time                   -0.0429176986
+                                                  9.9570827484
+  data required time                              9.9570827484
+  ---------------------------------------------------------------
+  data required time                              9.9570827484
+  data arrival time                               -0.0540224761
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9030599594
+
+
+  Startpoint: RST (input port clocked by clk)
+  Endpoint: PC_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  RST (in)                             0.0000000000
+                                                  0.0000000000 f
+  _3331_/Y (OAOI211X0P5H7R)            0.0545879081
+                                                  0.0545879081 r
+  PC_1__reg_p/D (DFFQX1H7R)            0.0000000000
+                                                  0.0545879081 r
+  data arrival time                               0.0545879081
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  PC_1__reg_p/CK (DFFQX1H7R)                      10.0000000000 r
+  library setup time                   -0.0419176184
+                                                  9.9580821991
+  data required time                              9.9580821991
+  ---------------------------------------------------------------
+  data required time                              9.9580821991
+  data arrival time                               -0.0545879081
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9034948349
+
+
+1

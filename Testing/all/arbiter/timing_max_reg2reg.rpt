@@ -1,0 +1,755 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_reg
+	-sort_by slack
+Design : arbiter
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:49 2026
+****************************************
+
+
+  Startpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: token_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_0__reg_p/Q (DFFQX1H7R)                        0.2004970014
+                                                                 0.2004970014 r
+  _120_/Y (AOI22X6H7R)                                0.0634311140
+                                                                 0.2639281154 f
+  _121_/Y (AND4X1P4H7L)                               0.0748314261
+                                                                 0.3387595415 f
+  _127_/Y (NAND3X6H7L)                                0.0255262256
+                                                                 0.3642857671 r
+  _136_/Y (AOI2BB1X4H7L)                              0.0610009432
+                                                                 0.4252867103 r
+  _150_/Y (BUFX16H7L)                                 0.0402587056
+                                                                 0.4655454159 r
+  _190_/Y (NAND2BX0P7H7L)                             0.0384660363
+                                                                 0.5040114522 f
+  _196_/Y (AOI21X1H7L)                                0.0459937453
+                                                                 0.5500051975 r
+  token_5__reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.5500051975 r
+  data arrival time                                              0.5500051975
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  token_5__reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0346096493
+                                                                 9.9653902054
+  data required time                                             9.9653902054
+  ------------------------------------------------------------------------------
+  data required time                                             9.9653902054
+  data arrival time                                              -0.5500051975
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.4153852463
+
+
+  Startpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: token_4__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_0__reg_p/Q (DFFQX1H7R)                        0.2004970014
+                                                                 0.2004970014 r
+  _120_/Y (AOI22X6H7R)                                0.0634311140
+                                                                 0.2639281154 f
+  _121_/Y (AND4X1P4H7L)                               0.0748314559
+                                                                 0.3387595713 f
+  _127_/Y (NAND3X6H7L)                                0.0255262256
+                                                                 0.3642857969 r
+  _136_/Y (AOI2BB1X4H7L)                              0.0610009134
+                                                                 0.4252867103 r
+  _150_/Y (BUFX16H7L)                                 0.0402587354
+                                                                 0.4655454457 r
+  _182_/Y (NAND2BX0P7H7L)                             0.0384660065
+                                                                 0.5040114522 f
+  _189_/Y (AOI21X1H7L)                                0.0459688306
+                                                                 0.5499802828 r
+  token_4__reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.5499802828 r
+  data arrival time                                              0.5499802828
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  token_4__reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0346083790
+                                                                 9.9653911591
+  data required time                                             9.9653911591
+  ------------------------------------------------------------------------------
+  data required time                                             9.9653911591
+  data arrival time                                              -0.5499802828
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.4154109955
+
+
+  Startpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: token_3__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_0__reg_p/Q (DFFQX1H7R)                        0.2004970014
+                                                                 0.2004970014 r
+  _120_/Y (AOI22X6H7R)                                0.0634311140
+                                                                 0.2639281154 f
+  _121_/Y (AND4X1P4H7L)                               0.0748314261
+                                                                 0.3387595415 f
+  _127_/Y (NAND3X6H7L)                                0.0255262256
+                                                                 0.3642857671 r
+  _136_/Y (AOI2BB1X4H7L)                              0.0610009134
+                                                                 0.4252866805 r
+  _150_/Y (BUFX16H7L)                                 0.0402587354
+                                                                 0.4655454159 r
+  _171_/Y (NAND2BX0P7H7L)                             0.0384660363
+                                                                 0.5040114522 f
+  _181_/Y (AOI21X1H7L)                                0.0451991558
+                                                                 0.5492106080 r
+  token_3__reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.5492106080 r
+  data arrival time                                              0.5492106080
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  token_3__reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0345691554
+                                                                 9.9654312134
+  data required time                                             9.9654312134
+  ------------------------------------------------------------------------------
+  data required time                                             9.9654312134
+  data arrival time                                              -0.5492106080
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.4162206650
+
+
+  Startpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: token_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_0__reg_p/Q (DFFQX1H7R)                        0.2004970014
+                                                                 0.2004970014 r
+  _120_/Y (AOI22X6H7R)                                0.0634311140
+                                                                 0.2639281154 f
+  _121_/Y (AND4X1P4H7L)                               0.0748314559
+                                                                 0.3387595713 f
+  _127_/Y (NAND3X6H7L)                                0.0255262256
+                                                                 0.3642857969 r
+  _136_/Y (AOI2BB1X4H7L)                              0.0610009134
+                                                                 0.4252867103 r
+  _150_/Y (BUFX16H7L)                                 0.0402587354
+                                                                 0.4655454457 r
+  _161_/Y (OAI211X1P4H7R)                             0.0356929600
+                                                                 0.5012384057 f
+  _162_/Y (OAOI211X1H7L)                              0.0406205058
+                                                                 0.5418589115 r
+  token_1__reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.5418589115 r
+  data arrival time                                              0.5418589115
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  token_1__reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0382376797
+                                                                 9.9617624283
+  data required time                                             9.9617624283
+  ------------------------------------------------------------------------------
+  data required time                                             9.9617624283
+  data arrival time                                              -0.5418589115
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.4199037552
+
+
+  Startpoint: token_4__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: token_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_4__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_4__reg_p/Q (DFFQX1H7R)                        0.1653153896
+                                                                 0.1653153896 f
+  _124_/Y (AOI22X6H7L)                                0.0748290122
+                                                                 0.2401444018 r
+  _126_/Y (AND4X4H7L)                                 0.1044382751
+                                                                 0.3445826769 r
+  _127_/Y (NAND3X6H7L)                                0.0268782377
+                                                                 0.3714609146 f
+  _136_/Y (AOI2BB1X4H7L)                              0.0680138171
+                                                                 0.4394747317 f
+  _150_/Y (BUFX16H7L)                                 0.0391663313
+                                                                 0.4786410630 f
+  _170_/Y (AOI211X1P4H7L)                             0.0539573133
+                                                                 0.5325983763 r
+  token_2__reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.5325983763 r
+  data arrival time                                              0.5325983763
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  token_2__reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0375849307
+                                                                 9.9624147415
+  data required time                                             9.9624147415
+  ------------------------------------------------------------------------------
+  data required time                                             9.9624147415
+  data arrival time                                              -0.5325983763
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.4298162460
+
+
+  Startpoint: token_4__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_4__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_4__reg_p/Q (DFFQX1H7R)                        0.1653153896
+                                                                 0.1653153896 f
+  _124_/Y (AOI22X6H7L)                                0.0748290420
+                                                                 0.2401444316 r
+  _126_/Y (AND4X4H7L)                                 0.1044382751
+                                                                 0.3445827067 r
+  _127_/Y (NAND3X6H7L)                                0.0268782377
+                                                                 0.3714609444 f
+  _136_/Y (AOI2BB1X4H7L)                              0.0680138171
+                                                                 0.4394747615 f
+  _149_/Y (OAO211X0P5H7L)                             0.0854276419
+                                                                 0.5249024034 f
+  token_0__reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.5249024034 f
+  data arrival time                                              0.5249024034
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0423196591
+                                                                 9.9576807022
+  data required time                                             9.9576807022
+  ------------------------------------------------------------------------------
+  data required time                                             9.9576807022
+  data arrival time                                              -0.5249024034
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.4327783585
+
+
+  Startpoint: token_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: select[0]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_5__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_5__reg_p/Q (DFFQX1H7R)                        0.2051888704
+                                                                 0.2051888704 r
+  _101_/Y (AND2X1H7L)                                 0.0677602589
+                                                                 0.2729491293 r
+  _108_/Y (AOI2XB1X0P5H7R)                            0.0385163128
+                                                                 0.3114654422 f
+  _109_/Y (OAOI211X0P5H7R)                            0.0760467947
+                                                                 0.3875122368 r
+  select[0]_reg_p/D (DFFQX1H7R)                       0.0000000000
+                                                                 0.3875122368 r
+  data arrival time                                              0.3875122368
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  select[0]_reg_p/CK (DFFQX1H7R)                                 10.0000000000 r
+  library setup time                                  -0.0412539281
+                                                                 9.9587459564
+  data required time                                             9.9587459564
+  ------------------------------------------------------------------------------
+  data required time                                             9.9587459564
+  data arrival time                                              -0.3875122368
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.5712337494
+
+
+  Startpoint: token_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: active_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_5__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_5__reg_p/Q (DFFQX1H7R)                        0.1657985449
+                                                                 0.1657985449 f
+  _101_/Y (AND2X1H7L)                                 0.0714113414
+                                                                 0.2372098863 f
+  _105_/Y (NOR2X0P7H7L)                               0.0438723564
+                                                                 0.2810822427 r
+  _107_/Y (NAND4BX1P4H7L)                             0.0640945733
+                                                                 0.3451768160 f
+  active_reg_p/D (DFFQX1H7R)                          0.0000000000
+                                                                 0.3451768160 f
+  data arrival time                                              0.3451768160
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  active_reg_p/CK (DFFQX1H7R)                                    10.0000000000 r
+  library setup time                                  -0.0563501567
+                                                                 9.9436502457
+  data required time                                             9.9436502457
+  ------------------------------------------------------------------------------
+  data required time                                             9.9436502457
+  data arrival time                                              -0.3451768160
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.5984725952
+
+
+  Startpoint: token_3__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: select[2]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_3__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_3__reg_p/Q (DFFQX1H7R)                        0.1565534174
+                                                                 0.1565534174 f
+  _099_/Y (AND2X1H7L)                                 0.0700192899
+                                                                 0.2265727073 f
+  _106_/Y (NOR2X1P4H7L)                               0.0493630916
+                                                                 0.2759357989 r
+  _112_/Y (NOR3BX0P5H7R)                              0.0825123489
+                                                                 0.3584481478 r
+  select[2]_reg_p/D (DFFQX1H7R)                       0.0000000000
+                                                                 0.3584481478 r
+  data arrival time                                              0.3584481478
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  select[2]_reg_p/CK (DFFQX1H7R)                                 10.0000000000 r
+  library setup time                                  -0.0399454497
+                                                                 9.9600543976
+  data required time                                             9.9600543976
+  ------------------------------------------------------------------------------
+  data required time                                             9.9600543976
+  data arrival time                                              -0.3584481478
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6016063690
+
+
+  Startpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: select[1]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_0__reg_p/Q (DFFQX1H7R)                        0.2004970014
+                                                                 0.2004970014 r
+  _102_/Y (AND2X1H7L)                                 0.0742205083
+                                                                 0.2747175097 r
+  _110_/Y (NAND2BX0P5H7R)                             0.0513180196
+                                                                 0.3260355294 r
+  _111_/Y (NOR2X0P5H7R)                               0.0265428722
+                                                                 0.3525784016 f
+  select[1]_reg_p/D (DFFQX1H7R)                       0.0000000000
+                                                                 0.3525784016 f
+  data arrival time                                              0.3525784016
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  select[1]_reg_p/CK (DFFQX1H7R)                                 10.0000000000 r
+  library setup time                                  -0.0413237959
+                                                                 9.9586763382
+  data required time                                             9.9586763382
+  ------------------------------------------------------------------------------
+  data required time                                             9.9586763382
+  data arrival time                                              -0.3525784016
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6060981750
+
+
+  Startpoint: token_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grant[1]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_1__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_1__reg_p/Q (DFFQX1H7R)                        0.1728540808
+                                                                 0.1728540808 r
+  _103_/Y (NAND2X0P5H7R)                              0.0886269361
+                                                                 0.2614810169 f
+  _104_/Y (INVX0P5H7R)                                0.0366336405
+                                                                 0.2981146574 r
+  grant[1]_reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.2981146574 r
+  data arrival time                                              0.2981146574
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  grant[1]_reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0345431790
+                                                                 9.9654569626
+  data required time                                             9.9654569626
+  ------------------------------------------------------------------------------
+  data required time                                             9.9654569626
+  data arrival time                                              -0.2981146574
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6673421860
+
+
+  Startpoint: token_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grant[0]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_0__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_0__reg_p/Q (DFFQX1H7R)                        0.2004970014
+                                                                 0.2004970014 r
+  _102_/Y (AND2X1H7L)                                 0.0742205083
+                                                                 0.2747175097 r
+  grant[0]_reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.2747175097 r
+  data arrival time                                              0.2747175097
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  grant[0]_reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0354047082
+                                                                 9.9645948410
+  data required time                                             9.9645948410
+  ------------------------------------------------------------------------------
+  data required time                                             9.9645948410
+  data arrival time                                              -0.2747175097
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6898775101
+
+
+  Startpoint: token_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grant[5]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_5__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_5__reg_p/Q (DFFQX1H7R)                        0.2051888704
+                                                                 0.2051888704 r
+  _101_/Y (AND2X1H7L)                                 0.0677602589
+                                                                 0.2729491293 r
+  grant[5]_reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.2729491293 r
+  data arrival time                                              0.2729491293
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  grant[5]_reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0346069932
+                                                                 9.9653930664
+  data required time                                             9.9653930664
+  ------------------------------------------------------------------------------
+  data required time                                             9.9653930664
+  data arrival time                                              -0.2729491293
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6924438477
+
+
+  Startpoint: token_4__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grant[4]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_4__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_4__reg_p/Q (DFFQX1H7R)                        0.2047823668
+                                                                 0.2047823668 r
+  _100_/Y (AND2X1H7L)                                 0.0676358044
+                                                                 0.2724181712 r
+  grant[4]_reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.2724181712 r
+  data arrival time                                              0.2724181712
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  grant[4]_reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0345957205
+                                                                 9.9654045105
+  data required time                                             9.9654045105
+  ------------------------------------------------------------------------------
+  data required time                                             9.9654045105
+  data arrival time                                              -0.2724181712
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.6929864883
+
+
+  Startpoint: token_3__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grant[3]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_3__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_3__reg_p/Q (DFFQX1H7R)                        0.1935784519
+                                                                 0.1935784519 r
+  _099_/Y (AND2X1H7L)                                 0.0682617426
+                                                                 0.2618401945 r
+  grant[3]_reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.2618401945 r
+  data arrival time                                              0.2618401945
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  grant[3]_reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0347691476
+                                                                 9.9652309418
+  data required time                                             9.9652309418
+  ------------------------------------------------------------------------------
+  data required time                                             9.9652309418
+  data arrival time                                              -0.2618401945
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7033910751
+
+
+  Startpoint: token_2__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grant[2]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Last common pin: clk
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  token_2__reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  token_2__reg_p/Q (DFFQX1H7R)                        0.1824431568
+                                                                 0.1824431568 r
+  _098_/Y (AND2X1H7L)                                 0.0649426579
+                                                                 0.2473858148 r
+  grant[2]_reg_p/D (DFFQX1H7R)                        0.0000000000
+                                                                 0.2473858148 r
+  data arrival time                                              0.2473858148
+
+  clock clk (rise edge)                               10.0000000000
+                                                                 10.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 10.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 10.0000000000
+  grant[2]_reg_p/CK (DFFQX1H7R)                                  10.0000000000 r
+  library setup time                                  -0.0345497578
+                                                                 9.9654502869
+  data required time                                             9.9654502869
+  ------------------------------------------------------------------------------
+  data required time                                             9.9654502869
+  data arrival time                                              -0.2473858148
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    9.7180643082
+
+
+1

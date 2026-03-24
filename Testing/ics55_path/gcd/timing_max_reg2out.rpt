@@ -1,0 +1,611 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-transition_time
+	-capacitance
+	-pba_mode path
+	-sort_by slack
+Design : gcd
+Version: U-2022.12-SP3
+Date   : Tue Feb 10 15:40:57 2026
+****************************************
+
+
+  Startpoint: ctrl.curr_state__0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: req_rdy (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                           Cap      Trans       Incr       Path
+  ---------------------------------------------------------------------------------------
+  clock clk (rise edge)                                            0.0000000000 0.0000000000
+  clock network delay (propagated)                                 0.0000000000 0.0000000000
+  ctrl.curr_state__0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  ctrl.curr_state__0_1__reg_p/Q (DFFQX1H7R)  0.0584612004 0.6324524283 0.4334602654 0.4334602654 r
+  _272_/Y (NOR2X0P5H7R)                      0.0060137608 0.2124457359 0.1657696664 0.5992299318 f
+  _273_/Y (BUFX1P4H7L)                       0.0065928139 0.0518065132 0.0941166878 0.6933466196 f
+  req_rdy (out)                                         0.0518065132 0.0000000000 0.6933466196 f
+  data arrival time                                                           0.6933466196
+
+  clock clk (rise edge)                                            10.0000000000 10.0000000000
+  clock network delay (propagated)                                 0.0000000000 10.0000000000
+  clock reconvergence pessimism                                    0.0000000000 10.0000000000
+  output external delay                                            0.0000000000 10.0000000000
+  data required time                                                          10.0000000000
+  ---------------------------------------------------------------------------------------
+  data required time                                                          10.0000000000
+  data arrival time                                                           -0.6933466196
+  ---------------------------------------------------------------------------------------
+  slack (MET)                                                                 9.3066530228
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[11]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _289_/Y (NAND4X6H7L)                     0.0016746491 0.0317147896 0.0344983339 0.2475498319 f
+  _293_/Y (AO211X4H7L)                     0.0039585200 0.0392207280 0.0943485200 0.3418983519 f
+  _359_/Y (AOAI211X4H7L)                   0.0034476412 0.0523988865 0.0496724546 0.3915708065 r
+  _360_/Y (OAI21X0P7H7L)                   0.0040451121 0.0678530186 0.0567286313 0.4482994378 f
+  _552_/Y (AO21X1H7R)                      0.0016882049 0.0301461779 0.0772620142 0.5255614519 f
+  _553_/Y (OAI2BB1X0P5H7R)                 0.0008755360 0.0325214788 0.0533291698 0.5788906217 f
+  _554_/Y (XOR2X0P5H7R)                    0.0000000000 0.0146228103 0.0782928467 0.6571834683 r
+  resp_msg[11] (out)                                  0.0146228103 0.0000000000 0.6571834683 r
+  data arrival time                                                         0.6571834683
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.6571834683
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.3428163528
+
+
+  Startpoint: dpath.a_lt_b$in0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[6]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in0_1__reg_p/Q (DFFQX1H7R)  0.0045331069 0.0601160266 0.1241533309 0.1241533309 r
+  _280_/Z (NOR2BX1P4H7L)                   0.0030559059 0.0757578164 0.0726050586 0.1967583895 r
+  _425_/Y (OAO211X2H7L)                    0.0024911901 0.0337537043 0.0662918091 0.2630501986 r
+  _440_/Y (AOI21X1P4H7L)                   0.0015542191 0.0307336375 0.0274886489 0.2905388474 f
+  _442_/Y (OAOI211X1P4H7L)                 0.0017112440 0.0866897628 0.0733133256 0.3638521731 r
+  _450_/Y (OAI2BB1X0P7H7L)                 0.0008752850 0.0271580536 0.0542870760 0.4181392491 r
+  _451_/Y (XOR2X0P5H7R)                    0.0026712478 0.0482449830 0.1092241704 0.5273634195 f
+  _560_/Y (XNOR2X0P5H7R)                   0.0000000000 0.0147834131 0.0840546489 0.6114180684 r
+  resp_msg[6] (out)                                   0.0147834131 0.0000000000 0.6114180684 r
+  data arrival time                                                         0.6114180684
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.6114180684
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.3885822296
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[10]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _289_/Y (NAND4X6H7L)                     0.0016746491 0.0317147896 0.0344983339 0.2475498319 f
+  _293_/Y (AO211X4H7L)                     0.0039585200 0.0392207280 0.0943485200 0.3418983519 f
+  _359_/Y (AOAI211X4H7L)                   0.0034476412 0.0523988865 0.0496724546 0.3915708065 r
+  _360_/Y (OAI21X0P7H7L)                   0.0040451121 0.0678530186 0.0567286313 0.4482994378 f
+  _552_/Y (AO21X1H7R)                      0.0016882049 0.0301461779 0.0772620142 0.5255614519 f
+  _555_/Y (XNOR2X0P5H7R)                   0.0000000000 0.0147993797 0.0782669783 0.6038284302 r
+  resp_msg[10] (out)                                  0.0147993797 0.0000000000 0.6038284302 r
+  data arrival time                                                         0.6038284302
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.6038284302
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.3961715698
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[8]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _289_/Y (NAND4X6H7L)                     0.0016746491 0.0317147896 0.0344983339 0.2475498319 f
+  _293_/Y (AO211X4H7L)                     0.0039585200 0.0392207280 0.0943485200 0.3418983519 f
+  _359_/Y (AOAI211X4H7L)                   0.0034476412 0.0523988865 0.0496724546 0.3915708065 r
+  _465_/Y (XOR2X0P5H7R)                    0.0026712478 0.0482557677 0.1164996624 0.5080704689 f
+  _558_/Y (XNOR2X0P5H7R)                   0.0000000000 0.0147834029 0.0840581059 0.5921285748 r
+  resp_msg[8] (out)                                   0.0147834029 0.0000000000 0.5921285748 r
+  data arrival time                                                         0.5921285748
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5921285748
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4078712463
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[13]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _289_/Y (NAND4X6H7L)                     0.0016746491 0.0317147896 0.0344983339 0.2475498319 f
+  _293_/Y (AO211X4H7L)                     0.0039585200 0.0392207280 0.0943485200 0.3418983519 f
+  _359_/Y (AOAI211X4H7L)                   0.0034476412 0.0523988865 0.0496724546 0.3915708065 r
+  _383_/Y (OAI2XB1X3H7L)                   0.0040244218 0.0697977766 0.0699424148 0.4615132213 r
+  _549_/Y (AOI21X0P5H7R)                   0.0008755360 0.0441541076 0.0451215506 0.5066347718 f
+  _550_/Y (XOR2X0P5H7R)                    0.0000000000 0.0146420980 0.0820286870 0.5886634588 r
+  resp_msg[13] (out)                                  0.0146420980 0.0000000000 0.5886634588 r
+  data arrival time                                                         0.5886634588
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5886634588
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4113368988
+
+
+  Startpoint: dpath.a_lt_b$in0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[7]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in0_1__reg_p/Q (DFFQX1H7R)  0.0045331069 0.0601160266 0.1241533309 0.1241533309 r
+  _280_/Z (NOR2BX1P4H7L)                   0.0030559059 0.0757578164 0.0726050586 0.1967583895 r
+  _425_/Y (OAO211X2H7L)                    0.0024911901 0.0337537043 0.0662918091 0.2630501986 r
+  _440_/Y (AOI21X1P4H7L)                   0.0015542191 0.0307336375 0.0274886489 0.2905388474 f
+  _457_/Y (OAOI211X0P5H7R)                 0.0008701850 0.0849527493 0.0776466727 0.3681855202 r
+  _458_/Y (XNOR2X0P5H7R)                   0.0016340880 0.0365575477 0.1132988930 0.4814844131 f
+  _559_/Y (XOR2X0P5H7R)                    0.0000000000 0.0146295018 0.0795890093 0.5610734224 r
+  resp_msg[7] (out)                                   0.0146295018 0.0000000000 0.5610734224 r
+  data arrival time                                                         0.5610734224
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5610734224
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4389266968
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[15]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _296_/Y (AOA211X1H7L)                    0.0035338991 0.0556709841 0.0861891508 0.2992406487 r
+  _298_/Y (OA21X1P4H7L)                    0.0018310400 0.0297845881 0.0556938648 0.3549345136 r
+  _307_/Y (OAI211X3H7L)                    0.0030410520 0.0448771082 0.0402504206 0.3951849341 f
+  _326_/Y (AOAI211X4H7L)                   0.0030019039 0.0486776903 0.0489508510 0.4441357851 r
+  _348_/Y (NAND2X1P4H7L)                   0.0041504330 0.0525478050 0.0439692736 0.4881050587 f
+  _543_/Y (XNOR2X0P5H7R)                   0.0000000000 0.0147350049 0.0720402598 0.5601453185 r
+  resp_msg[15] (out)                                  0.0147350049 0.0000000000 0.5601453185 r
+  data arrival time                                                         0.5601453185
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5601453185
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4398546219
+
+
+  Startpoint: dpath.a_lt_b$in0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[5]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in0_1__reg_p/Q (DFFQX1H7R)  0.0045331069 0.0601160266 0.1241533309 0.1241533309 r
+  _280_/Z (NOR2BX1P4H7L)                   0.0030559059 0.0757578164 0.0726050586 0.1967583895 r
+  _425_/Y (OAO211X2H7L)                    0.0024911901 0.0337537043 0.0662918091 0.2630501986 r
+  _440_/Y (AOI21X1P4H7L)                   0.0015542191 0.0307336375 0.0274886489 0.2905388474 f
+  _442_/Y (OAOI211X1P4H7L)                 0.0017112440 0.0866897628 0.0733133256 0.3638521731 r
+  _443_/Y (XNOR2X0P5H7R)                   0.0016340880 0.0365576297 0.1136799157 0.4775320888 f
+  _546_/Y (XOR2X0P5H7R)                    0.0000000000 0.0146295018 0.0795890689 0.5571211576 r
+  resp_msg[5] (out)                                   0.0146295018 0.0000000000 0.5571211576 r
+  data arrival time                                                         0.5571211576
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5571211576
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4428787231
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[12]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _289_/Y (NAND4X6H7L)                     0.0016746491 0.0317147896 0.0344983339 0.2475498319 f
+  _293_/Y (AO211X4H7L)                     0.0039585200 0.0392207280 0.0943485200 0.3418983519 f
+  _359_/Y (AOAI211X4H7L)                   0.0034476412 0.0523988865 0.0496724546 0.3915708065 r
+  _383_/Y (OAI2XB1X3H7L)                   0.0040244218 0.0697977766 0.0699424148 0.4615132213 r
+  _551_/Y (XNOR2X0P5H7R)                   0.0000000000 0.0177202690 0.0926899314 0.5542031527 f
+  resp_msg[12] (out)                                  0.0177202690 0.0000000000 0.5542031527 f
+  data arrival time                                                         0.5542031527
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5542031527
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4457969666
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[14]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _296_/Y (AOA211X1H7L)                    0.0035338991 0.0556709841 0.0861891508 0.2992406487 r
+  _298_/Y (OA21X1P4H7L)                    0.0018310400 0.0297845881 0.0556938648 0.3549345136 r
+  _307_/Y (OAI211X3H7L)                    0.0030410520 0.0448771082 0.0402504206 0.3951849341 f
+  _401_/Y (AOI21X1P4H7L)                   0.0035948900 0.0925633460 0.0725815892 0.4677665234 r
+  _545_/Y (XOR2X0P5H7R)                    0.0000000000 0.0176140852 0.0835409164 0.5513074398 f
+  resp_msg[14] (out)                                  0.0176140852 0.0000000000 0.5513074398 f
+  data arrival time                                                         0.5513074398
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5513074398
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4486923218
+
+
+  Startpoint: dpath.a_lt_b$in1_5__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[9]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_5__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_5__reg_p/Q (DFFQX1H7R)  0.0085629923 0.0996792912 0.1483024359 0.1483024359 r
+  _286_/Y (NAND2BX3H7L)                    0.0047786250 0.0423177704 0.0647490621 0.2130514979 r
+  _289_/Y (NAND4X6H7L)                     0.0016746491 0.0317147896 0.0344983339 0.2475498319 f
+  _293_/Y (AO211X4H7L)                     0.0039585200 0.0392207280 0.0943485200 0.3418983519 f
+  _359_/Y (AOAI211X4H7L)                   0.0034476412 0.0523988865 0.0496724546 0.3915708065 r
+  _360_/Y (OAI21X0P7H7L)                   0.0040451121 0.0678530186 0.0567286313 0.4482994378 f
+  _557_/Y (XNOR2X0P5H7R)                   0.0000000000 0.0148204174 0.0892342031 0.5375336409 r
+  resp_msg[9] (out)                                   0.0148204174 0.0000000000 0.5375336409 r
+  data arrival time                                                         0.5375336409
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.5375336409
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.4624662399
+
+
+  Startpoint: ctrl.curr_state__0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_val (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                           Cap      Trans       Incr       Path
+  ---------------------------------------------------------------------------------------
+  clock clk (rise edge)                                            0.0000000000 0.0000000000
+  clock network delay (propagated)                                 0.0000000000 0.0000000000
+  ctrl.curr_state__0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  ctrl.curr_state__0_1__reg_p/Q (DFFQX1H7R)  0.0584612004 0.6324524283 0.4334602654 0.4334602654 r
+  _561_/Z (NOR2BX1H7L)                       0.0000000000 0.0285154358 0.0453955233 0.4788557887 r
+  resp_val (out)                                        0.0285154358 0.0000000000 0.4788557887 r
+  data arrival time                                                           0.4788557887
+
+  clock clk (rise edge)                                            10.0000000000 10.0000000000
+  clock network delay (propagated)                                 0.0000000000 10.0000000000
+  clock reconvergence pessimism                                    0.0000000000 10.0000000000
+  output external delay                                            0.0000000000 10.0000000000
+  data required time                                                          10.0000000000
+  ---------------------------------------------------------------------------------------
+  data required time                                                          10.0000000000
+  data arrival time                                                           -0.4788557887
+  ---------------------------------------------------------------------------------------
+  slack (MET)                                                                 9.5211439133
+
+
+  Startpoint: dpath.a_lt_b$in1_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[4]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_0__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_0__reg_p/Q (DFFQX1H7R)  0.0081865275 0.0957961679 0.1461145431 0.1461145431 r
+  _281_/Y (NAND2BX6H7L)                    0.0047758729 0.0401887931 0.0300241411 0.1761386842 f
+  _425_/Y (OAO211X2H7L)                    0.0025183992 0.0376474746 0.1011087447 0.2772474289 f
+  _434_/Y (AOI31X0P5H7R)                   0.0008701850 0.0471583121 0.0505098104 0.3277572393 r
+  _435_/Y (XNOR2X0P5H7R)                   0.0009349380 0.0286462307 0.0979878306 0.4257450700 f
+  resp_msg[4] (out)                                   0.0286462307 0.0000000000 0.4257450700 f
+  data arrival time                                                         0.4257450700
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.4257450700
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.5742549896
+
+
+  Startpoint: dpath.a_lt_b$in0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[3]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in0_1__reg_p/Q (DFFQX1H7R)  0.0045331069 0.0601160266 0.1241533309 0.1241533309 r
+  _280_/Z (NOR2BX1P4H7L)                   0.0030559059 0.0757578164 0.0726050586 0.1967583895 r
+  _425_/Y (OAO211X2H7L)                    0.0024911901 0.0337537043 0.0662918091 0.2630501986 r
+  _426_/Y (NAND2X0P5H7R)                   0.0016481400 0.0478886589 0.0422392786 0.3052894771 f
+  _429_/Y (XNOR2X0P5H7R)                   0.0009948590 0.0304092281 0.0826455653 0.3879350424 r
+  resp_msg[3] (out)                                   0.0304092281 0.0000000000 0.3879350424 r
+  data arrival time                                                         0.3879350424
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.3879350424
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.6120653152
+
+
+  Startpoint: dpath.a_lt_b$in0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[2]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in0_1__reg_p/Q (DFFQX1H7R)  0.0045331069 0.0601160266 0.1241533309 0.1241533309 r
+  _280_/Z (NOR2BX1P4H7L)                   0.0030559059 0.0757578164 0.0726050586 0.1967583895 r
+  _419_/Y (OAI21X0P5H7R)                   0.0016481400 0.0541200452 0.0595872402 0.2563456297 f
+  _421_/Y (XNOR2X0P5H7R)                   0.0009948590 0.0304228775 0.0841221809 0.3404678106 r
+  resp_msg[2] (out)                                   0.0304228775 0.0000000000 0.3404678106 r
+  data arrival time                                                         0.3404678106
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.3404678106
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.6595325470
+
+
+  Startpoint: dpath.a_lt_b$in0_1__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[1]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in0_1__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in0_1__reg_p/Q (DFFQX1H7R)  0.0045331069 0.0601160266 0.1241533309 0.1241533309 r
+  _280_/Z (NOR2BX1P4H7L)                   0.0030559059 0.0757578164 0.0726050586 0.1967583895 r
+  _414_/Y (NOR2X0P5H7R)                    0.0008755360 0.0325206518 0.0319634229 0.2287218124 f
+  _415_/Y (XOR2X0P5H7R)                    0.0009948590 0.0302765854 0.0900651664 0.3187869787 r
+  resp_msg[1] (out)                                   0.0302765854 0.0000000000 0.3187869787 r
+  data arrival time                                                         0.3187869787
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.3187869787
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.6812133789
+
+
+  Startpoint: dpath.a_lt_b$in1_0__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: resp_msg[0]
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: max  (recalculated)
+
+  Point                                         Cap      Trans       Incr       Path
+  -------------------------------------------------------------------------------------
+  clock clk (rise edge)                                          0.0000000000 0.0000000000
+  clock network delay (propagated)                               0.0000000000 0.0000000000
+  dpath.a_lt_b$in1_0__reg_p/CK (DFFQX1H7R)            0.0000000000 0.0000000000 0.0000000000 r
+  dpath.a_lt_b$in1_0__reg_p/Q (DFFQX1H7R)  0.0081865275 0.0957961679 0.1461145431 0.1461145431 r
+  _547_/Y (NAND2BX0P5H7R)                  0.0007566500 0.0274020173 0.0526914746 0.1988060176 r
+  _548_/Y (NAND2X0P5H7R)                   0.0000000000 0.0129013602 0.0198975950 0.2187036127 f
+  resp_msg[0] (out)                                   0.0129013602 0.0000000000 0.2187036127 f
+  data arrival time                                                         0.2187036127
+
+  clock clk (rise edge)                                          10.0000000000 10.0000000000
+  clock network delay (propagated)                               0.0000000000 10.0000000000
+  clock reconvergence pessimism                                  0.0000000000 10.0000000000
+  output external delay                                          0.0000000000 10.0000000000
+  data required time                                                        10.0000000000
+  -------------------------------------------------------------------------------------
+  data required time                                                        10.0000000000
+  data arrival time                                                         -0.2187036127
+  -------------------------------------------------------------------------------------
+  slack (MET)                                                               9.7812967300
+
+
+1

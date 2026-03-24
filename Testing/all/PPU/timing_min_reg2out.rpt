@@ -1,0 +1,139 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : PPU
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:00 2026
+****************************************
+
+
+  Startpoint: vbl_enable_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: nmi (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  vbl_enable_reg_p/CK (DFFQX1H7R)                     0.0000000000
+                                                                 0.0000000000 r
+  vbl_enable_reg_p/Q (DFFQX1H7R)                      0.0733765960
+                                                                 0.0733765960 f
+  _09030_/Y (AND2X1H7L)                               0.0281780809
+                                                                 0.1015546769 f
+  nmi (out)                                           0.0000000000
+                                                                 0.1015546769 f
+  data arrival time                                              0.1015546769
+
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  output external delay                               0.0000000000
+                                                                 0.0000000000
+  data required time                                             0.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             0.0000000000
+  data arrival time                                              -0.1015546769
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1015546769
+
+
+  Startpoint: cycle[0]_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: vram_r (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  cycle[0]_reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  cycle[0]_reg_p/Q (DFFQX1H7R)                        0.1247315332
+                                                                 0.1247315332 f
+  _12977_/Y (NOR2X0P5H7R)                             0.0454868600
+                                                                 0.1702183932 r
+  _12978_/Y (AO22X0P7H7R)                             0.0514092594
+                                                                 0.2216276526 r
+  vram_r (out)                                        0.0000000000
+                                                                 0.2216276526 r
+  data arrival time                                              0.2216276526
+
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  output external delay                               0.0000000000
+                                                                 0.0000000000
+  data required time                                             0.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             0.0000000000
+  data arrival time                                              -0.2216276526
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.2216276526
+
+
+  Startpoint: bg_painter.loopy_10__reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: vram_w (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  bg_painter.loopy_10__reg_p/CK (DFFQX1H7R)           0.0000000000
+                                                                 0.0000000000 r
+  bg_painter.loopy_10__reg_p/Q (DFFQX1H7R)            0.0952625722
+                                                                 0.0952625722 f
+  _08242_/Y (NAND4X0P5H7R)                            0.0366301388
+                                                                 0.1318927109 r
+  _08243_/Z (NOR2BX1P4H7L)                            0.0318775177
+                                                                 0.1637702286 f
+  _08244_/Y (BUFX1P4H7L)                              0.0568905175
+                                                                 0.2206607461 f
+  _12980_/Y (NOR3X0P5H7R)                             0.0569309890
+                                                                 0.2775917351 r
+  _12981_/Z (NOR2BX1H7L)                              0.0382689834
+                                                                 0.3158607185 r
+  vram_w (out)                                        0.0000000000
+                                                                 0.3158607185 r
+  data arrival time                                              0.3158607185
+
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  output external delay                               0.0000000000
+                                                                 0.0000000000
+  data required time                                             0.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             0.0000000000
+  data arrival time                                              -0.3158607185
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.3158607185
+
+
+1

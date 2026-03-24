@@ -1,0 +1,121 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : top
+Version: U-2022.12-SP3
+Date   : Fri Feb  6 15:43:26 2026
+****************************************
+
+
+  Startpoint: sda_reg_p (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: sda (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  sda_reg_p/CK (DFFQX1H7R)             0.0000000000
+                                                  0.0000000000 r
+  sda_reg_p/Q (DFFQX1H7R)              0.0691098943
+                                                  0.0691098943 f
+  sda (out)                            0.0000000000
+                                                  0.0691098943 f
+  data arrival time                               0.0691098943
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0691098943
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0691098943
+
+
+  Startpoint: scl_reg_p (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: scl (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  scl_reg_p/CK (DFFQX1H7R)             0.0000000000
+                                                  0.0000000000 r
+  scl_reg_p/Q (DFFQX1H7R)              0.0694849715
+                                                  0.0694849715 f
+  scl (out)                            0.0000000000
+                                                  0.0694849715 f
+  data arrival time                               0.0694849715
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0694849715
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0694849715
+
+
+  Startpoint: out_uart_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: out_uart (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  out_uart_reg_p/CK (DFFQX1H7R)                       0.0000000000
+                                                                 0.0000000000 r
+  out_uart_reg_p/Q (DFFQX1H7R)                        0.0696656108
+                                                                 0.0696656108 f
+  out_uart (out)                                      0.0000000000
+                                                                 0.0696656108 f
+  data arrival time                                              0.0696656108
+
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  output external delay                               0.0000000000
+                                                                 0.0000000000
+  data required time                                             0.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             0.0000000000
+  data arrival time                                              -0.0696656108
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.0696656108
+
+
+1

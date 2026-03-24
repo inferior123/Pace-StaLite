@@ -1,0 +1,123 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : dcpu16_cpu
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 21:00:48 2026
+****************************************
+
+
+  Startpoint: f_wre_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: f_wre (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  f_wre_reg_p/CK (DFFQX1H7R)           0.0000000000
+                                                  0.0000000000 r
+  f_wre_reg_p/Q (DFFQX1H7R)            0.0685132965
+                                                  0.0685132965 f
+  f_wre (out)                          0.0000000000
+                                                  0.0685132965 f
+  data arrival time                               0.0685132965
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0685132965
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0685132965
+
+
+  Startpoint: f_stb_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: f_stb (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  f_stb_reg_p/CK (DFFQX1H7R)           0.0000000000
+                                                  0.0000000000 r
+  f_stb_reg_p/Q (DFFQX1H7R)            0.0792328194
+                                                  0.0792328194 f
+  f_stb (out)                          0.0000000000
+                                                  0.0792328194 f
+  data arrival time                               0.0792328194
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0792328194
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0792328194
+
+
+  Startpoint: g_stb_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: g_stb (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  g_stb_reg_p/CK (DFFQX1H7R)           0.0000000000
+                                                  0.0000000000 r
+  g_stb_reg_p/Q (DFFQX1H7R)            0.2618210614
+                                                  0.2618210614 f
+  g_stb (out)                          0.0000000000
+                                                  0.2618210614 f
+  data arrival time                               0.2618210614
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.2618210614
+  ---------------------------------------------------------------
+  slack (MET)                                     0.2618210614
+
+
+1

@@ -1,0 +1,93 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type in_to_out
+	-sort_by slack
+Design : picorv32a
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:58:44 2026
+****************************************
+
+
+  Startpoint: resetn (input port clocked by clk)
+  Endpoint: mem_la_read
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  resetn (in)                          0.0000000000
+                                                  0.0000000000 f
+  _23285_/Y (OA211X1P4H7L)             0.0274302978
+                                                  0.0274302978 f
+  mem_la_read (out)                    0.0000000000
+                                                  0.0274302978 f
+  data arrival time                               0.0274302978
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0274302978
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0274302978
+
+
+  Startpoint: resetn (input port clocked by clk)
+  Endpoint: mem_la_write
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  input external delay                 0.0000000000
+                                                  0.0000000000 f
+  resetn (in)                          0.0000000000
+                                                  0.0000000000 f
+  _23286_/Y (NAND3X0P5H7R)             0.0230898671
+                                                  0.0230898671 r
+  _23287_/Y (INVX0P5H7R)               0.0185134746
+                                                  0.0416033417 f
+  mem_la_write (out)                   0.0000000000
+                                                  0.0416033417 f
+  data arrival time                               0.0416033417
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.0416033417
+  ---------------------------------------------------------------
+  slack (MET)                                     0.0416033417
+
+
+1

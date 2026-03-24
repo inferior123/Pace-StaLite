@@ -1,0 +1,128 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : APU
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:58:25 2026
+****************************************
+
+
+  Startpoint: odd_or_even_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: odd_or_even
+               (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  odd_or_even_reg_p/CK (DFFQX1H7R)                    0.0000000000
+                                                                 0.0000000000 r
+  odd_or_even_reg_p/Q (DFFQX1H7R)                     0.0884491876
+                                                                 0.0884491876 f
+  odd_or_even (out)                                   0.0000000000
+                                                                 0.0884491876 f
+  data arrival time                                              0.0884491876
+
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  output external delay                               0.0000000000
+                                                                 0.0000000000
+  data required time                                             0.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             0.0000000000
+  data arrival time                                              -0.0884491876
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.0884491876
+
+
+  Startpoint: Dmc.HasSampleBuffer_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: DmaReq (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                                   Incr       Path
+  ------------------------------------------------------------------------------
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  Dmc.HasSampleBuffer_reg_p/CK (DFFQX1H7R)            0.0000000000
+                                                                 0.0000000000 r
+  Dmc.HasSampleBuffer_reg_p/Q (DFFQX1H7R)             0.0736204237
+                                                                 0.0736204237 f
+  _0877_/Y (NOR3BX0P5H7R)                             0.0376749337
+                                                                 0.1112953573 r
+  DmaReq (out)                                        0.0000000000
+                                                                 0.1112953573 r
+  data arrival time                                              0.1112953573
+
+  clock clk (rise edge)                               0.0000000000
+                                                                 0.0000000000
+  clock network delay (propagated)                    0.0000000000
+                                                                 0.0000000000
+  clock reconvergence pessimism                       0.0000000000
+                                                                 0.0000000000
+  output external delay                               0.0000000000
+                                                                 0.0000000000
+  data required time                                             0.0000000000
+  ------------------------------------------------------------------------------
+  data required time                                             0.0000000000
+  data arrival time                                              -0.1112953573
+  ------------------------------------------------------------------------------
+  slack (MET)                                                    0.1112953573
+
+
+  Startpoint: Dmc.Irq_reg_p
+               (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: IRQ (output port clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  Dmc.Irq_reg_p/CK (DFFQX1H7R)         0.0000000000
+                                                  0.0000000000 r
+  Dmc.Irq_reg_p/Q (DFFQX1H7R)          0.0743460059
+                                                  0.0743460059 f
+  _1062_/Y (OR2X0P5H7L)                0.0439859927
+                                                  0.1183319986 f
+  IRQ (out)                            0.0000000000
+                                                  0.1183319986 f
+  data arrival time                               0.1183319986
+
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  0.0000000000
+  output external delay                0.0000000000
+                                                  0.0000000000
+  data required time                              0.0000000000
+  ---------------------------------------------------------------
+  data required time                              0.0000000000
+  data arrival time                               -0.1183319986
+  ---------------------------------------------------------------
+  slack (MET)                                     0.1183319986
+
+
+1

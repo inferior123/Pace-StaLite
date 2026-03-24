@@ -1,0 +1,50 @@
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 1000.0000000000
+	-max_paths 1000
+	-start_end_type reg_to_out
+	-sort_by slack
+Design : aes_cipher_top
+Version: U-2022.12-SP3
+Date   : Thu Feb 26 20:59:07 2026
+****************************************
+
+
+  Startpoint: done_reg_p (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: done (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                    Incr       Path
+  ---------------------------------------------------------------
+  clock clk (rise edge)                0.0000000000
+                                                  0.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  0.0000000000
+  done_reg_p/CK (DFFQX1H7R)            0.0000000000
+                                                  0.0000000000 r
+  done_reg_p/Q (DFFQX1H7R)             0.0900390446
+                                                  0.0900390446 r
+  done (out)                           0.0000000000
+                                                  0.0900390446 r
+  data arrival time                               0.0900390446
+
+  clock clk (rise edge)                10.0000000000
+                                                  10.0000000000
+  clock network delay (propagated)     0.0000000000
+                                                  10.0000000000
+  clock reconvergence pessimism        0.0000000000
+                                                  10.0000000000
+  output external delay                0.0000000000
+                                                  10.0000000000
+  data required time                              10.0000000000
+  ---------------------------------------------------------------
+  data required time                              10.0000000000
+  data arrival time                               -0.0900390446
+  ---------------------------------------------------------------
+  slack (MET)                                     9.9099607468
+
+
+1
