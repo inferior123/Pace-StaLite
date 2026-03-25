@@ -10,7 +10,7 @@
 #include "cell/celllib_cache.hpp"
 #include "sta/debug.h"
 
-bool run_pba = true;
+bool run_pba = false;
 
 namespace {
 std::string point_name(const sta::TimingPointRef &p) {

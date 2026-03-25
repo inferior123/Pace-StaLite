@@ -1,5 +1,6 @@
 #include "sta/sta_report.hpp"
 #include "sta/sta_data_structures.hpp"
+#include "sta/timing_point_classifier.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <fstream>
@@ -67,14 +68,6 @@ static char dir_to_char(TransitionDirection d) {
   default:
     return 'n';
   }
-}
-
-// 与 build_fanouts / effective_start_type_for_group 一致：用 type 或 __clk__
-// 识别时钟
-static bool is_clock_point_for_report(const TimingPointRef &p) {
-  return p.type == CLK_PIN ||
-         (!p.port_name.empty() && p.port_name == "__clk__") ||
-         (p.bit.has_value() && p.bit->wire_name == "__clk__");
 }
 
 std::string

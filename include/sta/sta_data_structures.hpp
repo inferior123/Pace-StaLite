@@ -801,7 +801,6 @@ const celllib::TimingArc *find_default_arc(celllib::Pin &pin,
                                            const std::string &related_pin);
 
 std::string group_type_str(sta::PathGroup group);
-std::string point_type_str(sta::PointType t);
 void print_candidate_nodes(
     const sta::CandidateGraphy &cg, const sta::TimingRunResult &res,
     const std::unordered_set<std::size_t> &startpoint_nodes);

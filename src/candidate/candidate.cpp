@@ -1,4 +1,5 @@
 #include "sta/sta_data_structures.hpp"
+#include "sta/timing_point_classifier.hpp"
 #include <cassert>
 #include <cstddef>
 #include <functional>
@@ -249,18 +250,6 @@ void STAWorker::compute_path_setup_hold(TimingPathResult &pr) const {
       pr.library_hold_time = h;
     }
   }
-}
-
-// 判断节点是否为终点（D 端或 OUTPUT），非则多为 non-unate 等，需继续链下去
-static bool is_terminal_node(const TimingRunResult &res,
-                             const CandidateGraphy &cg, std::size_t node_id) {
-  if (node_id >= cg.nodes.size())
-    return true;
-  std::size_t pt_id = cg.nodes[node_id].point_idx;
-  if (pt_id >= res.points.size())
-    return true;
-  PointType t = res.points[pt_id].type;
-  return (t == REGD || t == OUTPUT);
 }
 
 void STAWorker::run_candidate_graphy_dfs() {

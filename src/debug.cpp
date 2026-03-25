@@ -1,6 +1,7 @@
 #include "sta/debug.h"
 #include "cell/cell_data_structure.hpp"
 #include "sta/sta_data_structures.hpp"
+#include "sta/timing_point_classifier.hpp"
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -263,29 +264,6 @@ auto pin_dir_str(celllib::PinDirection dir) {
   case celllib::PinDirection::INTERNAL:
     return "INTERNAL";
   }
-  return "?";
-}
-
-std::string point_type_str(sta::PointType type) {
-  switch (type) {
-  case sta::CLK:
-    return "CLK";
-  case sta::CLK_PIN:
-    return "CLK_PIN";
-  case sta::INPUT:
-    return "INPUT";
-  case sta::OUTPUT:
-    return "OUTPUT";
-  case sta::REGD:
-    return "REGD";
-  case sta::REGQ:
-    return "REGQ";
-  case sta::COMB_PIN:
-    return "COMB_PIN";
-  case sta::CLK_SOURCE:
-    return "CLK_SOURCE";
-  }
-
   return "?";
 }
 
