@@ -127,7 +127,7 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/verilog_collect.cpp
   ${PROJECT_SOURCE_DIR}/src/lookuptable.cpp
   ${PROJECT_SOURCE_DIR}/src/trace_debug.cpp
-  ${PROJECT_SOURCE_DIR}/src/sta_report.cpp
+  ${PROJECT_SOURCE_DIR}/src/report/sta_report.cpp
   ${PROJECT_SOURCE_DIR}/src/sdc_parser.cpp
   ${PROJECT_SOURCE_DIR}/src/cell_data_structure.cpp
   ${PROJECT_SOURCE_DIR}/src/celllib_cache.cpp
@@ -136,7 +136,7 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/candidate/candidate_graphy.cpp
   ${PROJECT_SOURCE_DIR}/src/candidate/candidate_utils.cpp
   ${PROJECT_SOURCE_DIR}/src/gba_dfs/gba_dfs.cpp
-  ${PROJECT_SOURCE_DIR}/src/utils.cpp
+  ${PROJECT_SOURCE_DIR}/src/report/respath_sort.cpp
   ${PROJECT_SOURCE_DIR}/src/debug.cpp
   ${FLEX_verilog_lexer_OUTPUTS}
   ${BISON_verilog_parser_OUTPUTS}
