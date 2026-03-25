@@ -119,6 +119,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 # Main executable
 add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/main.cpp
+  ${PROJECT_SOURCE_DIR}/src/sta_logger.cpp
   ${PROJECT_SOURCE_DIR}/src/sta.cpp
   ${PROJECT_SOURCE_DIR}/src/verilog_collect.cpp
   ${PROJECT_SOURCE_DIR}/src/lookuptable.cpp
