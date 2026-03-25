@@ -131,11 +131,10 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/sdc_parser.cpp
   ${PROJECT_SOURCE_DIR}/src/cell_data_structure.cpp
   ${PROJECT_SOURCE_DIR}/src/celllib_cache.cpp
-  ${PROJECT_SOURCE_DIR}/src/candidate/candidate.cpp
-  ${PROJECT_SOURCE_DIR}/src/candidate/candidate_recalculate.cpp
-  ${PROJECT_SOURCE_DIR}/src/candidate/candidate_graphy.cpp
-  ${PROJECT_SOURCE_DIR}/src/candidate/candidate_utils.cpp
-  ${PROJECT_SOURCE_DIR}/src/gba_dfs/gba_dfs.cpp
+  ${PROJECT_SOURCE_DIR}/src/analysis/pba/pba_graph_builder.cpp
+  ${PROJECT_SOURCE_DIR}/src/analysis/pba/pba_enumerator.cpp
+  ${PROJECT_SOURCE_DIR}/src/analysis/pba/pba_recalculate.cpp
+  ${PROJECT_SOURCE_DIR}/src/analysis/gba/gba_engine.cpp
   ${PROJECT_SOURCE_DIR}/src/report/respath_sort.cpp
   ${PROJECT_SOURCE_DIR}/src/debug.cpp
   ${FLEX_verilog_lexer_OUTPUTS}
