@@ -1,4 +1,5 @@
 #include "sta/sta_data_structures.hpp"
+#include "sta/sta_logger.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -593,21 +594,22 @@ void STAWorker::run_gba_timing_analysis(bool clear_paths_first) {
     }
   }
 }
-}
 
-void run_gba_analysis(sta::STAWorker &worker) {
-  std::cout << "  [GBA] Step 1: build_fanouts()...\n";
+void run_gba_analysis(STAWorker &worker) {
+  LOG_INFO << "Step 1: build_fanouts()";
   worker.build_fanouts();
-  std::cout << "  [GBA-MAX] Step 2: calculate_load_capacitance()...\n";
+  LOG_INFO << "Step 2: calculate_load_capacitance()";
   worker.calculate_load_cap();
-  std::cout << "  [GBA-MAX] Step 3: build_gba_graphy()...\n";
+  LOG_INFO << "Step 3: build_gba_graphy()";
   worker.build_gba_graphy();
 
   worker.reset_gba_nodes_state();
-  worker.run_gba_propagate(sta::PointType::CLK_PIN);
+  worker.run_gba_propagate(PointType::CLK_PIN);
   worker.run_gba_timing_analysis(true);   // clear res.paths first
 
   worker.reset_gba_nodes_state();
-  worker.run_gba_propagate(sta::PointType::INPUT);
+  worker.run_gba_propagate(PointType::INPUT);
   worker.run_gba_timing_analysis(false);  // append to res.paths
 }
+
+} // namespace sta

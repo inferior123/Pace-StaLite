@@ -835,9 +835,9 @@ double recalc_slew_with_max_cap(const TimingRunResult &res,
                                 AnalysisMode mode, std::size_t from_pt,
                                 std::size_t to_pt, double prev_slew,
                                 TransitionDirection out_dir);
-} // namespace sta
+void run_pba_analysis(STAWorker &worker);
+void run_gba_analysis(STAWorker &worker);
 
-void run_pba_analysis(sta::STAWorker &worker);
-void run_gba_analysis(sta::STAWorker &worker);
+} // namespace sta
 
 #endif // STA_DATA_STRUCTURES_HPP

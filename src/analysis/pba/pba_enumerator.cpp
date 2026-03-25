@@ -1,4 +1,5 @@
 #include "sta/sta_data_structures.hpp"
+#include "sta/sta_logger.hpp"
 #include "sta/timing_point_classifier.hpp"
 #include <cassert>
 #include <cstddef>
@@ -394,17 +395,17 @@ void STAWorker::run_candidate_graphy_dfs() {
     debug_dfs_total_paths(res.paths.size());
 }
 
-} // namespace sta
-
-void run_pba_analysis(sta::STAWorker &worker) {
-  std::cout << "  [PBA] Step 1: build_fanouts()...\n";
+void run_pba_analysis(STAWorker &worker) {
+  LOG_INFO << "Step 1: build_fanouts()";
   worker.build_fanouts();
 
-  std::cout << "  [PBA-MAX] Step 2: calculate_load_capacitance()...\n";
+  LOG_INFO << "Step 2: calculate_load_capacitance()";
   worker.calculate_load_cap();
-  std::cout << "  [PBA-MAX] Step 3: build_candidate_graphy()...\n";
+  LOG_INFO << "Step 3: build_candidate_graphy()";
   worker.build_candidate_graphy_dfs();
   worker.run_candidate_graphy_dfs();
 
   worker.candidate_recalculate();
 }
+
+} // namespace sta

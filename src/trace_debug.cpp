@@ -10,7 +10,7 @@
 #include "cell/celllib_cache.hpp"
 #include "sta/debug.h"
 
-bool run_pba = false;
+bool run_pba = true;
 
 namespace {
 std::string point_name(const sta::TimingPointRef &p) {
@@ -157,9 +157,9 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
       if (run_pba == false) {
-        run_gba_analysis(worker);
+        sta::run_gba_analysis(worker);
       } else {
-        run_pba_analysis(worker);
+        sta::run_pba_analysis(worker);
       }
 
       // display_all_longest_path(worker);
@@ -195,9 +195,9 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
       std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
       if (run_pba == false) {
-        run_gba_analysis(worker);
+        sta::run_gba_analysis(worker);
       } else {
-        run_pba_analysis(worker);
+        sta::run_pba_analysis(worker);
       }
 
       debug_paths_through_instance(worker, "state_1__reg_p");
@@ -291,9 +291,9 @@ void signal_test(char *file_name) {
     std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
     if (run_pba == false) {
-      run_gba_analysis(worker);
+      sta::run_gba_analysis(worker);
     } else {
-      run_pba_analysis(worker);
+      sta::run_pba_analysis(worker);
     }
 
     debug_paths_through_instance(worker, "state_1__reg_p");
@@ -330,9 +330,9 @@ void signal_test(char *file_name) {
     std::string report_dir = "./result/" + dir_prefix + "/" + design_name;
 
     if (run_pba == false) {
-      run_gba_analysis(worker);
+      sta::run_gba_analysis(worker);
     } else {
-      run_pba_analysis(worker);
+      sta::run_pba_analysis(worker);
     }
 
     debug_paths_through_instance(worker, "state_1__reg_p");
