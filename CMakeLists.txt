@@ -122,6 +122,7 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/sta_logger.cpp
   ${PROJECT_SOURCE_DIR}/src/timing/timing_graph_builder.cpp
   ${PROJECT_SOURCE_DIR}/src/timing/timing_point_classifier.cpp
+  ${PROJECT_SOURCE_DIR}/src/timing/timing_arc_eval.cpp
   ${PROJECT_SOURCE_DIR}/src/sta.cpp
   ${PROJECT_SOURCE_DIR}/src/verilog_collect.cpp
   ${PROJECT_SOURCE_DIR}/src/lookuptable.cpp
