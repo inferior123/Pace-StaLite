@@ -41,8 +41,9 @@ void debug_non_unate_arc(const celllib::TimingArc &arc, bool is_comb,
                          bool is_c2q, double load_cap, double delay_tmp,
                          double slew_tmp);
 void debug_non_unate_summary(std::size_t from_pt, std::size_t to_pt,
-                             bool has_unate, double best_delay, double best_slew,
-                             double unate_delay, double unate_slew);
+                             bool has_unate, double best_delay,
+                             double best_slew, double unate_delay,
+                             double unate_slew);
 
 /// GBA run_gba_propagate 每条 path 详细信息调试输出，置 true 启用
 inline constexpr bool kDebugGbaPropPath = false;
@@ -79,10 +80,23 @@ void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
               double slew);
 void test_setup_hold(const char *cell_name, const char *pin_name,
                      const char *related_pin, double slew_ns);
-
+void print_candidate_nodes(
+    const sta::CandidateGraphy &cg, const sta::TimingRunResult &res,
+    const std::unordered_set<std::size_t> &startpoint_nodes);
+void print_candidate_paths(
+    const sta::CandidateGraphy &cg,
+    const std::unordered_set<std::size_t> &startpoint_nodes);
 namespace sta {
-    void display_longest_path(sta::STAWorker &worker);
-    void display_points_fanout(sta::STAWorker &worker, std::size_t pt_no);
-    void show_lib_details(const char *cell_name, celllib::CellLibrary lib);
-    void debug_paths_through_instance(STAWorker &worker,const std::string &inst_substr);
-}
+void display_longest_path(sta::STAWorker &worker);
+void display_points_fanout(sta::STAWorker &worker, std::size_t pt_no);
+void show_lib_details(const char *cell_name, celllib::CellLibrary lib);
+void debug_paths_through_instance(STAWorker &worker,
+                                  const std::string &inst_substr);
+double clamp_cap_to_lut_max(const celllib::LookupTable &lut,
+                            const celllib::CellLibrary *lib,
+                            const std::string &var1, const std::string &var2,
+                            double cap);
+void debug_print_tb(const celllib::LookupTable &tb,
+                    const std::string &template_name, const std::string &var1,
+                    const std::string &var2);
+} // namespace sta

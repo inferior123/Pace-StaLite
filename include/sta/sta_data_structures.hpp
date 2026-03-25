@@ -212,7 +212,7 @@ struct TimingPointRef {
   std::optional<SignalBit> bit;
 
   // 如果没有值，就说明不是candidate
-  std::optional<size_t> candidate_idx; 
+  std::optional<size_t> candidate_idx;
 
   double load_cap = 0.0;
   double rise_cap = 0.0;
@@ -335,9 +335,9 @@ struct GbaPath {
 
   double slew;
   double incr;
-  TransitionDirection dir;      // 输出方向
+  TransitionDirection dir;       // 输出方向
   TransitionDirection input_dir; // 输入方向，回溯时用于确定 prev 的 rise/fall
-  size_t path_idx;              // 在 gba_graphy_.paths 中的下标，供 prev_path_* 使用
+  size_t path_idx; // 在 gba_graphy_.paths 中的下标，供 prev_path_* 使用
 };
 
 struct GbaNode {
@@ -370,7 +370,8 @@ struct GbaGraphy {
   std::unordered_map<size_t, size_t> pt_to_node;
   std::vector<size_t> end_node;
 
-  // 缓存 point 层面的拓扑排序结果，由 build_gba_graphy() 填充，run_gba_propagate() 复用
+  // 缓存 point 层面的拓扑排序结果，由 build_gba_graphy()
+  // 填充，run_gba_propagate() 复用
   std::vector<std::size_t> topo_order;
 };
 
@@ -770,43 +771,37 @@ private:
 // 复用 sta.cpp 中的 LUT 计算与方向推断工具函数（在 namespace sta 中定义）
 double get_lut_avg(std::optional<celllib::LookupTable> lut);
 double calculate_delay_rise(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double input_slew_rise, double load_cap);
+                            const celllib::CellLibrary *lib,
+                            double input_slew_rise, double load_cap);
 double calculate_delay_fall(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib,
-                           double input_slew_fall, double load_cap);
+                            const celllib::CellLibrary *lib,
+                            double input_slew_fall, double load_cap);
 double calculate_transition_fall(const celllib::TimingArc arc,
-                                const celllib::CellLibrary *lib,
-                                double input_slew_fall, double load_cap);
+                                 const celllib::CellLibrary *lib,
+                                 double input_slew_fall, double load_cap);
 double calculate_transition_rise(const celllib::TimingArc arc,
-                                const celllib::CellLibrary *lib,
-                                double input_slew_rise, double load_cap);
+                                 const celllib::CellLibrary *lib,
+                                 double input_slew_rise, double load_cap);
 sta::TransitionDirection
 speculate_transition_direction(bool is_clock_to_q, celllib::TimingArc arc,
                                sta::TransitionDirection input_direction);
 
 double calculate_setup_fall(const celllib::TimingArc arc,
-                           const celllib::CellLibrary *lib, double data_trans,
-                           double clk_trans);
+                            const celllib::CellLibrary *lib, double data_trans,
+                            double clk_trans);
 double calculate_hold_rise(const celllib::TimingArc arc,
-                          const celllib::CellLibrary *lib, double data_trans,
-                          double clk_trans);
-double calculate_setup_rise(const celllib::TimingArc arc,
                            const celllib::CellLibrary *lib, double data_trans,
                            double clk_trans);
+double calculate_setup_rise(const celllib::TimingArc arc,
+                            const celllib::CellLibrary *lib, double data_trans,
+                            double clk_trans);
 double calculate_hold_fall(const celllib::TimingArc arc,
-                          const celllib::CellLibrary *lib, double data_trans,
-                          double clk_trans);
+                           const celllib::CellLibrary *lib, double data_trans,
+                           double clk_trans);
 const celllib::TimingArc *find_default_arc(celllib::Pin &pin,
                                            const std::string &related_pin);
 
 std::string group_type_str(sta::PathGroup group);
-void print_candidate_nodes(
-    const sta::CandidateGraphy &cg, const sta::TimingRunResult &res,
-    const std::unordered_set<std::size_t> &startpoint_nodes);
-void print_candidate_paths(
-    const sta::CandidateGraphy &cg,
-    const std::unordered_set<std::size_t> &startpoint_nodes);
 
 namespace sta {
 struct segment_res {
@@ -822,25 +817,25 @@ void segment_delay_slew(const TimingRunResult &res,
                         TransitionDirection cur_dir, double &out_delay,
                         double &out_slew, TransitionDirection &out_dir);
 
-std::vector<segment_res> segment_delays_slews(const TimingRunResult &res,
-                        const celllib::CellLibrary *cell_library_,
-                        AnalysisMode mode, std::size_t from_pt,
-                        std::size_t to_pt, double prev_slew,
-                        TransitionDirection cur_dir);
+std::vector<segment_res>
+segment_delays_slews(const TimingRunResult &res,
+                     const celllib::CellLibrary *cell_library_,
+                     AnalysisMode mode, std::size_t from_pt, std::size_t to_pt,
+                     double prev_slew, TransitionDirection cur_dir);
 
-std::vector<segment_res> segment_delays_slews_gba(const TimingRunResult &res,
-                        const celllib::CellLibrary *cell_library_,
-                        AnalysisMode mode, std::size_t from_pt,
-                        std::size_t to_pt, double prev_slew,
-                        TransitionDirection cur_dir);
+std::vector<segment_res> segment_delays_slews_gba(
+    const TimingRunResult &res, const celllib::CellLibrary *cell_library_,
+    AnalysisMode mode, std::size_t from_pt, std::size_t to_pt, double prev_slew,
+    TransitionDirection cur_dir);
 
-// 使用该方向的 max/min cap load 重算单步输出 slew（ns），用于 GBA setup/hold 计算
+// 使用该方向的 max/min cap load 重算单步输出 slew（ns），用于 GBA setup/hold
+// 计算
 double recalc_slew_with_max_cap(const TimingRunResult &res,
                                 const celllib::CellLibrary *cell_library_,
                                 AnalysisMode mode, std::size_t from_pt,
                                 std::size_t to_pt, double prev_slew,
                                 TransitionDirection out_dir);
-}
+} // namespace sta
 
 void run_pba_analysis(sta::STAWorker &worker);
 void run_gba_analysis(sta::STAWorker &worker);

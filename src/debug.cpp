@@ -34,8 +34,8 @@ void debug_dfs_push_or_continue(std::size_t end_node_id, std::size_t end_pt,
                                 TransitionDirection dir) {
   std::cerr << "[run_candidate_dfs]   push_or_continue end_n" << end_node_id
             << " pt" << end_pt << " delay=" << delay << " "
-            << (terminal ? "-> PUSH" : "-> recurse")
-            << " dir=" << dir_char(dir) << "\n";
+            << (terminal ? "-> PUSH" : "-> recurse") << " dir=" << dir_char(dir)
+            << "\n";
 }
 
 void debug_dfs_dup_skip() {
@@ -52,10 +52,10 @@ void debug_dfs_push_path(std::size_t path_idx, std::size_t startpoint,
 void debug_dfs_emit_chains(std::size_t node_id, std::size_t pt,
                            TransitionDirection dir, double delay_so_far,
                            std::size_t fanout_cnt, std::size_t relate_cnt) {
-  std::cerr << "[run_candidate_dfs] emit_chains cur_n" << node_id << " pt"
-            << pt << " dir=" << dir_char(dir)
-            << " delay_so_far=" << delay_so_far << " fanout_paths=" << fanout_cnt
-            << " relate=" << relate_cnt << "\n";
+  std::cerr << "[run_candidate_dfs] emit_chains cur_n" << node_id << " pt" << pt
+            << " dir=" << dir_char(dir) << " delay_so_far=" << delay_so_far
+            << " fanout_paths=" << fanout_cnt << " relate=" << relate_cnt
+            << "\n";
 }
 
 void debug_dfs_unate_path(std::size_t path_id, std::size_t end_node_id,
@@ -87,8 +87,7 @@ void debug_non_unate_entry(std::size_t from_pt, std::size_t to_pt,
             << " inst=" << (to_ref.inst ? to_ref.inst->instance_name : "?")
             << "(" << (to_ref.inst ? to_ref.inst->module_name : "?") << ")"
             << " output_pin=" << to_ref.port_name
-            << " input_pin=" << from_ref.port_name
-            << " output_dir="
+            << " input_pin=" << from_ref.port_name << " output_dir="
             << (output_dir == TransitionDirection::RISING
                     ? "R"
                     : (output_dir == TransitionDirection::FALLING ? "F" : "?"))
@@ -112,13 +111,14 @@ void debug_non_unate_arc(const celllib::TimingArc &arc, bool is_comb,
 }
 
 void debug_non_unate_summary(std::size_t from_pt, std::size_t to_pt,
-                             bool has_unate, double best_delay, double best_slew,
-                             double unate_delay, double unate_slew) {
+                             bool has_unate, double best_delay,
+                             double best_slew, double unate_delay,
+                             double unate_slew) {
   std::cerr << "[non_unate_debug_summary] from_pt=" << from_pt
             << " to_pt=" << to_pt << " has_unate=" << (has_unate ? "Y" : "N")
             << " best_delay=" << best_delay << " best_slew_ns=" << best_slew
-            << " unate_delay=" << unate_delay
-            << " unate_slew_ns=" << unate_slew << std::endl;
+            << " unate_delay=" << unate_delay << " unate_slew_ns=" << unate_slew
+            << std::endl;
 }
 
 void debug_gba_propagate_arcs(const GbaGraphy &g,
@@ -135,9 +135,8 @@ void debug_gba_propagate_arcs(const GbaGraphy &g,
     const char *from_inst = (from_pt < points.size() && points[from_pt].inst)
                                 ? points[from_pt].inst->instance_name.c_str()
                                 : "(null)";
-    const char *from_port = (from_pt < points.size())
-                                ? points[from_pt].port_name.c_str()
-                                : "?";
+    const char *from_port =
+        (from_pt < points.size()) ? points[from_pt].port_name.c_str() : "?";
     const char *to_inst = (to_pt < points.size() && points[to_pt].inst)
                               ? points[to_pt].inst->instance_name.c_str()
                               : "(null)";
@@ -190,8 +189,9 @@ void debug_gba_setup_hold_lut(std::size_t endpoint, const char *arc_type,
                               double result_ns, double result_ps) {
   std::cerr << "[gba_setup_hold] LUT pt" << endpoint << " " << arc_type
             << " data_trans=" << std::setprecision(10) << data_trans_ns
-            << "ns clk_trans=" << clk_trans_ns << "ns -> result_ns=" << result_ns
-            << " result_ps=" << result_ps << "\n";
+            << "ns clk_trans=" << clk_trans_ns
+            << "ns -> result_ns=" << result_ns << " result_ps=" << result_ps
+            << "\n";
   std::cerr << "  (data_required_time参考=-0.0085453279ns=-8.5453279ps "
                "若hold作为data_required则比对)\n";
 }
@@ -677,7 +677,7 @@ void display_specific_group(STAWorker &worker) {
   std::cout << "[" << group_type_str(group) << " "
             << (mode == AnalysisMode::MAX ? "max" : "min")
             << " entries size: " << entries_size << "]\n";
-  for (std::size_t i = 0; i < entries_size && i<3; ++i) {
+  for (std::size_t i = 0; i < entries_size && i < 3; ++i) {
     const PathEntry *e = nullptr;
     if (mode == AnalysisMode::MAX) {
       e = worker.get_top_k(group, mode, i); // MAX：从前往后取最差若干条
@@ -693,15 +693,143 @@ void display_specific_group(STAWorker &worker) {
 }
 
 void display_all_path(STAWorker &worker) {
-  for(const auto &path : worker.get_sta_res().paths) {
+  for (const auto &path : worker.get_sta_res().paths) {
     worker.display_result_path_detail(path);
   }
 }
 
 void debug_paths_through_instance(STAWorker &worker,
                                   const std::string &inst_substr) {
-    display_specific_group(worker);
-    // display_all_path(worker);
+  display_specific_group(worker);
+  // display_all_path(worker);
+}
+
+void print_candidate_nodes(
+    const sta::CandidateGraphy &cg, const sta::TimingRunResult &res,
+    const std::unordered_set<std::size_t> &startpoint_nodes) {
+  std::cout << "\n=== NODES ===\n";
+  for (const auto &node : cg.nodes) {
+    bool is_startpoint = startpoint_nodes.count(node.id) > 0;
+    std::cout << "  [" << std::setw(3) << node.id << "] ";
+    if (is_startpoint)
+      std::cout << "[START] ";
+    if (node.point_idx >= res.points.size()) {
+      std::cout << "pt?" << node.point_idx << " | related point num: "
+                << node.relate_candidate_point.size() << "\n";
+      continue;
+    }
+    const sta::TimingPointRef &pt = res.points[node.point_idx];
+    if (pt.inst == nullptr)
+      std::cout << "PORT: ";
+    else
+      std::cout << "INST: " << pt.inst->instance_name << " ("
+                << pt.inst->module_name << ") ";
+    std::cout << "port:\"" << pt.port_name << "\"";
+    std::cout << " | fanout_paths: " << node.fanout_paths.size();
+    if (!node.fanout_paths.empty()) {
+      std::cout << " -> [";
+      for (size_t i = 0; i < node.fanout_paths.size() && i < 5; ++i) {
+        if (i > 0)
+          std::cout << ", ";
+        std::cout << node.fanout_paths[i];
+      }
+      if (node.fanout_paths.size() > 5)
+        std::cout << ", ...";
+      std::cout << "]";
+    }
+    std::cout << "\n";
+  }
+}
+
+void print_candidate_paths(
+    const sta::CandidateGraphy &cg,
+    const std::unordered_set<std::size_t> &startpoint_nodes) {
+  std::cout << "\n=== PATHS ===\n";
+  for (const auto &path : cg.paths) {
+    bool is_startpath = startpoint_nodes.count(path.start_node) > 0;
+    std::cout << "  [" << std::setw(3) << path.id << "] ";
+    if (is_startpath)
+      std::cout << "[START] ";
+    std::cout << "Node[" << path.start_node << "] -> Node[" << path.end_node
+              << "]";
+    if (path.next_path.has_value())
+      std::cout << " -> Path[" << path.next_path.value() << "]";
+    else
+      std::cout << " [END]";
+    std::cout << " | fanouts_edge: " << path.fanouts_edge.size();
+    if (!path.fanouts_edge.empty()) {
+      std::cout << " | eid";
+      for (size_t i = 0; i < path.fanouts_edge.size() && i < 5; ++i)
+        std::cout << " " << path.fanouts_edge[i];
+      if (path.fanouts_edge.size() > 5)
+        std::cout << " ...";
+    }
+    std::cout << "\n";
+  }
 }
 
 } // namespace sta
+
+double clamp_cap_to_lut_max(const celllib::LookupTable &lut,
+                            const celllib::CellLibrary *lib,
+                            const std::string &var1, const std::string &var2,
+                            double cap) {
+  static const std::string CAP_VAR = "total_output_net_capacitance";
+  // 确定 cap 对应哪个轴（index_1 or index_2）
+  bool cap_is_index2 = (var2 == CAP_VAR);
+  bool cap_is_index1 = (var1 == CAP_VAR);
+  if (!cap_is_index1 && !cap_is_index2)
+    return cap; // 该表无 cap 轴，不 clamp
+
+  // 取 LUT 自身 index 优先，否则用 template 的 index
+  const std::vector<double> *indices = nullptr;
+  if (cap_is_index2) {
+    if (!lut.index_2.empty()) {
+      indices = &lut.index_2;
+    } else if (lib) {
+      const auto *templ =
+          lib->get_table_template(lut.template_name.value_or(""));
+      if (templ && !templ->index_2.empty())
+        indices = &templ->index_2;
+    }
+  } else {
+    if (!lut.index_1.empty()) {
+      indices = &lut.index_1;
+    } else if (lib) {
+      const auto *templ =
+          lib->get_table_template(lut.template_name.value_or(""));
+      if (templ && !templ->index_1.empty())
+        indices = &templ->index_1;
+    }
+  }
+
+  if (!indices || indices->empty())
+    return cap;
+
+  double max_cap = indices->back();
+  return (cap > max_cap) ? max_cap : cap;
+}
+
+// 调试打印：给定具体的 LUT 表（而不是整条 arc），输出索引与所有表值，
+// 供 calculate_transition_* / calculate_setup_* 等调用处查看。
+void debug_print_tb(const celllib::LookupTable &tb,
+                    const std::string &template_name, const std::string &var1,
+                    const std::string &var2) {
+  std::cout << "\n[DEBUG][LUT] template=" << template_name << " var1=" << var1
+            << " var2=" << var2 << "\n";
+  std::cout << "  index_1[" << tb.index_1.size() << "] =";
+  for (double v : tb.index_1)
+    std::cout << " " << v;
+  std::cout << "\n";
+  std::cout << "  index_2[" << tb.index_2.size() << "] =";
+  for (double v : tb.index_2)
+    std::cout << " " << v;
+  std::cout << "\n";
+  std::cout << "  values (rows=index_1, cols=index_2):\n";
+  for (size_t i = 0; i < tb.values.size(); ++i) {
+    std::cout << "    ";
+    for (size_t j = 0; j < tb.values[i].size(); ++j)
+      std::cout << " " << tb.values[i][j];
+    std::cout << "\n";
+  }
+}
