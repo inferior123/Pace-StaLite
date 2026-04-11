@@ -580,6 +580,22 @@ private:
                                    std::vector<FanoutPendingEdge> &pending);
   void fanout_apply_pending_edges(const std::vector<FanoutPendingEdge> &pending);
 
+  // --- build_gba_graphy：GBA 图构建阶段（实现见 gba_engine.cpp）---
+  void gba_clear_graph_structure();
+  void gba_allocate_nodes_for_points();
+  std::size_t gba_append_path(std::size_t from_node, std::size_t to_node,
+                              double incr_ps, double slew_ns,
+                              TransitionDirection dir,
+                              TransitionDirection input_dir);
+  void gba_compute_topo_and_break_cycles(std::size_t point_count);
+  void gba_seed_input_clock_nodes();
+  void gba_relax_fanout_segments(std::size_t u_pt, std::size_t v_pt,
+                                 std::size_t u_node_id, std::size_t v_node_id,
+                                 GbaNode &v_node, double base_delay_ps,
+                                 double prev_slew_ns,
+                                 TransitionDirection input_dir);
+  void gba_forward_propagate_build_paths(std::size_t point_count);
+
 public:
   STAWorker() : max_arrival_time(0) {}
 
@@ -607,7 +623,8 @@ public:
   /// 根据 res.points 的 fanouts 填充 res.edges，供 CandidatePath 使用 edge
   /// index
   void build_res_edges();
-  /// 基于当前 TimingRunResult 构建 GBA 图（节点 + 弧，不含传播）
+  /// 基于当前 TimingRunResult 构建 GBA 图（节点 + 弧 + 初次全源传播）。
+  /// 具体阶段见 doc/build_gba_graph_design.md。
   void build_gba_graphy();
   /// 重置 GBA 图中所有节点的 delay/slew/prev 状态
   void reset_gba_nodes_state();

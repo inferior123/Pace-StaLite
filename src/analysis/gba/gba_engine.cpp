@@ -1,34 +1,27 @@
 #include "sta/sta_data_structures.hpp"
 #include "sta/sta_logger.hpp"
+#include <algorithm>
 #include <cassert>
-#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <limits>
+#include <unordered_set>
 #include <vector>
 
 #include "sta/debug.h"
 
 namespace sta {
 
-void STAWorker::build_gba_graphy() {
-  // 清空旧图
+void STAWorker::gba_clear_graph_structure() {
   gba_graphy_.nodes.clear();
   gba_graphy_.paths.clear();
   gba_graphy_.pt_to_node.clear();
   gba_graphy_.end_node.clear();
   gba_graphy_.topo_order.clear();
+}
 
+void STAWorker::gba_allocate_nodes_for_points() {
   const std::size_t point_count = res.points.size();
-  std::cerr << "[gba] build_gba_graphy: points=" << point_count
-            << " edges=" << res.edges.size() << "\n";
-
-  if (point_count == 0) {
-    std::cerr << "[gba] no res point detect, skip\n";
-  }
-
-  // 为每个 TimingPointRef 创建一个 GbaNode，并建立 pt_idx -> node_id 映射
-  // MAX: 未到达用 -inf，更新时取更大；MIN: 未到达用 +inf，更新时取更小
   const double pos_inf = std::numeric_limits<double>::infinity();
   const double neg_inf = -pos_inf;
   const double init_delay =
@@ -54,29 +47,28 @@ void STAWorker::build_gba_graphy() {
     gba_graphy_.pt_to_node[i] = node.id;
     gba_graphy_.nodes.push_back(std::move(node));
   }
+}
 
-  auto add_path = [this](std::size_t from_node, std::size_t to_node,
-                        double incr_ps, double slew_ns,
-                        TransitionDirection dir,
-                        TransitionDirection input_dir) -> std::size_t {
-    GbaPath path;
-    path.startnode = from_node;
-    path.endnode = to_node;
-    path.incr = incr_ps;   // ps
-    path.slew = slew_ns;   // ns
-    path.dir = dir;
-    path.input_dir = input_dir;
-    path.path_idx = gba_graphy_.paths.size();
+std::size_t STAWorker::gba_append_path(std::size_t from_node, std::size_t to_node,
+                                       double incr_ps, double slew_ns,
+                                       TransitionDirection dir,
+                                       TransitionDirection input_dir) {
+  GbaPath path;
+  path.startnode = from_node;
+  path.endnode = to_node;
+  path.incr = incr_ps;
+  path.slew = slew_ns;
+  path.dir = dir;
+  path.input_dir = input_dir;
+  path.path_idx = gba_graphy_.paths.size();
 
-    gba_graphy_.nodes[from_node].fanouts.push_back(path);
-    gba_graphy_.paths.push_back(path);
+  gba_graphy_.nodes[from_node].fanouts.push_back(path);
+  gba_graphy_.paths.push_back(path);
 
-    return path.path_idx;
-  };
+  return path.path_idx;
+}
 
-  assert(cell_library_);
-
-  // 1. 计算 point 图的入度，用于拓扑排序
+void STAWorker::gba_compute_topo_and_break_cycles(std::size_t point_count) {
   std::vector<std::size_t> indeg(point_count, 0);
   for (const auto &pt : res.points) {
     for (const auto &e : pt.fanouts) {
@@ -86,7 +78,6 @@ void STAWorker::build_gba_graphy() {
     }
   }
 
-  // 2. Kahn 拓扑排序，得到 point 层面的 topo 序列，并缓存到 gba_graphy_.topo_order
   std::vector<std::size_t> &topo = gba_graphy_.topo_order;
   topo.clear();
   topo.reserve(point_count);
@@ -110,60 +101,63 @@ void STAWorker::build_gba_graphy() {
     }
   }
 
-  // 检测环：若有节点未进入 topo，说明图中存在环。
-  // 处理策略：
-  //   1. 先做一次完整 topo，收集所有仍在环中（indeg > 0）的节点，打印环结构
-  //   2. 在环中节点之间找一条 WIRE 边删除
-  //   3. 重新做 topo，重复直到无环
-  //   4. 若环中无 WIRE 边可删，强制追加到 topo 末尾
   auto retopo = [&]() {
     std::fill(indeg.begin(), indeg.end(), 0);
-    for (const auto &pt : res.points)
-      for (const auto &e : pt.fanouts)
-        if (e.target_point < point_count)
+    for (const auto &pt : res.points) {
+      for (const auto &e : pt.fanouts) {
+        if (e.target_point < point_count) {
           indeg[e.target_point]++;
+        }
+      }
+    }
     topo.clear();
     queue.clear();
-    for (std::size_t i = 0; i < point_count; ++i)
-      if (indeg[i] == 0)
+    for (std::size_t i = 0; i < point_count; ++i) {
+      if (indeg[i] == 0) {
         queue.push_back(i);
+      }
+    }
     for (std::size_t head = 0; head < queue.size(); ++head) {
       std::size_t u_pt = queue[head];
       topo.push_back(u_pt);
-      for (const auto &e : res.points[u_pt].fanouts)
-        if (e.target_point < point_count && --indeg[e.target_point] == 0)
+      for (const auto &e : res.points[u_pt].fanouts) {
+        if (e.target_point < point_count && --indeg[e.target_point] == 0) {
           queue.push_back(e.target_point);
+        }
+      }
     }
   };
 
   auto break_cycles = [&]() {
     while (topo.size() < point_count) {
-      // 1. 收集环中节点（indeg > 0），打印完整环结构
       std::unordered_set<std::size_t> in_cycle;
-      for (std::size_t i = 0; i < point_count; ++i)
-        if (indeg[i] > 0)
+      for (std::size_t i = 0; i < point_count; ++i) {
+        if (indeg[i] > 0) {
           in_cycle.insert(i);
+        }
+      }
 
-      std::cerr << "[GBA] WARNING: combinational loop detected! "
-                << in_cycle.size() << " node(s) involved"
-                << " (total=" << point_count << ", reached=" << topo.size() << ")\n";
+      LOG_WARN << "[GBA] WARNING: combinational loop detected! "
+               << in_cycle.size() << " node(s) involved"
+               << " (total=" << point_count << ", reached=" << topo.size()
+               << ")\n";
       for (std::size_t u : in_cycle) {
         const auto &fp = res.points[u];
-        std::cerr << "  [GBA] cycle node: pt" << u << "("
+        LOG_DEBUG << "  [GBA] cycle node: pt" << u << "("
                   << (fp.inst ? fp.inst->instance_name : "(port)")
                   << "/" << fp.port_name << ") edges-in-cycle:";
-        for (const auto &e : fp.fanouts)
+        for (const auto &e : fp.fanouts) {
           if (in_cycle.count(e.target_point)) {
             const auto &tp = res.points[e.target_point];
-            std::cerr << " ->pt" << e.target_point << "("
+            LOG_DEBUG << " ->pt" << e.target_point << "("
                       << (tp.inst ? tp.inst->instance_name : "(port)")
                       << "/" << tp.port_name << ","
                       << (e.type == WIRE ? "WIRE" : "COMB") << ")";
           }
-        std::cerr << "\n";
+        }
+        LOG_DEBUG << "\n";
       }
 
-      // 2. 找环中第一条 WIRE 边删除
       bool removed = false;
       for (std::size_t u : in_cycle) {
         auto &fanouts = res.points[u].fanouts;
@@ -181,29 +175,33 @@ void STAWorker::build_gba_graphy() {
             break;
           }
         }
-        if (removed) break;
+        if (removed) {
+          break;
+        }
       }
 
       if (!removed) {
-        // 环中无 WIRE 边（全是 COMB_ARC），无法打断，强制追加
         std::cerr << "[GBA] WARNING: no WIRE edge to break, "
                      "forcing remaining nodes into topo\n";
-        for (std::size_t i : in_cycle)
+        for (std::size_t i : in_cycle) {
           topo.push_back(i);
+        }
         break;
       }
 
-      // 3. 重新 topo，检查是否还有环
       retopo();
     }
   };
-  break_cycles();
 
-  // 3. 初始化起点（input + clock）：从这些点开始做 GBA 传播，slew/delay 先全部计算完
+  break_cycles();
+}
+
+void STAWorker::gba_seed_input_clock_nodes() {
   for (std::size_t pt_idx : input_clk_point_ids) {
     auto it = gba_graphy_.pt_to_node.find(pt_idx);
-    if (it == gba_graphy_.pt_to_node.end())
+    if (it == gba_graphy_.pt_to_node.end()) {
       continue;
+    }
     GbaNode &node = gba_graphy_.nodes[it->second];
     node.delay_rise = 0.0;
     node.delay_fall = 0.0;
@@ -212,20 +210,66 @@ void STAWorker::build_gba_graphy() {
     node.prev_node_rise = node.id;
     node.prev_node_fall = node.id;
   }
+}
 
-  // 4. 沿 topo 序做 DP：对每条 edge 计算 slew/delay，add_path，更新 v_node
+void STAWorker::gba_relax_fanout_segments(std::size_t u_pt, std::size_t v_pt,
+                                         std::size_t u_node_id,
+                                         std::size_t v_node_id, GbaNode &v_node,
+                                         double base_delay_ps,
+                                         double prev_slew_ns,
+                                         TransitionDirection input_dir) {
   const bool use_max = (analysis_mode == AnalysisMode::MAX);
 
-  for (std::size_t u_pt : topo) {
-    auto it_u = gba_graphy_.pt_to_node.find(u_pt);
-    if (it_u == gba_graphy_.pt_to_node.end())
-      continue;
-    std::size_t u_node_id = it_u->second;
-    GbaNode &u_node = gba_graphy_.nodes[u_node_id];
+  auto segs = segment_delays_slews_gba(res, cell_library_, analysis_mode, u_pt,
+                                       v_pt, prev_slew_ns, input_dir);
 
+  if (segs.empty()) {
+    segment_res seg;
+    seg.slew = prev_slew_ns;
+    seg.delay = 0.0;
+    seg.dir = input_dir;
+    segs.push_back(seg);
+  }
+
+  for (const auto &seg : segs) {
+    const double cand_delay = base_delay_ps + seg.delay;
+    const std::size_t path_idx =
+        gba_append_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
+                        input_dir);
+
+    if (seg.dir == TransitionDirection::RISING) {
+      if ((use_max && seg.slew > v_node.slew_rise) ||
+          (!use_max && seg.slew < v_node.slew_rise)) {
+        v_node.delay_rise = cand_delay;
+        v_node.slew_rise = seg.slew;
+        v_node.prev_node_rise = u_node_id;
+        v_node.prev_path_rise = path_idx;
+      }
+    } else if (seg.dir == TransitionDirection::FALLING) {
+      if ((use_max && seg.slew > v_node.slew_fall) ||
+          (!use_max && seg.slew < v_node.slew_fall)) {
+        v_node.delay_fall = cand_delay;
+        v_node.slew_fall = seg.slew;
+        v_node.prev_node_fall = u_node_id;
+        v_node.prev_path_fall = path_idx;
+      }
+    }
+  }
+}
+
+void STAWorker::gba_forward_propagate_build_paths(std::size_t point_count) {
+  const double pos_inf = std::numeric_limits<double>::infinity();
+  const double neg_inf = -pos_inf;
+
+  for (std::size_t u_pt : gba_graphy_.topo_order) {
+    auto it_u = gba_graphy_.pt_to_node.find(u_pt);
+    if (it_u == gba_graphy_.pt_to_node.end()) {
+      continue;
+    }
+    const std::size_t u_node_id = it_u->second;
+    GbaNode &u_node = gba_graphy_.nodes[u_node_id];
     const TimingPointRef &u_ref = res.points[u_pt];
 
-    // MAX: 已到达 = delay > -inf；MIN: 已到达 = delay < +inf
     const bool has_rise = (analysis_mode == AnalysisMode::MAX)
                               ? (u_node.delay_rise > neg_inf)
                               : (u_node.delay_rise < pos_inf);
@@ -233,109 +277,57 @@ void STAWorker::build_gba_graphy() {
                               ? (u_node.delay_fall > neg_inf)
                               : (u_node.delay_fall < pos_inf);
 
-    if (!has_rise && !has_fall)
+    if (!has_rise && !has_fall) {
       continue;
+    }
 
     if (u_ref.type == OUTPUT || u_ref.type == REGD) {
       gba_graphy_.end_node.push_back(u_pt);
     }
 
     for (const auto &edge : u_ref.fanouts) {
-      std::size_t v_pt = edge.target_point;
-      if (v_pt >= point_count)
+      const std::size_t v_pt = edge.target_point;
+      if (v_pt >= point_count) {
         continue;
-
+      }
       auto it_v = gba_graphy_.pt_to_node.find(v_pt);
-      if (it_v == gba_graphy_.pt_to_node.end())
+      if (it_v == gba_graphy_.pt_to_node.end()) {
         continue;
-      std::size_t v_node_id = it_v->second;
+      }
+      const std::size_t v_node_id = it_v->second;
       GbaNode &v_node = gba_graphy_.nodes[v_node_id];
 
-      // 4.1 以 RISING 作为当前输入方向
       if (has_rise) {
-        double prev_slew_ns = u_node.slew_rise;
-        double base_delay = u_node.delay_rise;
-
-        auto segs = segment_delays_slews_gba(
-            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
-            TransitionDirection::RISING);
-
-        if (segs.empty()) {
-          segment_res seg;
-          seg.slew = prev_slew_ns;
-          seg.delay = 0.0;
-          seg.dir = TransitionDirection::RISING;
-          segs.push_back(seg);
-        }
-
-        for (const auto &seg : segs) {
-          double cand_delay = base_delay + seg.delay;
-          std::size_t path_idx =
-              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
-                       TransitionDirection::RISING);
-          if (seg.dir == TransitionDirection::RISING) {
-            if ((use_max && seg.slew > v_node.slew_rise) ||
-                (!use_max && seg.slew < v_node.slew_rise)) {
-              v_node.delay_rise = cand_delay;
-              v_node.slew_rise = seg.slew;
-              v_node.prev_node_rise = u_node_id;
-              v_node.prev_path_rise = path_idx;
-            }
-          } else if (seg.dir == TransitionDirection::FALLING) {
-            if ((use_max && seg.slew > v_node.slew_fall) ||
-                (!use_max && seg.slew < v_node.slew_fall)) {
-              v_node.delay_fall = cand_delay;
-              v_node.slew_fall = seg.slew;
-              v_node.prev_node_fall = u_node_id;
-              v_node.prev_path_fall = path_idx;
-            }
-          }
-        }
+        gba_relax_fanout_segments(u_pt, v_pt, u_node_id, v_node_id, v_node,
+                                  u_node.delay_rise, u_node.slew_rise,
+                                  TransitionDirection::RISING);
       }
-
-      // 4.2 以 FALLING 作为当前输入方向
       if (has_fall) {
-        double prev_slew_ns = u_node.slew_fall;
-        double base_delay = u_node.delay_fall;
-
-        auto segs = segment_delays_slews_gba(
-            res, cell_library_, analysis_mode, u_pt, v_pt, prev_slew_ns,
-            TransitionDirection::FALLING);
-
-        if (segs.empty()) {
-          segment_res seg;
-          seg.slew = prev_slew_ns;
-          seg.delay = 0.0;
-          seg.dir = TransitionDirection::FALLING;
-          segs.push_back(seg);
-        }
-
-        for (const auto &seg : segs) {
-          double cand_delay = base_delay + seg.delay;
-          std::size_t path_idx =
-              add_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
-                       TransitionDirection::FALLING);
-          if (seg.dir == TransitionDirection::RISING) {
-            if ((use_max && seg.slew > v_node.slew_rise) ||
-                (!use_max && seg.slew < v_node.slew_rise)) {
-              v_node.delay_rise = cand_delay;
-              v_node.slew_rise = seg.slew;
-              v_node.prev_node_rise = u_node_id;
-              v_node.prev_path_rise = path_idx;
-            }
-          } else if (seg.dir == TransitionDirection::FALLING) {
-            if ((use_max && seg.slew > v_node.slew_fall) ||
-                (!use_max && seg.slew < v_node.slew_fall)) {
-              v_node.delay_fall = cand_delay;
-              v_node.slew_fall = seg.slew;
-              v_node.prev_node_fall = u_node_id;
-              v_node.prev_path_fall = path_idx;
-            }
-          }
-        }
+        gba_relax_fanout_segments(u_pt, v_pt, u_node_id, v_node_id, v_node,
+                                  u_node.delay_fall, u_node.slew_fall,
+                                  TransitionDirection::FALLING);
       }
     }
   }
+}
+
+void STAWorker::build_gba_graphy() {
+  gba_clear_graph_structure();
+
+  const std::size_t point_count = res.points.size();
+  LOG_INFO << "[gba] build_gba_graphy: points=" << point_count
+           << " edges=" << res.edges.size() << "\n";
+
+  if (point_count == 0) {
+    LOG_WARN << "[gba] no res point detect, skip\n";
+  }
+
+  assert(cell_library_);
+
+  gba_allocate_nodes_for_points();
+  gba_compute_topo_and_break_cycles(point_count);
+  gba_seed_input_clock_nodes();
+  gba_forward_propagate_build_paths(point_count);
 }
 
 void STAWorker::reset_gba_nodes_state() {
@@ -410,7 +402,7 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
       const std::size_t filter = kDebugGbaPropPathFilterPt;
       if (filter == static_cast<std::size_t>(-1) || u_pt == filter) {
         const auto &u_ref = res.points[u_pt];
-        std::cerr << "[prop] u_pt=" << u_pt
+        LOG_DEBUG << "[prop] u_pt=" << u_pt
                   << " (" << (u_ref.inst ? u_ref.inst->instance_name : "(port)")
                   << "/" << u_ref.port_name << ")"
                   << " delay_rise=" << u_node.delay_rise << "ps"
@@ -445,7 +437,7 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
           const auto &v_ref = res.points[v_pt];
           const char *idir = path.input_dir == TransitionDirection::RISING ? "R" : "F";
           const char *odir = path.dir == TransitionDirection::RISING ? "R" : "F";
-          std::cerr << "  -> v_pt=" << v_pt
+          LOG_DEBUG << "  -> v_pt=" << v_pt
                     << " (" << (v_ref.inst ? v_ref.inst->instance_name : "(port)")
                     << "/" << v_ref.port_name << ")"
                     << " [" << idir << "->" << odir << "]"
