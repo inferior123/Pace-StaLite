@@ -546,6 +546,40 @@ private:
   bool reg2out_min_sorted = false;
   bool in2out_min_sorted = false;
 
+  // --- build_fanouts：内部状态与阶段函数（实现见 timing_graph_builder.cpp）---
+  struct FanoutPendingEdge {
+    std::size_t from_pt = 0;
+    std::size_t to_pt = 0;
+    EdgeType type = WIRE;
+  };
+  using FanoutBitDriverMap =
+      std::unordered_map<SignalBit, std::size_t, SignalBitHash>;
+
+  void fanout_check_preconditions() const;
+  void fanout_seed_clk_input_drivers(FanoutBitDriverMap &bit_to_driver) const;
+  SignalBit fanout_resolve_sequential_clock_bit(
+      Instance *inst, const std::string &clock_pin_name) const;
+  void fanout_process_sequential_instance(
+      Instance *inst, const celllib::StandardCell &cell,
+      FanoutBitDriverMap &bit_to_driver,
+      std::vector<FanoutPendingEdge> &pending);
+  void fanout_process_combinational_instance(
+      Instance *inst, const celllib::StandardCell &cell,
+      FanoutBitDriverMap &bit_to_driver,
+      std::vector<FanoutPendingEdge> &pending);
+  void fanout_first_pass_instances(FanoutBitDriverMap &bit_to_driver,
+                                   std::vector<FanoutPendingEdge> &pending);
+  static bool fanout_pending_has(const std::vector<FanoutPendingEdge> &pending,
+                                 std::size_t from_pt, std::size_t to_pt);
+  void fanout_patch_wires_driver_to_loads(
+      const FanoutBitDriverMap &bit_to_driver,
+      std::vector<FanoutPendingEdge> &pending);
+  void fanout_patch_regd_secondary_pass(const FanoutBitDriverMap &bit_to_driver,
+                                        std::vector<FanoutPendingEdge> &pending);
+  void fanout_wire_primary_outputs(const FanoutBitDriverMap &bit_to_driver,
+                                   std::vector<FanoutPendingEdge> &pending);
+  void fanout_apply_pending_edges(const std::vector<FanoutPendingEdge> &pending);
+
 public:
   STAWorker() : max_arrival_time(0) {}
 

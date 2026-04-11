@@ -54,29 +54,156 @@ static inline void check_cell_lib(const celllib::CellLibrary *lib) {
   return;
 }
 
-void STAWorker::build_fanouts() {
-  if (has_clock == false) {
-    assert("must spec clock");
+void STAWorker::fanout_check_preconditions() const {
+  assert(has_clock && "clock must be specified before build_fanouts");
+  check_cell_lib(cell_library_);
+}
+
+void STAWorker::fanout_seed_clk_input_drivers(
+    FanoutBitDriverMap &bit_to_driver) const {
+  for (std::size_t pt_id : input_clk_point_ids) {
+    if (pt_id < res.points.size() && res.points[pt_id].bit.has_value())
+      bit_to_driver[res.points[pt_id].bit.value()] = pt_id;
+  }
+}
+
+SignalBit STAWorker::fanout_resolve_sequential_clock_bit(
+    Instance *inst, const std::string &clock_pin_name) const {
+  if (inst->connections.count(clock_pin_name)) {
+    const SignalSpec &clock_signals = inst->connections.at(clock_pin_name);
+    if (!clock_signals.empty())
+      return sigmap.find(clock_signals[0]);
   }
 
-  check_cell_lib(cell_library_);
+  LOG_ERROR << "Sequential \"" << inst->instance_name << "\" ("
+            << inst->module_name << "): clock pin \"" << clock_pin_name
+            << "\" has no net (netlist issue); trying cfg.clk_name=\""
+            << cfg.clk_name << "\"";
+  auto it = signal_registry.find(cfg.clk_name);
+  if (it == signal_registry.end() || it->second.empty()) {
+    LOG_ERROR << "Cannot fall back: top port \"" << cfg.clk_name
+              << "\" not in signal_registry";
+    std::exit(1);
+  }
+  return sigmap.find(it->second[0]);
+}
 
-  // bit -> driver point id（用于建立 WIRE 边）
-  std::unordered_map<SignalBit, std::size_t, SignalBitHash> bit_to_driver;
-  // 1. 预填 bit_to_driver：来自 collect_port 的 INPUT points
-  for (std::size_t pt_id : input_clk_point_ids) {
-    if (pt_id < res.points.size() && res.points[pt_id].bit.has_value()) {
-      bit_to_driver[res.points[pt_id].bit.value()] = pt_id;
+void STAWorker::fanout_process_sequential_instance(
+    Instance *inst, const celllib::StandardCell &cell,
+    FanoutBitDriverMap &bit_to_driver,
+    std::vector<FanoutPendingEdge> &pending) {
+  const auto &ff_def = cell.ff.value();
+  const std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
+
+  const SignalBit clock_canonical =
+      fanout_resolve_sequential_clock_bit(inst, clock_pin_name);
+
+  std::size_t clk_pt =
+      get_or_create_point(inst, clock_pin_name, clock_canonical, CLK_PIN);
+  if (clk_pt < res.points.size())
+    res.points[clk_pt].type = CLK_PIN;
+  input_clk_point_ids.push_back(clk_pt);
+
+  for (const auto &output_pin_name : cell.get_output_pins()) {
+    const auto *output_pin = cell.get_pin(output_pin_name);
+    if (!output_pin || !inst->connections.count(output_pin_name))
+      continue;
+    const SignalSpec &output_signals = inst->connections[output_pin_name];
+
+    for (const auto &arc : output_pin->timing_arcs) {
+      if ((arc.timing_type == celllib::TimingType::RISING_EDGE ||
+           arc.timing_type == celllib::TimingType::FALLING_EDGE) &&
+          arc.related_pin == clock_pin_name) {
+        if (analysis_granularity_ != AnalysisGranularity::COARSE)
+          get_or_create_candidate_node(clk_pt);
+        for (size_t i = 0; i < output_signals.size(); ++i) {
+          SignalBit output_canonical = sigmap.find(output_signals[i]);
+          std::size_t regq_pt = get_or_create_point(
+              inst, output_pin_name, output_canonical, REGQ);
+          pending.push_back({clk_pt, regq_pt, SEQ_ARC});
+          bit_to_driver[output_canonical] = regq_pt;
+        }
+        break;
+      }
     }
   }
 
-  // 第一遍：创建所有 point，填充 bit_to_driver
-  struct PendingEdge {
-    std::size_t from_pt, to_pt;
-    EdgeType type;
-  };
-  std::vector<PendingEdge> pending_edges;
+  for (const auto &input_pin_name : cell.get_input_pins()) {
+    if (input_pin_name == clock_pin_name)
+      continue;
+    if (!inst->connections.count(input_pin_name))
+      continue;
+    const SignalSpec &input_signals = inst->connections[input_pin_name];
+    for (size_t i = 0; i < input_signals.size(); ++i) {
+      SignalBit input_canonical = sigmap.find(input_signals[i]);
+      std::size_t regd_pt =
+          get_or_create_point(inst, input_pin_name, input_canonical, REGD);
+      auto it = bit_to_driver.find(input_canonical);
+      if (it != bit_to_driver.end())
+        pending.push_back({it->second, regd_pt, WIRE});
+    }
+  }
+}
 
+void STAWorker::fanout_process_combinational_instance(
+    Instance *inst, const celllib::StandardCell &cell,
+    FanoutBitDriverMap &bit_to_driver,
+    std::vector<FanoutPendingEdge> &pending) {
+  for (const auto &output_pin_name : cell.get_output_pins()) {
+    const auto *output_pin = cell.get_pin(output_pin_name);
+    if (!output_pin || !inst->connections.count(output_pin_name))
+      continue;
+    const SignalSpec &output_signals = inst->connections[output_pin_name];
+
+    for (const auto &arc : output_pin->timing_arcs) {
+      if (arc.timing_type != celllib::TimingType::COMBINATIONAL)
+        continue;
+      const std::string &input_pin_name = arc.related_pin;
+      if (!inst->connections.count(input_pin_name))
+        continue;
+      const SignalSpec &input_signals = inst->connections[input_pin_name];
+
+      for (size_t i = 0;
+           i < input_signals.size() && i < output_signals.size(); ++i) {
+        SignalBit input_canonical = sigmap.find(input_signals[i]);
+        SignalBit output_canonical = sigmap.find(output_signals[i]);
+
+        std::size_t input_pt = get_or_create_point(
+            inst, input_pin_name, input_canonical, COMB_PIN);
+        std::size_t output_pt = get_or_create_point(
+            inst, output_pin_name, output_canonical, COMB_PIN);
+
+        if (arc.timing_sense == celllib::TimingSense::NON_UNATE) {
+          std::size_t input_node_id = get_or_create_candidate_node(input_pt);
+          std::size_t output_node_id = get_or_create_candidate_node(output_pt);
+
+          if (input_node_id != SIZE_MAX && output_node_id != SIZE_MAX &&
+              input_node_id < candidate_graphy_.nodes.size() &&
+              output_node_id < candidate_graphy_.nodes.size())
+            candidate_graphy_.nodes[input_node_id].relate_candidate_point
+                .push_back(output_node_id);
+
+          res.points[input_pt].candidate_idx = input_node_id;
+          res.points[output_pt].candidate_idx = output_node_id;
+        }
+
+        pending.push_back({input_pt, output_pt, COMB_ARC});
+        auto driver_it = bit_to_driver.find(input_canonical);
+        if (driver_it != bit_to_driver.end())
+          pending.push_back({driver_it->second, input_pt, WIRE});
+
+        auto existing = bit_to_driver.find(output_canonical);
+        if (existing == bit_to_driver.end() ||
+            res.points[existing->second].type != REGQ) {
+          bit_to_driver[output_canonical] = output_pt;
+        }
+      }
+    }
+  }
+}
+
+void STAWorker::fanout_first_pass_instances(
+    FanoutBitDriverMap &bit_to_driver, std::vector<FanoutPendingEdge> &pending) {
   for (auto &instance : instances) {
     const auto *cell = cell_library_->get_cell(instance->module_name);
     if (!cell) {
@@ -84,166 +211,26 @@ void STAWorker::build_fanouts() {
                 << "' in CellLibrary, skipping." << std::endl;
       continue;
     }
-
-    bool is_sequential = cell->ff.has_value();
-
-    if (is_sequential) {
-      const auto &ff_def = cell->ff.value();
-      std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
-
-      // 统一为每个寄存器创建一个"时钟端口"点 clk_pt（实例的 CLK pin），
-      // SEQ_ARC / path group 仍从 clk_pt 出发；clk_pt.bit 挂接在真实时钟网上
-      //（含门控后的网），便于与顶层时钟树一致；仅当 pin 未接网时回退到顶层
-      // clk 端口在 signal_registry 中的位。
-      SignalBit clock_canonical;
-      {
-        bool resolved = false;
-        if (instance->connections.count(clock_pin_name)) {
-          const SignalSpec &clock_signals = instance->connections[clock_pin_name];
-          if (!clock_signals.empty()) {
-            clock_canonical = sigmap.find(clock_signals[0]);
-            resolved = true;
-          }
-        }
-        if (!resolved) {
-          LOG_ERROR << "Sequential \"" << instance->instance_name << "\" ("
-                    << instance->module_name << "): clock pin \""
-                    << clock_pin_name
-                    << "\" has no net (netlist issue); trying cfg.clk_name=\""
-                    << cfg.clk_name << "\"";
-          auto it = signal_registry.find(cfg.clk_name);
-          if (it == signal_registry.end() || it->second.empty()) {
-            LOG_ERROR << "Cannot fall back: top port \"" << cfg.clk_name
-                      << "\" not in signal_registry";
-            std::exit(1);
-          }
-          clock_canonical = sigmap.find(it->second[0]);
-        }
-      }
-      // 为该寄存器实例的 CLK pin 创建/获取专用 TimingPointRef，类型标为 CLK
-      std::size_t clk_pt = get_or_create_point(instance.get(), clock_pin_name,
-                                               clock_canonical, CLK_PIN);
-      if (clk_pt < res.points.size())
-        res.points[clk_pt].type = CLK_PIN;
-      input_clk_point_ids.push_back(clk_pt);
-
-      for (const auto &output_pin_name : cell->get_output_pins()) {
-        const auto *output_pin = cell->get_pin(output_pin_name);
-        if (!output_pin || !instance->connections.count(output_pin_name))
-          continue;
-        SignalSpec output_signals = instance->connections[output_pin_name];
-
-        for (const auto &arc : output_pin->timing_arcs) {
-          if ((arc.timing_type == celllib::TimingType::RISING_EDGE ||
-               arc.timing_type == celllib::TimingType::FALLING_EDGE) &&
-              arc.related_pin == clock_pin_name) {
-            if (analysis_granularity_ != AnalysisGranularity::COARSE) {
-              get_or_create_candidate_node(clk_pt);
-            }
-            for (size_t i = 0; i < output_signals.size(); ++i) {
-              SignalBit output_canonical = sigmap.find(output_signals[i]);
-              std::size_t regq_pt = get_or_create_point(
-                  instance.get(), output_pin_name, output_canonical, REGQ);
-              // SEQ_ARC：从该寄存器的 CLK pin 到 Q 输出
-              pending_edges.push_back({clk_pt, regq_pt, SEQ_ARC});
-              bit_to_driver[output_canonical] = regq_pt;
-            }
-            break;
-          }
-        }
-      }
-
-      for (const auto &input_pin_name : cell->get_input_pins()) {
-        if (input_pin_name == clock_pin_name)
-          continue;
-        if (!instance->connections.count(input_pin_name))
-          continue;
-        SignalSpec input_signals = instance->connections[input_pin_name];
-        for (size_t i = 0; i < input_signals.size(); ++i) {
-          SignalBit input_canonical = sigmap.find(input_signals[i]);
-          std::size_t regd_pt = get_or_create_point(
-              instance.get(), input_pin_name, input_canonical, REGD);
-          auto it = bit_to_driver.find(input_canonical);
-          if (it != bit_to_driver.end()) {
-            pending_edges.push_back({it->second, regd_pt, WIRE});
-          }
-        }
-      }
-    } else {
-      for (const auto &output_pin_name : cell->get_output_pins()) {
-        const auto *output_pin = cell->get_pin(output_pin_name);
-        if (!output_pin || !instance->connections.count(output_pin_name))
-          continue;
-        SignalSpec output_signals = instance->connections[output_pin_name];
-
-        for (const auto &arc : output_pin->timing_arcs) {
-          if (arc.timing_type != celllib::TimingType::COMBINATIONAL)
-            continue;
-          std::string input_pin_name = arc.related_pin;
-          if (!instance->connections.count(input_pin_name))
-            continue;
-          SignalSpec input_signals = instance->connections[input_pin_name];
-
-          for (size_t i = 0;
-               i < input_signals.size() && i < output_signals.size(); ++i) {
-            SignalBit input_canonical = sigmap.find(input_signals[i]);
-            SignalBit output_canonical = sigmap.find(output_signals[i]);
-
-            std::size_t input_pt = get_or_create_point(
-                instance.get(), input_pin_name, input_canonical, COMB_PIN);
-            std::size_t output_pt = get_or_create_point(
-                instance.get(), output_pin_name, output_canonical, COMB_PIN);
-
-            if (arc.timing_sense == celllib::TimingSense::NON_UNATE) {
-              std::size_t input_node_id =
-                  get_or_create_candidate_node(input_pt);
-              std::size_t output_node_id =
-                  get_or_create_candidate_node(output_pt);
-
-              if (input_node_id != SIZE_MAX && output_node_id != SIZE_MAX &&
-                  input_node_id < candidate_graphy_.nodes.size() &&
-                  output_node_id < candidate_graphy_.nodes.size())
-                candidate_graphy_.nodes[input_node_id]
-                    .relate_candidate_point.push_back(output_node_id);
-
-              res.points[input_pt].candidate_idx = input_node_id;
-              res.points[output_pt].candidate_idx = output_node_id;
-            }
-
-            pending_edges.push_back({input_pt, output_pt, COMB_ARC});
-            auto it = bit_to_driver.find(input_canonical);
-            if (it != bit_to_driver.end()) {
-              pending_edges.push_back({it->second, input_pt, WIRE});
-            }
-            // 仅当该 net 尚无 driver，或现有 driver 也是 COMB（非
-            // REGQ）时才覆盖。 REGQ 优先级高于 COMB：若 net 已被寄存器 Q
-            // 驱动，不用组合逻辑输出覆盖， 避免形成 COMB_Y → COMB_input
-            // 的组合环（multi-driver net 中 REGQ 为真正 driver）。
-            {
-              auto existing = bit_to_driver.find(output_canonical);
-              if (existing == bit_to_driver.end() ||
-                  res.points[existing->second].type != REGQ) {
-                bit_to_driver[output_canonical] = output_pt;
-              }
-            }
-          }
-        }
-      }
-    }
+    if (cell->ff.has_value())
+      fanout_process_sequential_instance(instance.get(), *cell, bit_to_driver,
+                                         pending);
+    else
+      fanout_process_combinational_instance(instance.get(), *cell, bit_to_driver,
+                                            pending);
   }
+}
 
-  // 2.5. 补充 REGD 的 WIRE 边（实例处理顺序可能导致 comb 在 seq 之后，首遍时
-  // bit_to_driver 尚未就绪）
-  auto pending_has = [&pending_edges](size_t from_pt, size_t to_pt) {
-    for (const auto &e : pending_edges)
-      if (e.from_pt == from_pt && e.to_pt == to_pt)
-        return true;
-    return false;
-  };
-  // 2.5b. 补充 REGQ（及任意 driver）到下游的 WIRE 边：若下游点先于 driver
-  // 被创建，
-  //       首遍时 bit_to_driver 尚无该 net，会漏掉 driver->consumer，这里按 bit
-  //       统一补上
+bool STAWorker::fanout_pending_has(const std::vector<FanoutPendingEdge> &pending,
+                                   std::size_t from_pt, std::size_t to_pt) {
+  for (const auto &e : pending)
+    if (e.from_pt == from_pt && e.to_pt == to_pt)
+      return true;
+  return false;
+}
+
+void STAWorker::fanout_patch_wires_driver_to_loads(
+    const FanoutBitDriverMap &bit_to_driver,
+    std::vector<FanoutPendingEdge> &pending) {
   for (const auto &pt : res.points) {
     if (!pt.bit.has_value())
       continue;
@@ -252,14 +239,16 @@ void STAWorker::build_fanouts() {
       continue;
     std::size_t driver_pt_id = it->second;
     const TimingPointRef &driver = res.points[driver_pt_id];
-    // 跳过同一 cell 内部的输出→输入反馈边（组合环），
-    // 例如 MUX 的 Y 输出 net 连接到同一 cell 的 B 输入。
     if (driver.inst != nullptr && driver.inst == pt.inst)
       continue;
-    if (!pending_has(driver_pt_id, pt.id))
-      pending_edges.push_back({driver_pt_id, pt.id, WIRE});
+    if (!fanout_pending_has(pending, driver_pt_id, pt.id))
+      pending.push_back({driver_pt_id, pt.id, WIRE});
   }
+}
 
+void STAWorker::fanout_patch_regd_secondary_pass(
+    const FanoutBitDriverMap &bit_to_driver,
+    std::vector<FanoutPendingEdge> &pending) {
   for (auto &instance : instances) {
     const auto *cell = cell_library_->get_cell(instance->module_name);
     if (!cell || !cell->ff.has_value())
@@ -270,7 +259,7 @@ void STAWorker::build_fanouts() {
       if (input_pin_name == clock_pin_name ||
           !instance->connections.count(input_pin_name))
         continue;
-      SignalSpec input_signals = instance->connections[input_pin_name];
+      const SignalSpec &input_signals = instance->connections[input_pin_name];
       for (size_t i = 0; i < input_signals.size(); ++i) {
         SignalBit input_canonical = sigmap.find(input_signals[i]);
         TimingPointRefKey key{instance.get(), input_pin_name, input_canonical};
@@ -281,28 +270,30 @@ void STAWorker::build_fanouts() {
         auto bit_it = bit_to_driver.find(input_canonical);
         if (bit_it != bit_to_driver.end()) {
           std::size_t from_pt = bit_it->second;
-          if (!pending_has(from_pt, regd_pt))
-            pending_edges.push_back({from_pt, regd_pt, WIRE});
+          if (!fanout_pending_has(pending, from_pt, regd_pt))
+            pending.push_back({from_pt, regd_pt, WIRE});
         }
       }
     }
   }
+}
 
-  // 3. 添加 WIRE 边：驱动顶层 OUTPUT 端口的 net 的 driver -> OUTPUT point
-  // 注意：pt.bit 在 collect_port 时设置，可能在 collect_assign 之前，故需用
-  // sigmap.find() 获取合并后的当前 canonical 才能与 bit_to_driver 的 key 匹配
+void STAWorker::fanout_wire_primary_outputs(
+    const FanoutBitDriverMap &bit_to_driver,
+    std::vector<FanoutPendingEdge> &pending) {
   for (const auto &pt : res.points) {
     if (pt.type != OUTPUT || !pt.bit.has_value())
       continue;
     SignalBit out_bit = sigmap.find(pt.bit.value());
     auto it = bit_to_driver.find(out_bit);
     if (it != bit_to_driver.end())
-      pending_edges.push_back({it->second, pt.id, WIRE});
+      pending.push_back({it->second, pt.id, WIRE});
   }
+}
 
-  // 第二遍：应用所有 pending edges（同一 (from_pt, to_pt) 只保留一条，避免
-  // candidate DFS 产生重复 path）
-  for (const auto &e : pending_edges) {
+void STAWorker::fanout_apply_pending_edges(
+    const std::vector<FanoutPendingEdge> &pending) {
+  for (const auto &e : pending) {
     auto &fanouts = res.points[e.from_pt].fanouts;
     bool already = false;
     for (const auto &f : fanouts)
@@ -313,7 +304,22 @@ void STAWorker::build_fanouts() {
     if (!already)
       fanouts.push_back(TimingEdge{e.type, e.from_pt, e.to_pt});
   }
+}
 
+void STAWorker::build_fanouts() {
+  fanout_check_preconditions();
+
+  FanoutBitDriverMap bit_to_driver;
+  fanout_seed_clk_input_drivers(bit_to_driver);
+
+  std::vector<FanoutPendingEdge> pending;
+  fanout_first_pass_instances(bit_to_driver, pending);
+
+  fanout_patch_wires_driver_to_loads(bit_to_driver, pending);
+  fanout_patch_regd_secondary_pass(bit_to_driver, pending);
+  fanout_wire_primary_outputs(bit_to_driver, pending);
+
+  fanout_apply_pending_edges(pending);
   build_res_edges();
 }
 
