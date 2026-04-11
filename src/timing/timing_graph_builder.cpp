@@ -1,7 +1,10 @@
 #include "cell/cell_data_structure.hpp"
 #include "sta/sta_data_structures.hpp"
+#include "sta/sta_logger.hpp"
 #include <algorithm>
 #include <cassert>
+#include <cmath>
+#include <cstdlib>
 #include <deque>
 #include <optional>
 #include <string>
@@ -44,11 +47,6 @@ std::size_t STAWorker::get_or_create_point(Instance *inst,
   return id;
 }
 
-SignalBit *STAWorker::get_virtual_clock() {
-  static SignalBit global_clk("__clk__", 0);
-  return &global_clk;
-}
-
 static inline void check_cell_lib(const celllib::CellLibrary *lib) {
   if (!lib) {
     assert(false && "CellLibrary is required, no hardcoded fallback");
@@ -72,16 +70,6 @@ void STAWorker::build_fanouts() {
     }
   }
 
-  // 2. 确保虚拟时钟 CLK point 存在
-  SignalBit virtual_clk = *get_virtual_clock();
-  std::size_t virtual_clk_pt =
-      get_or_create_point(nullptr, "__clk__", virtual_clk, CLK_SOURCE);
-  if (std::find(input_clk_point_ids.begin(), input_clk_point_ids.end(),
-                virtual_clk_pt) == input_clk_point_ids.end()) {
-    input_clk_point_ids.push_back(virtual_clk_pt);
-  }
-  bit_to_driver[virtual_clk] = virtual_clk_pt;
-
   // 第一遍：创建所有 point，填充 bit_to_driver
   struct PendingEdge {
     std::size_t from_pt, to_pt;
@@ -104,13 +92,32 @@ void STAWorker::build_fanouts() {
       std::string clock_pin_name = ff_def.clocked_on.value_or("CK");
 
       // 统一为每个寄存器创建一个"时钟端口"点 clk_pt（实例的 CLK pin），
-      // 后续 SEQ_ARC 以及 path group
-      // 都从该点出发，而不再直接从顶层时钟网驱动点出发。
-      SignalBit clock_canonical = *get_virtual_clock();
-      if (instance->connections.count(clock_pin_name)) {
-        SignalSpec clock_signals = instance->connections[clock_pin_name];
-        if (!clock_signals.empty()) {
-          clock_canonical = sigmap.find(clock_signals[0]);
+      // SEQ_ARC / path group 仍从 clk_pt 出发；clk_pt.bit 挂接在真实时钟网上
+      //（含门控后的网），便于与顶层时钟树一致；仅当 pin 未接网时回退到顶层
+      // clk 端口在 signal_registry 中的位。
+      SignalBit clock_canonical;
+      {
+        bool resolved = false;
+        if (instance->connections.count(clock_pin_name)) {
+          const SignalSpec &clock_signals = instance->connections[clock_pin_name];
+          if (!clock_signals.empty()) {
+            clock_canonical = sigmap.find(clock_signals[0]);
+            resolved = true;
+          }
+        }
+        if (!resolved) {
+          LOG_ERROR << "Sequential \"" << instance->instance_name << "\" ("
+                    << instance->module_name << "): clock pin \""
+                    << clock_pin_name
+                    << "\" has no net (netlist issue); trying cfg.clk_name=\""
+                    << cfg.clk_name << "\"";
+          auto it = signal_registry.find(cfg.clk_name);
+          if (it == signal_registry.end() || it->second.empty()) {
+            LOG_ERROR << "Cannot fall back: top port \"" << cfg.clk_name
+                      << "\" not in signal_registry";
+            std::exit(1);
+          }
+          clock_canonical = sigmap.find(it->second[0]);
         }
       }
       // 为该寄存器实例的 CLK pin 创建/获取专用 TimingPointRef，类型标为 CLK
@@ -208,9 +215,10 @@ void STAWorker::build_fanouts() {
             if (it != bit_to_driver.end()) {
               pending_edges.push_back({it->second, input_pt, WIRE});
             }
-            // 仅当该 net 尚无 driver，或现有 driver 也是 COMB（非 REGQ）时才覆盖。
-            // REGQ 优先级高于 COMB：若 net 已被寄存器 Q 驱动，不用组合逻辑输出覆盖，
-            // 避免形成 COMB_Y → COMB_input 的组合环（multi-driver net 中 REGQ 为真正 driver）。
+            // 仅当该 net 尚无 driver，或现有 driver 也是 COMB（非
+            // REGQ）时才覆盖。 REGQ 优先级高于 COMB：若 net 已被寄存器 Q
+            // 驱动，不用组合逻辑输出覆盖， 避免形成 COMB_Y → COMB_input
+            // 的组合环（multi-driver net 中 REGQ 为真正 driver）。
             {
               auto existing = bit_to_driver.find(output_canonical);
               if (existing == bit_to_driver.end() ||
@@ -309,6 +317,67 @@ void STAWorker::build_fanouts() {
   build_res_edges();
 }
 
+namespace {
+
+// 与 STAWorker::calculate_load_cap 一致：按 MAX/MIN 分析模式解析 Liberty 电容回退链。
+inline double pin_rise_cap_for_analysis(const celllib::Pin &pin, bool use_max) {
+  if (use_max) {
+    if (pin.rise_capacitance_max.has_value())
+      return pin.rise_capacitance_max.value();
+    if (pin.capacitance.has_value())
+      return pin.capacitance.value();
+    return 0;
+  }
+  if (pin.rise_capacitance_min.has_value())
+    return pin.rise_capacitance_min.value();
+  if (pin.rise_capacitance_max.has_value())
+    return pin.rise_capacitance_max.value();
+  if (pin.capacitance.has_value())
+    return pin.capacitance.value();
+  return 0;
+}
+
+inline double pin_fall_cap_for_analysis(const celllib::Pin &pin, bool use_max) {
+  if (use_max) {
+    if (pin.fall_capacitance_max.has_value())
+      return pin.fall_capacitance_max.value();
+    if (pin.capacitance.has_value())
+      return pin.capacitance.value();
+    return 0;
+  }
+  if (pin.fall_capacitance_min.has_value())
+    return pin.fall_capacitance_min.value();
+  if (pin.fall_capacitance_max.has_value())
+    return pin.fall_capacitance_max.value();
+  if (pin.capacitance.has_value())
+    return pin.capacitance.value();
+  return 0;
+}
+
+inline void accumulate_pin_corner_caps(const celllib::Pin &pin, TimingPointRef &pt) {
+  if (pin.rise_capacitance_max.has_value())
+    pt.rise_max_cap += pin.rise_capacitance_max.value();
+  else if (pin.capacitance.has_value())
+    pt.rise_max_cap += pin.capacitance.value();
+
+  if (pin.rise_capacitance_min.has_value())
+    pt.rise_min_cap += pin.rise_capacitance_min.value();
+  else if (pin.capacitance.has_value())
+    pt.rise_min_cap += pin.capacitance.value();
+
+  if (pin.fall_capacitance_max.has_value())
+    pt.fall_max_cap += pin.fall_capacitance_max.value();
+  else if (pin.capacitance.has_value())
+    pt.fall_max_cap += pin.capacitance.value();
+
+  if (pin.fall_capacitance_min.has_value())
+    pt.fall_min_cap += pin.fall_capacitance_min.value();
+  else if (pin.capacitance.has_value())
+    pt.fall_min_cap += pin.capacitance.value();
+}
+
+} // namespace
+
 void STAWorker::build_res_edges() {
   res.edges.clear();
   for (std::size_t i = 0; i < res.points.size(); ++i) {
@@ -317,6 +386,52 @@ void STAWorker::build_res_edges() {
     }
   }
 }
+
+void TimingPointRef::calculate_capacitance(bool is_max,
+                                           const TimingRunResult &res,
+                                           const celllib::CellLibrary *cell_library) {
+  if (type != COMB_PIN && type != REGQ && type != INPUT)
+    return;
+  if (!cell_library)
+    return;
+
+  for (const TimingEdge &e : fanouts) {
+    if (e.target_point >= res.points.size()) {
+      LOG_WARN << "target point out of range";
+      continue;
+    }
+
+    const TimingPointRef &target = res.points[e.target_point];
+    if (!target.inst) {
+      LOG_WARN << "target is not an instance";
+      continue;
+    }
+
+    const auto *fanout_cell = cell_library->get_cell(target.inst->module_name);
+    if (!fanout_cell) {
+      LOG_WARN << "fanout cell not found";
+      continue;
+    }
+
+    const auto *input_pin = fanout_cell->get_pin(target.port_name);
+    if (!input_pin) {
+      LOG_WARN << "input pin not found";
+      continue;
+    }
+
+    const double rise = pin_rise_cap_for_analysis(*input_pin, is_max);
+    const double fall = pin_fall_cap_for_analysis(*input_pin, is_max);
+    if (is_max)
+      load_cap += rise + fall;
+    else {
+      rise_cap += rise;
+      fall_cap += fall;
+    }
+
+    accumulate_pin_corner_caps(*input_pin, *this);
+  }
+}
+
 
 void STAWorker::calculate_load_cap() {
   if (!cell_library_)
@@ -348,54 +463,9 @@ void STAWorker::calculate_load_cap() {
           continue;
         const bool use_max = (get_analysis_mode() == AnalysisMode::MAX);
 
-        if (use_max) {
-          if (input_pin->rise_capacitance_max.has_value())
-            pt.rise_cap += input_pin->rise_capacitance_max.value();
-          else if (input_pin->capacitance.has_value())
-            pt.rise_cap += input_pin->capacitance.value();
-        } else {
-          // min 模式：优先 min，若 min 无值则用 max
-          if (input_pin->rise_capacitance_min.has_value())
-            pt.rise_cap += input_pin->rise_capacitance_min.value();
-          else if (input_pin->rise_capacitance_max.has_value())
-            pt.rise_cap += input_pin->rise_capacitance_max.value();
-          else if (input_pin->capacitance.has_value())
-            pt.rise_cap += input_pin->capacitance.value();
-        }
-
-        if (use_max) {
-          if (input_pin->fall_capacitance_max.has_value())
-            pt.fall_cap += input_pin->fall_capacitance_max.value();
-          else if (input_pin->capacitance.has_value())
-            pt.fall_cap += input_pin->capacitance.value();
-        } else {
-          if (input_pin->fall_capacitance_min.has_value())
-            pt.fall_cap += input_pin->fall_capacitance_min.value();
-          else if (input_pin->fall_capacitance_max.has_value())
-            pt.fall_cap += input_pin->fall_capacitance_max.value();
-          else if (input_pin->capacitance.has_value())
-            pt.fall_cap += input_pin->capacitance.value();
-        }
-
-        if (input_pin->rise_capacitance_max.has_value())
-          pt.rise_max_cap += input_pin->rise_capacitance_max.value();
-        else if (input_pin->capacitance.has_value())
-          pt.rise_max_cap += input_pin->capacitance.value();
-
-        if (input_pin->rise_capacitance_min.has_value())
-          pt.rise_min_cap += input_pin->rise_capacitance_min.value();
-        else if (input_pin->capacitance.has_value())
-          pt.rise_min_cap += input_pin->capacitance.value();
-
-        if (input_pin->fall_capacitance_max.has_value())
-          pt.fall_max_cap += input_pin->fall_capacitance_max.value();
-        else if (input_pin->capacitance.has_value())
-          pt.fall_max_cap += input_pin->capacitance.value();
-
-        if (input_pin->fall_capacitance_min.has_value())
-          pt.fall_min_cap += input_pin->fall_capacitance_min.value();
-        else if (input_pin->capacitance.has_value())
-          pt.fall_min_cap += input_pin->capacitance.value();
+        pt.rise_cap += pin_rise_cap_for_analysis(*input_pin, use_max);
+        pt.fall_cap += pin_fall_cap_for_analysis(*input_pin, use_max);
+        accumulate_pin_corner_caps(*input_pin, pt);
       }
     }
     for (const TimingEdge &e : pt.fanouts) {

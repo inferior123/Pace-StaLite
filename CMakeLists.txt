@@ -125,7 +125,6 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/timing/timing_arc_eval.cpp
   ${PROJECT_SOURCE_DIR}/src/sta.cpp
   ${PROJECT_SOURCE_DIR}/src/verilog_collect.cpp
-  ${PROJECT_SOURCE_DIR}/src/lookuptable.cpp
   ${PROJECT_SOURCE_DIR}/src/trace_debug.cpp
   ${PROJECT_SOURCE_DIR}/src/report/sta_report.cpp
   ${PROJECT_SOURCE_DIR}/src/sdc_parser.cpp

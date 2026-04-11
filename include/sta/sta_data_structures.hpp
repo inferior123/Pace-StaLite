@@ -205,7 +205,10 @@ struct TimingEdge {
   size_t target_point;
 };
 
-struct TimingPointRef {
+class TimingRunResult;
+
+class TimingPointRef {
+public:
   std::size_t id;
   Instance *inst;
   std::string port_name;
@@ -225,6 +228,9 @@ struct TimingPointRef {
 
   PointType type;
   std::vector<TimingEdge> fanouts;
+
+  void calculate_capacitance(bool is_max, const TimingRunResult &res,
+                             const celllib::CellLibrary *cell_library);
 };
 
 inline bool operator==(const TimingPointRefKey &a, const TimingPointRefKey &b) {
@@ -325,6 +331,7 @@ inline PointType effective_start_type_for_group(const TimingPointRef &p) {
   }
   return p.type;
 }
+
 // ============================================================================
 // 5. GBA数据结构(GBA )
 // ============================================================================
@@ -758,7 +765,6 @@ private:
                                              AnalysisMode mode);
   std::vector<PathEntry> *get_path_entry_ptr(PathEntryType type);
 
-  SignalBit *get_virtual_clock();
   void propagate_timing(const SignalBit &bit);
   void trace_critical_path();
 
