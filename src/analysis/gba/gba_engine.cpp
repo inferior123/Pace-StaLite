@@ -11,6 +11,190 @@
 #include "sta/debug.h"
 
 namespace sta {
+namespace {
+
+// --- GBA timing graph helpers (combinational point graph) --------------------
+
+/// Fanout counts toward indegree / topo / loop-breaking iff it is enabled and
+/// stays inside the point index range.
+inline bool gba_timing_edge_active(const TimingEdge &e, std::size_t point_count) {
+  return !e.loop_disabled && e.target_point < point_count;
+}
+
+/// OpenSTA-style loop breaking + Kahn topo on `points`, result in `out_topo`.
+/// Mutates `TimingEdge::loop_disabled` on back edges. Kept in an inner namespace
+/// so `STAWorker::gba_compute_topo_and_break_cycles` reads as a short pipeline.
+namespace gba_topo {
+
+enum class DfsVertexState : unsigned char { Fresh = 0, OnStack = 1, Done = 2 };
+
+struct DfsFrame {
+  std::size_t vertex;
+  std::size_t fanout_index;
+};
+
+static void log_disabling_back_edge(std::size_t from_idx, std::size_t to_idx,
+                                    const TimingPointRef &from_pt,
+                                    const TimingPointRef &to_pt,
+                                    const TimingEdge &edge) {
+  LOG_WARN << "[GBA] WARNING: combinational loop (DFS back edge), "
+              "disabling edge pt"
+           << from_idx << " -> pt" << to_idx << " ("
+           << (from_pt.inst ? from_pt.inst->instance_name : "(port)") << "/"
+           << from_pt.port_name << " -> "
+           << (to_pt.inst ? to_pt.inst->instance_name : "(port)") << "/"
+           << to_pt.port_name << ", "
+           << (edge.type == WIRE ? "WIRE" : "COMB_ARC") << ")\n";
+}
+
+static std::vector<std::size_t>
+compute_in_degrees(const std::vector<TimingPointRef> &points,
+                   std::size_t point_count) {
+  std::vector<std::size_t> indeg(point_count, 0);
+  for (const auto &pt : points) {
+    for (const auto &e : pt.fanouts) {
+      if (gba_timing_edge_active(e, point_count)) {
+        indeg[e.target_point]++;
+      }
+    }
+  }
+  return indeg;
+}
+
+/// Phase-1 DFS seeds: in-degree 0, sorted, and with at least one active fanout.
+static std::vector<std::size_t>
+sorted_roots_with_fanout(const std::vector<TimingPointRef> &points,
+                         std::size_t point_count,
+                         const std::vector<std::size_t> &in_degrees) {
+  std::vector<std::size_t> roots;
+  roots.reserve(point_count);
+  for (std::size_t i = 0; i < point_count; ++i) {
+    if (in_degrees[i] != 0) {
+      continue;
+    }
+    bool has_fanout = false;
+    for (const auto &e : points[i].fanouts) {
+      if (gba_timing_edge_active(e, point_count)) {
+        has_fanout = true;
+        break;
+      }
+    }
+    if (has_fanout) {
+      roots.push_back(i);
+    }
+  }
+  std::sort(roots.begin(), roots.end());
+  return roots;
+}
+
+static void dfs_disable_back_edges(std::vector<TimingPointRef> &points,
+                                   std::size_t point_count,
+                                   const std::vector<std::size_t> &start_vertices,
+                                   std::vector<DfsVertexState> &state) {
+  for (std::size_t root : start_vertices) {
+    if (state[root] != DfsVertexState::Fresh) {
+      continue;
+    }
+    state[root] = DfsVertexState::OnStack;
+    std::vector<DfsFrame> stack;
+    stack.push_back(DfsFrame{root, 0});
+    while (!stack.empty()) {
+      DfsFrame &fr = stack.back();
+      auto &fanouts = points[fr.vertex].fanouts;
+      if (fr.fanout_index >= fanouts.size()) {
+        state[fr.vertex] = DfsVertexState::Done;
+        stack.pop_back();
+        if (!stack.empty()) {
+          stack.back().fanout_index++;
+        }
+        continue;
+      }
+      TimingEdge &edge = fanouts[fr.fanout_index];
+      if (!gba_timing_edge_active(edge, point_count)) {
+        fr.fanout_index++;
+        continue;
+      }
+      const std::size_t v = edge.target_point;
+      if (state[v] == DfsVertexState::OnStack) {
+        log_disabling_back_edge(fr.vertex, v, points[fr.vertex], points[v],
+                                edge);
+        edge.loop_disabled = true;
+        fr.fanout_index++;
+        continue;
+      }
+      if (state[v] == DfsVertexState::Fresh) {
+        state[v] = DfsVertexState::OnStack;
+        stack.push_back(DfsFrame{v, 0});
+        continue;
+      }
+      fr.fanout_index++;
+    }
+  }
+}
+
+static std::vector<std::size_t>
+sorted_vertices_with_state(const std::vector<DfsVertexState> &state,
+                           std::size_t point_count, DfsVertexState match) {
+  std::vector<std::size_t> out;
+  out.reserve(point_count);
+  for (std::size_t i = 0; i < point_count; ++i) {
+    if (state[i] == match) {
+      out.push_back(i);
+    }
+  }
+  std::sort(out.begin(), out.end());
+  return out;
+}
+
+/// Kahn topo on the graph induced by active edges. If a residual cycle remains
+/// (DFS back edges need not hit every feedback arc), append remaining vertices
+/// so downstream propagation still visits every point.
+static void kahn_topological_order(const std::vector<TimingPointRef> &points,
+                                   std::size_t point_count,
+                                   std::vector<std::size_t> &out_topo_order) {
+  std::vector<std::size_t> indeg = compute_in_degrees(points, point_count);
+  out_topo_order.clear();
+  out_topo_order.reserve(point_count);
+  std::vector<std::size_t> queue;
+  queue.reserve(point_count);
+
+  for (std::size_t i = 0; i < point_count; ++i) {
+    if (indeg[i] == 0) {
+      queue.push_back(i);
+    }
+  }
+
+  for (std::size_t head = 0; head < queue.size(); ++head) {
+    const std::size_t u = queue[head];
+    out_topo_order.push_back(u);
+    for (const auto &e : points[u].fanouts) {
+      if (gba_timing_edge_active(e, point_count) &&
+          --indeg[e.target_point] == 0) {
+        queue.push_back(e.target_point);
+      }
+    }
+  }
+
+  if (out_topo_order.size() < point_count) {
+    std::unordered_set<std::size_t> leftover;
+    for (std::size_t i = 0; i < point_count; ++i) {
+      if (indeg[i] > 0) {
+        leftover.insert(i);
+      }
+    }
+    LOG_WARN << "[GBA] WARNING: graph still cyclic after DFS loop break; "
+             << leftover.size() << " node(s) not in topo (total="
+             << point_count << ", reached=" << out_topo_order.size() << ")\n";
+    std::cerr << "[GBA] WARNING: forcing remaining nodes into topo_order\n";
+    for (std::size_t i : leftover) {
+      out_topo_order.push_back(i);
+    }
+  }
+}
+
+} // namespace gba_topo
+
+} // namespace
 
 void STAWorker::gba_clear_graph_structure() {
   gba_graphy_.nodes.clear();
@@ -69,131 +253,32 @@ std::size_t STAWorker::gba_append_path(std::size_t from_node, std::size_t to_nod
 }
 
 void STAWorker::gba_compute_topo_and_break_cycles(std::size_t point_count) {
-  std::vector<std::size_t> indeg(point_count, 0);
-  for (const auto &pt : res.points) {
-    for (const auto &e : pt.fanouts) {
-      if (e.target_point < point_count) {
-        indeg[e.target_point]++;
-      }
-    }
-  }
+  using gba_topo::DfsVertexState;
+  using gba_topo::compute_in_degrees;
+  using gba_topo::dfs_disable_back_edges;
+  using gba_topo::kahn_topological_order;
+  using gba_topo::sorted_roots_with_fanout;
+  using gba_topo::sorted_vertices_with_state;
 
-  std::vector<std::size_t> &topo = gba_graphy_.topo_order;
-  topo.clear();
-  topo.reserve(point_count);
-  std::vector<std::size_t> queue;
-  queue.reserve(point_count);
+  // OpenSTA-style: DFS from sorted zero-indegree roots, then from any vertex
+  // still unvisited; back edges set TimingEdge::loop_disabled. Kahn topo on
+  // active edges; leftover SCC nodes are appended if the graph stays cyclic.
 
-  for (std::size_t i = 0; i < point_count; ++i) {
-    if (indeg[i] == 0) {
-      queue.push_back(i);
-    }
-  }
+  const std::vector<std::size_t> indeg0 =
+      compute_in_degrees(res.points, point_count);
+  std::vector<DfsVertexState> visit(point_count, DfsVertexState::Fresh);
 
-  for (std::size_t head = 0; head < queue.size(); ++head) {
-    std::size_t u_pt = queue[head];
-    topo.push_back(u_pt);
-    const auto &pt = res.points[u_pt];
-    for (const auto &e : pt.fanouts) {
-      if (e.target_point < point_count && --indeg[e.target_point] == 0) {
-        queue.push_back(e.target_point);
-      }
-    }
-  }
+  dfs_disable_back_edges(res.points, point_count,
+                         sorted_roots_with_fanout(res.points, point_count,
+                                                  indeg0),
+                         visit);
 
-  auto retopo = [&]() {
-    std::fill(indeg.begin(), indeg.end(), 0);
-    for (const auto &pt : res.points) {
-      for (const auto &e : pt.fanouts) {
-        if (e.target_point < point_count) {
-          indeg[e.target_point]++;
-        }
-      }
-    }
-    topo.clear();
-    queue.clear();
-    for (std::size_t i = 0; i < point_count; ++i) {
-      if (indeg[i] == 0) {
-        queue.push_back(i);
-      }
-    }
-    for (std::size_t head = 0; head < queue.size(); ++head) {
-      std::size_t u_pt = queue[head];
-      topo.push_back(u_pt);
-      for (const auto &e : res.points[u_pt].fanouts) {
-        if (e.target_point < point_count && --indeg[e.target_point] == 0) {
-          queue.push_back(e.target_point);
-        }
-      }
-    }
-  };
+  dfs_disable_back_edges(
+      res.points, point_count,
+      sorted_vertices_with_state(visit, point_count, DfsVertexState::Fresh),
+      visit);
 
-  auto break_cycles = [&]() {
-    while (topo.size() < point_count) {
-      std::unordered_set<std::size_t> in_cycle;
-      for (std::size_t i = 0; i < point_count; ++i) {
-        if (indeg[i] > 0) {
-          in_cycle.insert(i);
-        }
-      }
-
-      LOG_WARN << "[GBA] WARNING: combinational loop detected! "
-               << in_cycle.size() << " node(s) involved"
-               << " (total=" << point_count << ", reached=" << topo.size()
-               << ")\n";
-      for (std::size_t u : in_cycle) {
-        const auto &fp = res.points[u];
-        LOG_DEBUG << "  [GBA] cycle node: pt" << u << "("
-                  << (fp.inst ? fp.inst->instance_name : "(port)")
-                  << "/" << fp.port_name << ") edges-in-cycle:";
-        for (const auto &e : fp.fanouts) {
-          if (in_cycle.count(e.target_point)) {
-            const auto &tp = res.points[e.target_point];
-            LOG_DEBUG << " ->pt" << e.target_point << "("
-                      << (tp.inst ? tp.inst->instance_name : "(port)")
-                      << "/" << tp.port_name << ","
-                      << (e.type == WIRE ? "WIRE" : "COMB") << ")";
-          }
-        }
-        LOG_DEBUG << "\n";
-      }
-
-      bool removed = false;
-      for (std::size_t u : in_cycle) {
-        auto &fanouts = res.points[u].fanouts;
-        for (auto it = fanouts.begin(); it != fanouts.end(); ++it) {
-          if (it->type == WIRE && in_cycle.count(it->target_point)) {
-            const auto &fp = res.points[u];
-            const auto &tp = res.points[it->target_point];
-            std::cerr << "  [GBA] break cycle: remove WIRE pt" << u << "("
-                      << (fp.inst ? fp.inst->instance_name : "(port)")
-                      << "/" << fp.port_name << ") -> pt" << it->target_point
-                      << "(" << (tp.inst ? tp.inst->instance_name : "(port)")
-                      << "/" << tp.port_name << ")\n";
-            fanouts.erase(it);
-            removed = true;
-            break;
-          }
-        }
-        if (removed) {
-          break;
-        }
-      }
-
-      if (!removed) {
-        std::cerr << "[GBA] WARNING: no WIRE edge to break, "
-                     "forcing remaining nodes into topo\n";
-        for (std::size_t i : in_cycle) {
-          topo.push_back(i);
-        }
-        break;
-      }
-
-      retopo();
-    }
-  };
-
-  break_cycles();
+  kahn_topological_order(res.points, point_count, gba_graphy_.topo_order);
 }
 
 void STAWorker::gba_seed_input_clock_nodes() {
@@ -286,6 +371,9 @@ void STAWorker::gba_forward_propagate_build_paths(std::size_t point_count) {
     }
 
     for (const auto &edge : u_ref.fanouts) {
+      if (edge.loop_disabled) {
+        continue;
+      }
       const std::size_t v_pt = edge.target_point;
       if (v_pt >= point_count) {
         continue;

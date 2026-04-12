@@ -32,6 +32,8 @@ struct TimingEdge {
   EdgeType type;
   size_t origin_point;
   size_t target_point;
+  /// GBA / levelize: edge disabled to break a combinational loop (OpenSTA-style).
+  bool loop_disabled = false;
 };
 
 class TimingPointRef {
