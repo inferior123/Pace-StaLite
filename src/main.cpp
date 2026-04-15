@@ -6,6 +6,7 @@
 #include "cell/celllib_cache.hpp"
 #include "sdc/sdc_parser.hpp"
 #include "sta/sta_data_structures.hpp"
+#include "sta/sta_logger.hpp"
 #include "sta/sta_report.hpp"
 
 #include "sta/debug.h"
@@ -47,10 +48,8 @@ int candidate_test(int argc, char *argv[]) {
   // parse verilog file
   verilog_parser.set_filename(sdc_interface.verilog_file_name);
   if (verilog_parser.get_filename().empty()) {
-    std::cout << "no verilog file specific, use "
-                 "\"/home/ysyx/project/pba-sta-base/proj/Testing/reg.v \"\n"
-              << std::endl;
-    verilog_parser.read("/home/ysyx/project/pba-sta-base/proj/Testing/reg.v");
+    LOG_ERROR << "no verilog file specific, exit" << std::endl;
+    return 1;
   } else {
     verilog_parser.read_with_filename();
   }

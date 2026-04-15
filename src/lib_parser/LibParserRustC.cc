@@ -22,6 +22,7 @@
  * @date 2023-10-13
  *
  */
+#include <functional>
 #include <map>
 
 #include "lib_parser/Lib.hh"

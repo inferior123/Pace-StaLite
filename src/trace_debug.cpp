@@ -10,7 +10,7 @@
 #include "cell/celllib_cache.hpp"
 #include "sta/debug.h"
 
-bool run_pba = true;
+bool run_pba = false;
 
 namespace {
 std::string point_name(const sta::TimingPointRef &p) {
@@ -81,15 +81,15 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
   std::vector<std::string> libs;
 
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
       "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
       "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
       "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
 
@@ -107,7 +107,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
   // 2) 枚举 Testing/ics55_pba 目录下所有 .v 文件
   std::vector<fs::path> verilog_files;
   const fs::path root_dir =
-      "/home/ysyx/project/pba-sta-base/proj/Testing/ics55_gba";
+      "/home/cinder/Code/project/pba-sta-base/Testing/ics55_gba";
   for (auto &entry : fs::recursive_directory_iterator(root_dir)) {
     if (!entry.is_regular_file())
       continue;
@@ -239,15 +239,15 @@ void signal_test(char *file_name) {
   std::vector<std::string> libs;
 
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
       "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
       "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
       "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
 
@@ -347,15 +347,15 @@ void debug_lib_cell() {
   std::vector<std::string> libs;
 
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
       "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
       "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
       "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
 
@@ -378,15 +378,15 @@ void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
   std::vector<std::string> libs;
 
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
       "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
       "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
       "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
 
@@ -434,15 +434,15 @@ void test_setup_hold(const char *cell_name, const char *pin_name,
                      const char *related_pin, double slew_ns) {
   std::vector<std::string> libs;
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
       "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+        "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
       "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
   libs.push_back(
-      "/home/ysyx/project/pba-sta-base/proj/lib/icsprout55-pdk/IP/STD_cell/"
+    "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
       "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
       "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
 

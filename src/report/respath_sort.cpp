@@ -1,4 +1,5 @@
 #include "sta/sta_data_structures.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <utility>
 #include <vector>

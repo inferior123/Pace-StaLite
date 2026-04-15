@@ -212,6 +212,8 @@ void STAWorker::gba_allocate_nodes_for_points() {
       (analysis_mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
   const double init_slew =
       (analysis_mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+  const double init_required =
+      (analysis_mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
 
   gba_graphy_.nodes.reserve(point_count);
   for (std::size_t i = 0; i < point_count; ++i) {
@@ -222,10 +224,16 @@ void STAWorker::gba_allocate_nodes_for_points() {
     node.delay_fall = init_delay;
     node.slew_rise = init_slew;
     node.slew_fall = init_slew;
+    node.required_rise = init_required;
+    node.required_fall = init_required;
     node.prev_node_rise = std::numeric_limits<std::size_t>::max();
     node.prev_node_fall = std::numeric_limits<std::size_t>::max();
     node.prev_path_rise = std::numeric_limits<std::size_t>::max();
     node.prev_path_fall = std::numeric_limits<std::size_t>::max();
+    node.next_node_rise = std::numeric_limits<std::size_t>::max();
+    node.next_node_fall = std::numeric_limits<std::size_t>::max();
+    node.next_path_rise = std::numeric_limits<std::size_t>::max();
+    node.next_path_fall = std::numeric_limits<std::size_t>::max();
     node.fanouts.clear();
 
     gba_graphy_.pt_to_node[i] = node.id;
@@ -426,11 +434,17 @@ void STAWorker::reset_gba_nodes_state() {
   for (auto &node : gba_graphy_.nodes) {
     node.delay_rise = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
     node.delay_fall = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+    node.required_rise = (mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
+    node.required_fall = (mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
 
     node.prev_node_rise = std::numeric_limits<std::size_t>::max();
     node.prev_node_fall = std::numeric_limits<std::size_t>::max();
     node.prev_path_rise = std::numeric_limits<std::size_t>::max();
     node.prev_path_fall = std::numeric_limits<std::size_t>::max();
+    node.next_node_rise = std::numeric_limits<std::size_t>::max();
+    node.next_node_fall = std::numeric_limits<std::size_t>::max();
+    node.next_path_rise = std::numeric_limits<std::size_t>::max();
+    node.next_path_fall = std::numeric_limits<std::size_t>::max();
   }
 }
 
@@ -690,6 +704,7 @@ void run_gba_analysis(STAWorker &worker) {
   worker.reset_gba_nodes_state();
   worker.run_gba_propagate(PointType::INPUT);
   worker.run_gba_timing_analysis(false);  // append to res.paths
+  worker.run_gba_backward_compute_required_and_slack();
 }
 
 } // namespace sta

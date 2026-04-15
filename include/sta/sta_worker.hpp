@@ -159,6 +159,7 @@ public:
   void calculate_load_cap();
   void calculate_timing_arcs();
   void run_gba_timing_analysis(bool clear_paths_first = true);
+  void run_gba_backward_compute_required_and_slack();
 
   std::size_t get_or_create_candidate_node(std::size_t point_idx);
   std::size_t get_or_create_point_node(Instance *inst, const SignalBit &bit,
@@ -285,6 +286,10 @@ private:
   void compute_path_setup_hold(TimingPathResult &pr) const;
 
   void compute_setup_hold_gba(TimingPathResult &pr);
+  void gba_reset_required_state();
+  void gba_seed_endpoint_requireds();
+  void gba_backward_propagate_required();
+  void gba_backward_rebuild_node_required_links();
 
   std::vector<PathEntry> *get_sorted_entries(PathGroup group_type,
                                              AnalysisMode mode);

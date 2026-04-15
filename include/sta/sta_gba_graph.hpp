@@ -31,11 +31,17 @@ struct GbaNode {
   double delay_fall;
   double slew_rise;
   double slew_fall;
+  double required_rise;
+  double required_fall;
 
   size_t prev_node_rise;
   size_t prev_node_fall;
   size_t prev_path_rise;
   size_t prev_path_fall;
+  size_t next_node_rise;
+  size_t next_node_fall;
+  size_t next_path_rise;
+  size_t next_path_fall;
 
   std::optional<double> library_setup_time_rise;
   std::optional<double> library_setup_time_fall;
