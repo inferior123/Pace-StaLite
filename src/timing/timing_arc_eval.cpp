@@ -1,7 +1,9 @@
 #include "cell/cell_data_structure.hpp"
 #include "sta/sta_data_structures.hpp"
+#include "sta/sta_logger.hpp"
 #include <cassert>
 #include <cstddef>
+#include <iostream>
 #include <limits>
 #include <string>
 
@@ -13,8 +15,7 @@ double get_lut_avg(std::optional<celllib::LookupTable> lut) {
     size_t mid = lut->index_1.size() / 2;
     return lut->index_1[mid];
   } else {
-    std::cout << "[WARNING] the LookupTable is unavaliable, use deault value 0"
-              << std::endl;
+    LOG_WARN << "the LookupTable is unavaliable, use deault value 0";
     return 0.0;
   }
 }
@@ -270,15 +271,15 @@ std::vector<segment_res> segment_delays_slews_gba(const TimingRunResult &res,
   }
   if (!edge || edge->type == WIRE)
     return seg_res;
-  Instance *inst = to_ref.inst;
-  if (!inst || !cell_library_) {
-    std::cout << "[Error] cannot find the pt inst or the cell_lib is null " << std::endl;
-    assert(false);
+  if (!cell_library_) {
+    LOG_ERROR << "segment_delays_slews_gba: cell_library is null";
+    return seg_res;
   }
-  const auto *cell = cell_library_->get_cell(inst->module_name);
+  const auto *cell = to_ref.std_cell;
   if (!cell) {
-    std::cout << "[Error] cannot find the cell " << inst->module_name << " in the cell_library" << std::endl;
-    assert(false);
+    LOG_ERROR << "segment_delays_slews_gba: null std_cell at to_pt="
+              << to_pt << " (" << to_ref.port_name << ")";
+    return seg_res;
   }
 
   const std::string &output_pin_name = to_ref.port_name;
@@ -354,15 +355,15 @@ std::vector<segment_res> segment_delays_slews(const TimingRunResult &res,
   }
   if (!edge || edge->type == WIRE)
     return seg_res;
-  Instance *inst = to_ref.inst;
-  if (!inst || !cell_library_) {
-    std::cout << "[Error] cannot find the pt inst or the cell_lib is null " << std::endl;
-    assert(false);
+  if (!cell_library_) {
+    LOG_ERROR << "segment_delays_slews: cell_library is null";
+    return seg_res;
   }
-  const auto *cell = cell_library_->get_cell(inst->module_name);
+  const auto *cell = to_ref.std_cell;
   if (!cell) {
-    std::cout << "[Error] cannot find the cell " << inst->module_name << " in the cell_library" << std::endl;
-    assert(false);
+    LOG_ERROR << "segment_delays_slews: null std_cell at to_pt="
+              << to_pt << " (" << to_ref.port_name << ")";
+    return seg_res;
   }
 
   const std::string &output_pin_name = to_ref.port_name;
@@ -442,12 +443,14 @@ double recalc_slew_with_max_cap(const TimingRunResult &res,
   if (!edge || edge->type == WIRE)
     return prev_slew;
 
-  Instance *inst = to_ref.inst;
-  if (!inst || !cell_library_)
+  if (!cell_library_)
     return prev_slew;
-  const auto *cell = cell_library_->get_cell(inst->module_name);
-  if (!cell)
+  const auto *cell = to_ref.std_cell;
+  if (!cell) {
+    LOG_ERROR << "recalc_slew_with_max_cap: null std_cell at to_pt="
+              << to_pt << " (" << to_ref.port_name << ")";
     return prev_slew;
+  }
   const auto *output_pin = cell->get_pin(to_ref.port_name);
   if (!output_pin)
     return prev_slew;
@@ -514,15 +517,15 @@ void segment_delay_slew(const TimingRunResult &res,
   }
   if (!edge || edge->type == WIRE)
     return ;
-  Instance *inst = to_ref.inst;
-  if (!inst || !cell_library_) {
-    std::cout << "[Error] cannot find the pt inst or the cell_lib is null " << std::endl;
-    assert(false);
+  if (!cell_library_) {
+    LOG_ERROR << "segment_delay_slew: cell_library is null";
+    return;
   }
-  const auto *cell = cell_library_->get_cell(inst->module_name);
+  const auto *cell = to_ref.std_cell;
   if (!cell) {
-    std::cout << "[Error] cannot find the cell " << inst->module_name << " in the cell_library" << std::endl;
-    assert(false);
+    LOG_ERROR << "segment_delay_slew: null std_cell at to_pt=" << to_pt
+              << " (" << to_ref.port_name << ")";
+    return;
   }
 
   const std::string &output_pin_name = to_ref.port_name;
@@ -586,7 +589,6 @@ void segment_delay_slew(const TimingRunResult &res,
           calculate_transition_fall(arc, cell_library_, prev_slew, load_cap) /
           1000;
     }
-
 
     if (!has_candidate) {
       has_candidate = true;

@@ -1,6 +1,7 @@
 #ifndef STA_TIMING_RESULT_HPP
 #define STA_TIMING_RESULT_HPP
 
+#include "cell/cell_data_structure.hpp"
 #include "sta_instance.hpp"
 #include "sta_timing_core.hpp"
 
@@ -32,7 +33,8 @@ struct TimingEdge {
   EdgeType type;
   size_t origin_point;
   size_t target_point;
-  /// GBA / levelize: edge disabled to break a combinational loop (OpenSTA-style).
+  /// GBA / levelize: edge disabled to break a combinational loop
+  /// (OpenSTA-style).
   bool loop_disabled = false;
 };
 
@@ -40,6 +42,7 @@ class TimingPointRef {
 public:
   std::size_t id;
   Instance *inst;
+  const celllib::StandardCell *std_cell;
   std::string port_name;
   std::optional<SignalBit> bit;
 

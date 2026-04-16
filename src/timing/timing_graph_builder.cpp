@@ -38,6 +38,7 @@ std::size_t STAWorker::get_or_create_point(Instance *inst,
   TimingPointRef point;
   point.id = id;
   point.inst = inst;
+  point.std_cell = nullptr;
   point.port_name = port_name;
   point.bit = bit;
   point.type = type;
@@ -102,6 +103,7 @@ void STAWorker::fanout_process_sequential_instance(
       get_or_create_point(inst, clock_pin_name, clock_canonical, CLK_PIN);
   if (clk_pt < res.points.size())
     res.points[clk_pt].type = CLK_PIN;
+  res.points[clk_pt].std_cell = &cell;
   input_clk_point_ids.push_back(clk_pt);
 
   for (const auto &output_pin_name : cell.get_output_pins()) {
@@ -118,8 +120,9 @@ void STAWorker::fanout_process_sequential_instance(
           get_or_create_candidate_node(clk_pt);
         for (size_t i = 0; i < output_signals.size(); ++i) {
           SignalBit output_canonical = sigmap.find(output_signals[i]);
-          std::size_t regq_pt = get_or_create_point(
-              inst, output_pin_name, output_canonical, REGQ);
+          std::size_t regq_pt = get_or_create_point(inst, output_pin_name,
+                                                    output_canonical, REGQ);
+          res.points[regq_pt].std_cell = &cell;
           pending.push_back({clk_pt, regq_pt, SEQ_ARC});
           bit_to_driver[output_canonical] = regq_pt;
         }
@@ -138,6 +141,7 @@ void STAWorker::fanout_process_sequential_instance(
       SignalBit input_canonical = sigmap.find(input_signals[i]);
       std::size_t regd_pt =
           get_or_create_point(inst, input_pin_name, input_canonical, REGD);
+      res.points[regd_pt].std_cell = &cell;
       auto it = bit_to_driver.find(input_canonical);
       if (it != bit_to_driver.end())
         pending.push_back({it->second, regd_pt, WIRE});
@@ -163,15 +167,17 @@ void STAWorker::fanout_process_combinational_instance(
         continue;
       const SignalSpec &input_signals = inst->connections[input_pin_name];
 
-      for (size_t i = 0;
-           i < input_signals.size() && i < output_signals.size(); ++i) {
+      for (size_t i = 0; i < input_signals.size() && i < output_signals.size();
+           ++i) {
         SignalBit input_canonical = sigmap.find(input_signals[i]);
         SignalBit output_canonical = sigmap.find(output_signals[i]);
 
-        std::size_t input_pt = get_or_create_point(
-            inst, input_pin_name, input_canonical, COMB_PIN);
-        std::size_t output_pt = get_or_create_point(
-            inst, output_pin_name, output_canonical, COMB_PIN);
+        std::size_t input_pt = get_or_create_point(inst, input_pin_name,
+                                                   input_canonical, COMB_PIN);
+        std::size_t output_pt = get_or_create_point(inst, output_pin_name,
+                                                    output_canonical, COMB_PIN);
+        res.points[input_pt].std_cell = &cell;
+        res.points[output_pt].std_cell = &cell;
 
         if (arc.timing_sense == celllib::TimingSense::NON_UNATE) {
           std::size_t input_node_id = get_or_create_candidate_node(input_pt);
@@ -180,8 +186,8 @@ void STAWorker::fanout_process_combinational_instance(
           if (input_node_id != SIZE_MAX && output_node_id != SIZE_MAX &&
               input_node_id < candidate_graphy_.nodes.size() &&
               output_node_id < candidate_graphy_.nodes.size())
-            candidate_graphy_.nodes[input_node_id].relate_candidate_point
-                .push_back(output_node_id);
+            candidate_graphy_.nodes[input_node_id]
+                .relate_candidate_point.push_back(output_node_id);
 
           res.points[input_pt].candidate_idx = input_node_id;
           res.points[output_pt].candidate_idx = output_node_id;
@@ -203,7 +209,8 @@ void STAWorker::fanout_process_combinational_instance(
 }
 
 void STAWorker::fanout_first_pass_instances(
-    FanoutBitDriverMap &bit_to_driver, std::vector<FanoutPendingEdge> &pending) {
+    FanoutBitDriverMap &bit_to_driver,
+    std::vector<FanoutPendingEdge> &pending) {
   for (auto &instance : instances) {
     const auto *cell = cell_library_->get_cell(instance->module_name);
     if (!cell) {
@@ -215,13 +222,14 @@ void STAWorker::fanout_first_pass_instances(
       fanout_process_sequential_instance(instance.get(), *cell, bit_to_driver,
                                          pending);
     else
-      fanout_process_combinational_instance(instance.get(), *cell, bit_to_driver,
-                                            pending);
+      fanout_process_combinational_instance(instance.get(), *cell,
+                                            bit_to_driver, pending);
   }
 }
 
-bool STAWorker::fanout_pending_has(const std::vector<FanoutPendingEdge> &pending,
-                                   std::size_t from_pt, std::size_t to_pt) {
+bool STAWorker::fanout_pending_has(
+    const std::vector<FanoutPendingEdge> &pending, std::size_t from_pt,
+    std::size_t to_pt) {
   for (const auto &e : pending)
     if (e.from_pt == from_pt && e.to_pt == to_pt)
       return true;
@@ -325,7 +333,8 @@ void STAWorker::build_fanouts() {
 
 namespace {
 
-// 与 STAWorker::calculate_load_cap 一致：按 MAX/MIN 分析模式解析 Liberty 电容回退链。
+// 与 STAWorker::calculate_load_cap 一致：按 MAX/MIN 分析模式解析 Liberty
+// 电容回退链。
 inline double pin_rise_cap_for_analysis(const celllib::Pin &pin, bool use_max) {
   if (use_max) {
     if (pin.rise_capacitance_max.has_value())
@@ -360,7 +369,8 @@ inline double pin_fall_cap_for_analysis(const celllib::Pin &pin, bool use_max) {
   return 0;
 }
 
-inline void accumulate_pin_corner_caps(const celllib::Pin &pin, TimingPointRef &pt) {
+inline void accumulate_pin_corner_caps(const celllib::Pin &pin,
+                                       TimingPointRef &pt) {
   if (pin.rise_capacitance_max.has_value())
     pt.rise_max_cap += pin.rise_capacitance_max.value();
   else if (pin.capacitance.has_value())
@@ -393,9 +403,9 @@ void STAWorker::build_res_edges() {
   }
 }
 
-void TimingPointRef::calculate_capacitance(bool is_max,
-                                           const TimingRunResult &res,
-                                           const celllib::CellLibrary *cell_library) {
+void TimingPointRef::calculate_capacitance(
+    bool is_max, const TimingRunResult &res,
+    const celllib::CellLibrary *cell_library) {
   if (type != COMB_PIN && type != REGQ && type != INPUT)
     return;
   if (!cell_library)
@@ -437,7 +447,6 @@ void TimingPointRef::calculate_capacitance(bool is_max,
     accumulate_pin_corner_caps(*input_pin, *this);
   }
 }
-
 
 void STAWorker::calculate_load_cap() {
   if (!cell_library_)

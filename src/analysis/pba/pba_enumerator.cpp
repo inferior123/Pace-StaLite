@@ -88,9 +88,12 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
   const TimingPointRef &to_ref = res.points[to_pt];
   if (!from_ref.inst || !to_ref.inst || from_ref.inst != to_ref.inst)
     return out;
-  const auto *cell = cell_library_->get_cell(to_ref.inst->module_name);
-  if (!cell)
+  const auto *cell = to_ref.std_cell;
+  if (!cell) {
+    LOG_ERROR << "compute_one_edge_non_unate_segment: null std_cell at to_pt="
+              << to_pt << " (" << to_ref.port_name << ")";
     return out;
+  }
   const celllib::Pin *out_pin = cell->get_pin(to_ref.port_name);
   if (!out_pin)
     return out;
@@ -215,14 +218,17 @@ CandidatePathSegmentResult STAWorker::compute_one_edge_non_unate_segment(
 }
 
 void STAWorker::compute_path_setup_hold(TimingPathResult &pr) const {
-  if (pr.steps.empty() || pr.endpoint >= res.points.size() || !cell_library_)
+  if (pr.steps.empty() || pr.endpoint >= res.points.size())
     return;
   const auto &end_ref = res.points[pr.endpoint];
   if (end_ref.type != REGD || !end_ref.inst)
     return;
-  const auto *cell = cell_library_->get_cell(end_ref.inst->module_name);
-  if (!cell)
+  const auto *cell = end_ref.std_cell;
+  if (!cell) {
+    LOG_ERROR << "compute_path_setup_hold: null std_cell at endpoint pt="
+              << pr.endpoint << " (" << end_ref.port_name << ")";
     return;
+  }
   const auto *d_pin = cell->get_pin(end_ref.port_name);
   if (!d_pin)
     return;

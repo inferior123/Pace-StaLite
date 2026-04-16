@@ -20,7 +20,7 @@ static bool is_edge_non_unate(const TimingRunResult &res,
   const auto &to_ref = res.points[to_pt];
   if (!from_ref.inst || !to_ref.inst || from_ref.inst != to_ref.inst)
     return false;
-  const auto *cell = lib->get_cell(to_ref.inst->module_name);
+  const auto *cell = to_ref.std_cell;
   if (!cell)
     return false;
   const auto *out_pin = cell->get_pin(to_ref.port_name);
@@ -47,7 +47,7 @@ static TransitionDirection derive_input_dir(const TimingRunResult &res,
   const auto &to_ref = res.points[to_pt];
   if (!from_ref.inst || !to_ref.inst || from_ref.inst != to_ref.inst)
     return output_dir;
-  const auto *cell = lib->get_cell(to_ref.inst->module_name);
+  const auto *cell = to_ref.std_cell;
   if (!cell)
     return output_dir;
   const auto *out_pin = cell->get_pin(to_ref.port_name);
