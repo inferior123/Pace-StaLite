@@ -23,7 +23,7 @@ This project is a learning-oriented STA tool that aims to understand the core pr
 | Format | Description | Parser |
 |--------|-------------|--------|
 | `.lib` | Liberty standard cell library | iEDA Rust Liberty Parser |
-| `.v` | Gate-level netlist (Verilog) | Flex / Bison |
+| `.v` | Gate-level netlist (Verilog) | Rust Verilog Parser (`third_party/verilog`) |
 | `.sdc` | Timing constraints | Custom parser |
 
 ### Analysis Capabilities
@@ -44,33 +44,22 @@ proj/
 ├── CMakeLists.txt                  # CMake build configuration
 ├── Makefile                        # Alternative Makefile build
 ├── include/
-│   ├── sta/
-│   │   ├── sta_data_structures.hpp  # Core STA data structures
-│   │   └── sta_report.hpp           # Report generation interface
-│   ├── cell/
-│   │   ├── cell_data_structure.hpp  # Cell library data structures
-│   │   └── celllib_cache.hpp        # Parsed library caching
-│   ├── sdc/
-│   │   └── sdc_parser.hpp           # SDC constraint parser
-│   ├── parser-verilog/
-│   │   ├── verilog_data.hpp         # Verilog AST data structures
-│   │   └── verilog_driver.hpp       # Flex/Bison parser driver
-│   ├── interface/
-│   │   ├── verilog_adapter.hpp      # Verilog → STA adapter
-│   │   └── sdc_adapter.hpp          # SDC → STA adapter
-│   └── lib_parser/
-│       └── lib_to_celllib_converter.hpp  # Liberty → internal format
+│   ├── sta/                         # Core STA worker/config/data interfaces
+│   ├── cell/                        # Cell library data structures and cache
+│   ├── sdc/                         # SDC parser interfaces
+│   ├── interface/                   # Verilog/SDC adapters
+│   ├── timing/                      # Timing graph/arc evaluation interfaces
+│   ├── analysis/                    # PBA/GBA analysis interfaces
+│   └── report/                      # PT-style report interfaces
 ├── src/
-│   ├── main.cpp                     # Entry point
-│   ├── sta.cpp                      # Core STA engine (graph construction, load cap)
-│   ├── lookuptable.cpp              # LUT interpolation
-│   ├── sta_report.cpp               # Report generation
-│   ├── candidate/                   # PBA candidate path analysis
-│   │   ├── candidate.cpp            # PBA DFS logic
-│   │   ├── candidate_recaculate.cpp # Slew recalculation during propagation
-│   │   └── candidate_graphy.cpp     # Candidate graph construction
-│   └── gba_dfs/
-│       └── gba_dfs.cpp              # GBA topological-sort propagation
+│   ├── main.cpp                     # Entry point (signal_test / auto_test)
+│   ├── sta.cpp                      # Core STA flow orchestration
+│   ├── verilog_adapter.cpp          # Rust-Verilog → internal netlist conversion
+│   ├── timing/                      # Timing graph builder and arc evaluation
+│   ├── analysis/
+│   │   ├── pba/                     # PBA graph build / enumerate / recalculate
+│   │   └── gba/                     # GBA forward/backward propagation
+│   └── report/                      # PT-style timing report generation
 ├── doc/                             # Design documentation
 ├── lib/                             # Liberty library files
 ├── Testing/                         # Test designs (~85 cases)
@@ -143,8 +132,7 @@ The key difference lies in handling "ignorance nodes" (non-unate cells, CLK→Q 
 
 - C++17 compiler (GCC 9+ / Clang 10+)
 - CMake 3.16+
-- Flex & Bison (Verilog parsing)
-- Rust / Cargo (Liberty parser)
+- Rust / Cargo (Liberty + Verilog parsers)
 - Python 3 (regression testing scripts)
 
 ### Build
@@ -158,13 +146,17 @@ make -j$(nproc)
 ### Run
 
 ```bash
+# run single design from a constraint file
+./pba_sta path/to/design.sdc
+
+# run built-in batch regression flow
 ./pba_sta
 ```
 
-The main program supports multiple test modes (select in `src/main.cpp`):
-- `candidate_test`: Full PBA analysis flow
-- `auto_test`: Automated batch testing
-- `singal_test`: Single-design debugging
+Main entry behavior (in `src/main.cpp`):
+- `./pba_sta <sdc_file>`: invoke `signal_test` for one design
+- `./pba_sta`: invoke `auto_test` for batch/regression scenarios
+- extra debug argument counts dispatch to helper probes in `include/sta/debug.h`
 
 ### Regression Testing
 
@@ -213,4 +205,4 @@ python3 compare_timing_reports.py # Compare against reference results (PrimeTime
 
 This project is for educational and research purposes only.
 
-The third-party dependency [iEDA Liberty Parser](third_party/liberty-parser/) is licensed under Mulan PSL v2.
+The third-party dependencies [iEDA Liberty Parser](third_party/liberty-parser/) and [iEDA Verilog Parser](third_party/verilog/) are licensed under Mulan PSL v2.

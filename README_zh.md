@@ -21,7 +21,7 @@
 | 文件格式 | 说明 | 解析方式 |
 |---------|------|---------|
 | `.lib` | Liberty 标准单元库 | iEDA Rust Liberty Parser |
-| `.v` | 门级网表（Verilog） | Flex / Bison |
+| `.v` | 门级网表（Verilog） | Rust Verilog Parser（`third_party/verilog`） |
 | `.sdc` | 时序约束文件 | 自定义解析器 |
 
 ### 分析能力
@@ -42,33 +42,22 @@ proj/
 ├── CMakeLists.txt                  # CMake 构建配置
 ├── Makefile                        # 备选 Makefile 构建
 ├── include/
-│   ├── sta/
-│   │   ├── sta_data_structures.hpp  # 核心时序数据结构
-│   │   └── sta_report.hpp           # 报告生成接口
-│   ├── cell/
-│   │   ├── cell_data_structure.hpp  # 单元库数据结构
-│   │   └── celllib_cache.hpp        # 库文件缓存
-│   ├── sdc/
-│   │   └── sdc_parser.hpp           # SDC 约束解析
-│   ├── parser-verilog/
-│   │   ├── verilog_data.hpp         # Verilog AST 数据结构
-│   │   └── verilog_driver.hpp       # Flex/Bison 驱动
-│   ├── interface/
-│   │   ├── verilog_adapter.hpp      # Verilog → STA 适配层
-│   │   └── sdc_adapter.hpp          # SDC → STA 适配层
-│   └── lib_parser/
-│       └── lib_to_celllib_converter.hpp  # Liberty → 内部格式转换
+│   ├── sta/                         # STA Worker/配置/核心数据接口
+│   ├── cell/                        # 单元库数据结构与缓存
+│   ├── sdc/                         # SDC 解析接口
+│   ├── interface/                   # Verilog/SDC 适配层
+│   ├── timing/                      # 时序图构建与时序弧评估接口
+│   ├── analysis/                    # PBA/GBA 分析接口
+│   └── report/                      # PT 风格报告接口
 ├── src/
-│   ├── main.cpp                     # 程序入口
-│   ├── sta.cpp                      # 核心时序引擎（图构建、负载计算）
-│   ├── lookuptable.cpp              # 查找表插值
-│   ├── sta_report.cpp               # 报告生成
-│   ├── candidate/                   # PBA 候选路径分析
-│   │   ├── candidate.cpp            # PBA DFS 主逻辑
-│   │   ├── candidate_recaculate.cpp # 传播中的 slew 重计算
-│   │   └── candidate_graphy.cpp     # 候选图构建（处理 non-unate / 时序弧）
-│   └── gba_dfs/
-│       └── gba_dfs.cpp              # GBA 拓扑排序传播
+│   ├── main.cpp                     # 程序入口（signal_test / auto_test）
+│   ├── sta.cpp                      # STA 主流程编排
+│   ├── verilog_adapter.cpp          # Rust-Verilog 到内部网表结构转换
+│   ├── timing/                      # 时序图构建与弧延迟评估
+│   ├── analysis/
+│   │   ├── pba/                     # PBA 图构建/枚举/重计算
+│   │   └── gba/                     # GBA 正反向传播
+│   └── report/                      # PT 风格时序报告生成
 ├── doc/                             # 设计文档
 ├── lib/                             # Liberty 库文件
 ├── Testing/                         # 测试用例（~85 个设计）
@@ -141,8 +130,7 @@ CellLibrary
 
 - C++17 编译器（GCC 9+ / Clang 10+）
 - CMake 3.16+
-- Flex & Bison（Verilog 解析）
-- Rust / Cargo（Liberty 解析器）
+- Rust / Cargo（Liberty + Verilog 解析器）
 - Python 3（回归测试脚本）
 
 ### 编译
@@ -156,13 +144,17 @@ make -j$(nproc)
 ### 运行
 
 ```bash
+# 单设计运行（从约束文件启动）
+./pba_sta path/to/design.sdc
+
+# 运行内置批量回归流程
 ./pba_sta
 ```
 
-主程序支持多种测试模式，可在 `src/main.cpp` 中选择：
-- `candidate_test`：PBA 完整分析流程
-- `auto_test`：自动化批量测试
-- `singal_test`：单设计调试
+当前 `src/main.cpp` 的入口行为：
+- `./pba_sta <sdc_file>`：调用 `signal_test` 进行单设计分析
+- `./pba_sta`：调用 `auto_test` 进行批量/回归场景
+- 传入更多参数时，会进入 `include/sta/debug.h` 中定义的调试辅助流程
 
 ### 回归测试
 
@@ -225,4 +217,4 @@ GBA 中，每个节点的 slew 是所有到达该节点的路径中最坏情况�
 
 本项目仅供学习和研究使用。
 
-第三方依赖 [iEDA Liberty Parser](third_party/liberty-parser/) 遵循 Mulan PSL v2 许可证。
+第三方依赖 [iEDA Liberty Parser](third_party/liberty-parser/) 和 [iEDA Verilog Parser](third_party/verilog/) 遵循 Mulan PSL v2 许可证。
