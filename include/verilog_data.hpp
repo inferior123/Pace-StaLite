@@ -37,7 +37,7 @@ namespace verilog {
   }  
   
   struct Constant {
-    Constant() = default;  // Need this default constructor for return token
+    Constant() = default;
     Constant(std::string&& v, ConstantType t) : value(std::move(v)), type(t) {}
     std::string value;
     ConstantType type {ConstantType::NONE};
@@ -168,10 +168,7 @@ namespace verilog {
   using RHS = std::vector<std::variant<std::string, NetBit, NetRange, Constant>>;
 
   struct Assignment {
-    // Left hand side can be: a wire, a bit in a wire, a part of a wire  
     LHS lhs;
-
-    // Right hand side can be: a wire, a bit in a wire, a part of a wire, a constant
     RHS rhs;
   };
 
@@ -205,8 +202,6 @@ namespace verilog {
   struct Instance {
     std::string module_name;
     std::string inst_name;
-  
-    // pin_names might be empty. e.g. my_module m1(net1, net2);
     std::vector<std::variant<std::string, NetBit, NetRange>> pin_names;
     std::vector<std::vector<NetConcat>> net_names;
   };
@@ -248,9 +243,5 @@ namespace verilog {
     return os;
   }
 
-
-
 } 
-#endif  
-
-
+#endif

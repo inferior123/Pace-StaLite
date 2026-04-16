@@ -30,7 +30,9 @@ endif()
 # add the binary tree to the search path for include files
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/parser-verilog)  # For Flex/Bison generated files
+include_directories(${PROJECT_SOURCE_DIR}/third_party/verilog)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/verilog/verilog-rust/verilog-parser/dist)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/liberty-parser)
 
 # -----------------------------------------------------------------------------
 # Rust Liberty Parser (from iEDA)
@@ -65,6 +67,36 @@ target_include_directories(liberty_rust INTERFACE
 message(STATUS "Liberty Rust parser: ${LIBERTY_RUST_LIB_PATH}")
 
 # -----------------------------------------------------------------------------
+# Rust Verilog Parser (third_party/verilog)
+# -----------------------------------------------------------------------------
+set(VERILOG_RUST_PROJECT verilog_parser)
+set(VERILOG_RUST_DIR ${PROJECT_SOURCE_DIR}/third_party/verilog/verilog-rust/verilog-parser)
+set(VERILOG_RUST_LIB_PATH ${VERILOG_RUST_DIR}/target/release/libverilog_parser.a)
+set(VERILOG_RUST_CARGO_FLAGS "--release")
+
+ExternalProject_Add(${VERILOG_RUST_PROJECT}
+  PREFIX ${VERILOG_RUST_DIR}
+  SOURCE_DIR ${VERILOG_RUST_DIR}
+  BINARY_DIR ${VERILOG_RUST_DIR}
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND cargo build ${VERILOG_RUST_CARGO_FLAGS}
+  INSTALL_COMMAND ""
+  BUILD_BYPRODUCTS ${VERILOG_RUST_LIB_PATH}
+)
+
+add_library(verilog_rust STATIC IMPORTED GLOBAL)
+set_target_properties(verilog_rust PROPERTIES
+  IMPORTED_LOCATION ${VERILOG_RUST_LIB_PATH}
+)
+add_dependencies(verilog_rust ${VERILOG_RUST_PROJECT})
+target_include_directories(verilog_rust INTERFACE
+  ${PROJECT_SOURCE_DIR}/third_party/verilog
+  ${PROJECT_SOURCE_DIR}/third_party/liberty-parser
+)
+
+message(STATUS "Verilog Rust parser: ${VERILOG_RUST_LIB_PATH}")
+
+# -----------------------------------------------------------------------------
 # nlohmann/json (for LibLibrary::printLibertyLibraryJson)
 # -----------------------------------------------------------------------------
 find_package(nlohmann_json 3.2.0 QUIET)
@@ -92,24 +124,6 @@ target_link_libraries(lib_parser_cpp PUBLIC liberty_rust nlohmann_json::nlohmann
 add_dependencies(lib_parser_cpp liberty_rust)
 
 # -----------------------------------------------------------------------------
-# Flex & Bison
-# -----------------------------------------------------------------------------
-
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
-
-BISON_TARGET(verilog_parser
-             ${PROJECT_SOURCE_DIR}/parser-verilog/verilog_parser.yy
-             ${CMAKE_CURRENT_BINARY_DIR}/verilog_parser.tab.cc
-             DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/verilog_parser.tab.hh
-             COMPILE_FLAGS "-d")
-FLEX_TARGET(verilog_lexer
-            ${PROJECT_SOURCE_DIR}/parser-verilog/verilog_lexer.l
-            ${CMAKE_CURRENT_BINARY_DIR}/verilog_lexer.yy.cc)
-ADD_FLEX_BISON_DEPENDENCY(verilog_lexer verilog_parser)
-
-
-# -----------------------------------------------------------------------------
 # PbaSta program 
 # -----------------------------------------------------------------------------
 
@@ -119,6 +133,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 # Main executable
 add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/main.cpp
+  ${PROJECT_SOURCE_DIR}/src/verilog_adapter.cpp
   ${PROJECT_SOURCE_DIR}/src/sta_logger.cpp
   ${PROJECT_SOURCE_DIR}/src/timing/timing_graph_builder.cpp
   ${PROJECT_SOURCE_DIR}/src/timing/timing_point_classifier.cpp
@@ -134,12 +149,12 @@ add_executable(pba_sta
   ${PROJECT_SOURCE_DIR}/src/analysis/pba/pba_enumerator.cpp
   ${PROJECT_SOURCE_DIR}/src/analysis/pba/pba_recalculate.cpp
   ${PROJECT_SOURCE_DIR}/src/analysis/gba/gba_engine.cpp
+  ${PROJECT_SOURCE_DIR}/src/analysis/gba/gba_backward.cpp
   ${PROJECT_SOURCE_DIR}/src/report/respath_sort.cpp
   ${PROJECT_SOURCE_DIR}/src/debug.cpp
-  ${FLEX_verilog_lexer_OUTPUTS}
-  ${BISON_verilog_parser_OUTPUTS}
 )
-target_link_libraries(pba_sta PRIVATE lib_parser_cpp nlohmann_json::nlohmann_json pthread dl)
+target_link_libraries(pba_sta PRIVATE lib_parser_cpp verilog_rust nlohmann_json::nlohmann_json pthread dl)
+add_dependencies(pba_sta verilog_rust)
 
 # -----------------------------------------------------------------------------
 # Custom targets

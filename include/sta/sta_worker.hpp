@@ -2,7 +2,7 @@
 #define STA_WORKER_HPP
 
 #include "../cell/cell_data_structure.hpp"
-#include "../parser-verilog/verilog_data.hpp"
+#include "verilog_data.hpp"
 #include "sta_candidate_graph.hpp"
 #include "sta_gba_graph.hpp"
 
