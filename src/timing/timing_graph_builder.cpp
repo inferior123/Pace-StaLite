@@ -64,7 +64,9 @@ void STAWorker::fanout_seed_clk_input_drivers(
     FanoutBitDriverMap &bit_to_driver) const {
   for (std::size_t pt_id : input_clk_point_ids) {
     if (pt_id < res.points.size() && res.points[pt_id].bit.has_value())
-      bit_to_driver[res.points[pt_id].bit.value()] = pt_id;
+      // Use current sigmap canonical for robustness (union-find rep may
+      // change after parsing assigns/connections).
+      bit_to_driver[sigmap.find(res.points[pt_id].bit.value())] = pt_id;
   }
 }
 
@@ -242,7 +244,8 @@ void STAWorker::fanout_patch_wires_driver_to_loads(
   for (const auto &pt : res.points) {
     if (!pt.bit.has_value())
       continue;
-    auto it = bit_to_driver.find(pt.bit.value());
+    // Use current sigmap canonical when looking up driver.
+    auto it = bit_to_driver.find(sigmap.find(pt.bit.value()));
     if (it == bit_to_driver.end() || it->second == pt.id)
       continue;
     std::size_t driver_pt_id = it->second;

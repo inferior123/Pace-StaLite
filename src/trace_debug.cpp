@@ -54,6 +54,33 @@ void fanout_debuger(sta::STAWorker &worker) {
   }
 }
 
+std::vector<std::string> get_test_celllib_files() {
+  return {
+    "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
+    "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
+    "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib",
+    "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
+    "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
+    "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib",
+    "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
+    "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
+    "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib",
+  };
+}
+
+celllib::CellLibrary load_test_celllib() {
+  celllib::CellLibrary cell_lib;
+  MyCellLibParser lib_parser(cell_lib);
+  if (!celllib::try_load_celllib_cache(get_test_celllib_files(), cell_lib)) {
+    for (const auto &file : get_test_celllib_files()) {
+      std::cout << "liberty parser handle file " << file << std::endl;
+      lib_parser.parse_from_file(file);
+    }
+    celllib::save_celllib_cache(get_test_celllib_files(), cell_lib);
+  }
+  return cell_lib;
+}
+
 // 针对某个实例名（或子串）打印相关 point 及其 fanout，方便逐步排查 fanout
 // 是否正确
 void fanout_test_by_instance(sta::STAWorker &worker,
@@ -166,7 +193,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
 
       worker.get_config().clk_period = 10000;
       sta::STAReportGenerator::generate_report_pt_files(
-          worker, "__clk__", report_dir, design_name, 1);
+          worker, worker.get_config().clk_name, report_dir, design_name, 1);
     }
 
     {
@@ -204,7 +231,7 @@ void auto_test(int /*argc*/, char * /*argv*/[]) {
 
       worker.get_config().clk_period = 0;
       sta::STAReportGenerator::generate_report_pt_files(
-          worker, "__clk__", report_dir, design_name, 1);
+          worker, worker.get_config().clk_name, report_dir, design_name, 1);
     }
   }
 }
@@ -235,32 +262,7 @@ void display_all_longest_path(sta::STAWorker &worker) {
 }
 
 void signal_test(char *file_name) {
-
-  std::vector<std::string> libs;
-
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
-      "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
-      "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
-      "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
-
-  celllib::CellLibrary cell_lib;
-  MyCellLibParser lib_parser(cell_lib);
-
-  if (!celllib::try_load_celllib_cache(libs, cell_lib)) {
-    for (const auto &file : libs) {
-      std::cout << "liberty parser handle file " << file << std::endl;
-      lib_parser.parse_from_file(file);
-    }
-    celllib::save_celllib_cache(libs, cell_lib);
-  }
+  celllib::CellLibrary cell_lib = load_test_celllib();
 
   std::string vfile = file_name;
 
@@ -300,7 +302,7 @@ void signal_test(char *file_name) {
 
     worker.get_config().clk_period = 10000;
     sta::STAReportGenerator::generate_report_pt_files(
-        worker, "__clk__", report_dir, design_name, 1);
+        worker, worker.get_config().clk_name, report_dir, design_name, 1);
   }
 
   {
@@ -339,68 +341,18 @@ void signal_test(char *file_name) {
 
     worker.get_config().clk_period = 10000;
     sta::STAReportGenerator::generate_report_pt_files(
-        worker, "__clk__", report_dir, design_name, 1);
+        worker, worker.get_config().clk_name, report_dir, design_name, 1);
   }
 }
 
 void debug_lib_cell() {
-  std::vector<std::string> libs;
-
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
-      "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
-      "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
-      "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
-
-  celllib::CellLibrary cell_lib;
-  MyCellLibParser lib_parser(cell_lib);
-
-  if (!celllib::try_load_celllib_cache(libs, cell_lib)) {
-    for (const auto &file : libs) {
-      std::cout << "liberty parser handle file " << file << std::endl;
-      lib_parser.parse_from_file(file);
-    }
-    celllib::save_celllib_cache(libs, cell_lib);
-  }
-
+  celllib::CellLibrary cell_lib = load_test_celllib();
   sta::show_lib_details("DFFQX1H7L", cell_lib);
 }
 
 void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
               double slew) {
-  std::vector<std::string> libs;
-
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
-      "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
-      "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
-      "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
-
-  celllib::CellLibrary cell_lib;
-  MyCellLibParser lib_parser(cell_lib);
-
-  if (!celllib::try_load_celllib_cache(libs, cell_lib)) {
-    for (const auto &file : libs) {
-      std::cout << "liberty parser handle file " << file << std::endl;
-      lib_parser.parse_from_file(file);
-    }
-    celllib::save_celllib_cache(libs, cell_lib);
-  }
-
+  celllib::CellLibrary cell_lib = load_test_celllib();
   auto cell = cell_lib.get_cell(cell_name);
 
   auto pin = cell->get_pin(pin_name);
@@ -432,30 +384,7 @@ void test_lut(char *cell_name, char *pin_name, char *related_pin, double cap,
 
 void test_setup_hold(const char *cell_name, const char *pin_name,
                      const char *related_pin, double slew_ns) {
-  std::vector<std::string> libs;
-  libs.push_back(
-      "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CH/liberty/"
-      "ics55_LLSC_H7CH_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-        "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CR/liberty/"
-      "ics55_LLSC_H7CR_typ_tt_1p2_25_nldm.lib");
-  libs.push_back(
-    "/home/cinder/Code/project/pba-sta-base/lib/icsprout55-pdk/IP/STD_cell/"
-      "ics55_LLSC_H7C_V1p10C100/ics55_LLSC_H7CL/liberty/"
-      "ics55_LLSC_H7CL_typ_tt_1p2_25_nldm.lib");
-
-  celllib::CellLibrary cell_lib;
-  MyCellLibParser lib_parser(cell_lib);
-
-  if (!celllib::try_load_celllib_cache(libs, cell_lib)) {
-    for (const auto &file : libs) {
-      std::cout << "liberty parser handle file " << file << std::endl;
-      lib_parser.parse_from_file(file);
-    }
-    celllib::save_celllib_cache(libs, cell_lib);
-  }
+  celllib::CellLibrary cell_lib = load_test_celllib();
 
   auto cell = cell_lib.get_cell(cell_name);
   if (!cell) {

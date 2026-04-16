@@ -504,7 +504,7 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
       const std::size_t filter = kDebugGbaPropPathFilterPt;
       if (filter == static_cast<std::size_t>(-1) || u_pt == filter) {
         const auto &u_ref = res.points[u_pt];
-        LOG_DEBUG << "[prop] u_pt=" << u_pt
+        std::cout << "[prop] u_pt=" << u_pt
                   << " (" << (u_ref.inst ? u_ref.inst->instance_name : "(port)")
                   << "/" << u_ref.port_name << ")"
                   << " delay_rise=" << u_node.delay_rise << "ps"
@@ -512,7 +512,7 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
                   << " slew_rise_max=" << u_node.slew_rise << "ns"
                   << " slew_rise_min=" << u_node.slew_fall << "ns"
                   << " load_cap=" << u_ref.load_cap << "pF"
-                  << " fanouts=" << u_node.fanouts.size() << "\n";
+                  << " fanouts=" << u_node.fanouts.size() << std::endl;
       }
     }
 
@@ -539,7 +539,7 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
           const auto &v_ref = res.points[v_pt];
           const char *idir = path.input_dir == TransitionDirection::RISING ? "R" : "F";
           const char *odir = path.dir == TransitionDirection::RISING ? "R" : "F";
-          LOG_DEBUG << "  -> v_pt=" << v_pt
+          std::cout << "  -> v_pt=" << v_pt
                     << " (" << (v_ref.inst ? v_ref.inst->instance_name : "(port)")
                     << "/" << v_ref.port_name << ")"
                     << " [" << idir << "->" << odir << "]"
@@ -552,7 +552,7 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
                     << " cand=" << cand_delay << "ps"
                     << " v.delay_rise=" << v_node.delay_rise << "ps"
                     << " v.delay_fall=" << v_node.delay_fall << "ps"
-                    << "\n";
+                    << std::endl;
         }
       }
 

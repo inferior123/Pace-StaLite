@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 
+#include "sta/sta_logger.hpp"
 #include "verilog_data.hpp"
 extern "C" {
 #include "verilog_parser.h"

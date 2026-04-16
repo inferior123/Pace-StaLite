@@ -666,8 +666,8 @@ void show_lib_details(const char *cell_name, celllib::CellLibrary lib) {
 void display_specific_group(STAWorker &worker) {
   worker.divide_path_entry();
   const AnalysisMode mode = worker.get_analysis_mode();
-  const PathGroup group = PathGroup::REG2REG;
-  const AnalysisMode target_mode = AnalysisMode::MIN;
+  const PathGroup group = PathGroup::IN2REG;
+  const AnalysisMode target_mode = AnalysisMode::MAX;
 
   if (mode != target_mode)
     return;
@@ -677,7 +677,7 @@ void display_specific_group(STAWorker &worker) {
   std::cout << "[" << group_type_str(group) << " "
             << (mode == AnalysisMode::MAX ? "max" : "min")
             << " entries size: " << entries_size << "]\n";
-  for (std::size_t i = 0; i < entries_size && i < 3; ++i) {
+  for (std::size_t i = 0; i < entries_size; ++i) {
     const PathEntry *e = nullptr;
     if (mode == AnalysisMode::MAX) {
       e = worker.get_top_k(group, mode, i); // MAX：从前往后取最差若干条

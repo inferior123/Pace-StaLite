@@ -1,6 +1,37 @@
 #include "sta/sta_data_structures.hpp"
+#include "sta/sta_logger.hpp"
+#include <cstdlib>
 
 using namespace verilog;
+
+namespace {
+// Normalize escaped identifiers like `\req_msg[22]` into:
+//   wire_name="\\req_msg", bit_offset=22
+// This is needed because the rust verilog parser may represent instance connections
+// as NetBit(base_id="\\req_msg", index=22) while port/wire declarations may come
+// in as a single identifier containing "[idx]".
+bool split_indexed_name(const std::string &name, std::string &base,
+                         int &idx_out) {
+  const std::size_t l = name.rfind('[');
+  const std::size_t r = name.rfind(']');
+  if (l == std::string::npos || r == std::string::npos || r <= l + 1)
+    return false;
+  if (r != name.size() - 1)
+    return false; // only support suffix: "...[<idx>]"
+
+  const std::string inside = name.substr(l + 1, r - l - 1);
+  char *end = nullptr;
+  long v = std::strtol(inside.c_str(), &end, 10);
+  if (end == nullptr || *end != '\0')
+    return false;
+  base = name.substr(0, l);
+  if (base.empty())
+    return false;
+
+  idx_out = static_cast<int>(v);
+  return true;
+}
+} // namespace
 
 namespace sta {
 SignalSpec STAWorker::convert_to_signalspec(const LHS &lhs) {
@@ -115,9 +146,21 @@ void STAWorker::collect_net(verilog::Net &net) {
                       "ascending range like [0:7]");
     }
     for (auto &name : net.names) {
+      std::string bit_wire_name = name;
+      int embedded_idx = 0;
+      int cur_left = left;
+      int cur_right = right;
+      // If the parser encoded `\foo[3]` as a single identifier (no explicit range),
+      // convert it to base name + explicit bit offset.
+      if (net.beg == -1 && net.end == -1 &&
+          split_indexed_name(name, bit_wire_name, embedded_idx)) {
+        cur_left = embedded_idx;
+        cur_right = embedded_idx;
+      }
+
       std::vector<SignalBit> bits;
-      for (int i = left; i <= right; i++) {
-        sta::SignalBit bit(name, i);
+      for (int i = cur_left; i <= cur_right; i++) {
+        sta::SignalBit bit(bit_wire_name, i);
         bits.push_back(bit);
       }
       signal_registry[name] = std::move(bits);
@@ -141,9 +184,21 @@ void STAWorker::collect_port(verilog::Port &port) {
   }
 
   for (auto &sig_name : port.names) {
+    std::string bit_wire_name = sig_name;
+    int embedded_idx = 0;
+    int cur_left = left;
+    int cur_right = right;
+    // If the parser encoded `\foo[3]` as a single identifier (no explicit range),
+    // convert it to base name + explicit bit offset.
+    if (port.beg == -1 && port.end == -1 &&
+        split_indexed_name(sig_name, bit_wire_name, embedded_idx)) {
+      cur_left = embedded_idx;
+      cur_right = embedded_idx;
+    }
+
     std::vector<SignalBit> bits;
-    for (int i = left; i <= right; i++) {
-      SignalBit bit(sig_name, i);
+    for (int i = cur_left; i <= cur_right; i++) {
+      SignalBit bit(bit_wire_name, i);
       bits.push_back(bit);
 
       SignalBit canonical = sigmap.find(bit);
@@ -204,15 +259,7 @@ void STAWorker::collect_instance(verilog::Instance &inst) {
   if (cell_library_) {
     const auto *cell = cell_library_->get_cell(inst.module_name);
     if (!cell) {
-      std::cerr << "cannot find the cell " << inst.module_name
-                << " in CellLibrary" << std::endl;
-      // 调试信息：打印库中所有可用的单元名称
-      auto cell_names = cell_library_->get_cell_names();
-      std::cerr << "Available cells in library (" << cell_names.size() << "): ";
-      for (const auto &name : cell_names) {
-        std::cerr << name << " ";
-      }
-      std::cerr << std::endl;
+      LOG_ERROR << "Cell " << inst.module_name << " not found in CellLibrary";
       assert(false && "Cell not found in CellLibrary");
     }
 

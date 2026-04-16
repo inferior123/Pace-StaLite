@@ -56,8 +56,7 @@ STAWorker::compute_candidate_path_with_input(std::size_t path_id,
         else if (seg_dir == TransitionDirection::FALLING)
           step.cap_load = to_ref.fall_cap;
         else {
-          std::cerr << "[Warning] use the fall back, should not reach here"
-                    << std::endl;
+          LOG_WARN << "use the fall back, should not reach here";
           step.cap_load = to_ref.load_cap;
         }
       }
