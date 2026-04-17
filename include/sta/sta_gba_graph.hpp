@@ -3,8 +3,10 @@
 
 #include "../cell/cell_data_structure.hpp"
 #include "sta_timing_core.hpp"
+#include "sta_topo.hpp"
 
 #include <cstddef>
+#include <limits>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -49,6 +51,38 @@ struct GbaNode {
   std::optional<double> library_hold_time_fall;
 
   std::vector<GbaPath> fanouts;
+
+  void reset(AnalysisMode mode) {
+    const double pos_inf = std::numeric_limits<double>::infinity();
+    const double neg_inf = -pos_inf;
+    const size_t invalid_idx = std::numeric_limits<size_t>::max();
+
+    delay_rise = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+    delay_fall = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+    required_rise = (mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
+    required_fall = (mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
+
+    prev_node_rise = invalid_idx;
+    prev_node_fall = invalid_idx;
+    prev_path_rise = invalid_idx;
+    prev_path_fall = invalid_idx;
+    next_node_rise = invalid_idx;
+    next_node_fall = invalid_idx;
+    next_path_rise = invalid_idx;
+    next_path_fall = invalid_idx;
+  }
+
+  void init_for_point(size_t point_idx, AnalysisMode mode) {
+    const double pos_inf = std::numeric_limits<double>::infinity();
+    const double neg_inf = -pos_inf;
+
+    pt_idx = point_idx;
+    id = point_idx;
+    slew_rise = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+    slew_fall = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
+    fanouts.clear();
+    reset(mode);
+  }
 };
 
 struct GbaGraphy {
@@ -58,7 +92,7 @@ struct GbaGraphy {
   std::unordered_map<size_t, size_t> pt_to_node;
   std::vector<size_t> end_node;
 
-  std::vector<std::size_t> topo_order;
+  TopoVisitor topo;
 };
 
 } // namespace sta

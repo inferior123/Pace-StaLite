@@ -2,9 +2,9 @@
 #define STA_WORKER_HPP
 
 #include "../cell/cell_data_structure.hpp"
-#include "verilog_data.hpp"
 #include "sta_candidate_graph.hpp"
 #include "sta_gba_graph.hpp"
+#include "verilog_data.hpp"
 
 #include <deque>
 #include <memory>
@@ -57,11 +57,7 @@ private:
   std::vector<std::size_t> input_clk_point_ids;
 
 public:
-  enum class AnalysisGranularity {
-    COARSE,
-    MEDIUM,
-    FINE
-  };
+  enum class AnalysisGranularity { COARSE, MEDIUM, FINE };
 
   bool get_has_clock() { return has_clock; }
 
@@ -92,12 +88,14 @@ private:
 
   void fanout_check_preconditions() const;
   void fanout_seed_clk_input_drivers(FanoutBitDriverMap &bit_to_driver) const;
-  SignalBit fanout_resolve_sequential_clock_bit(
-      Instance *inst, const std::string &clock_pin_name) const;
-  void fanout_process_sequential_instance(
-      Instance *inst, const celllib::StandardCell &cell,
-      FanoutBitDriverMap &bit_to_driver,
-      std::vector<FanoutPendingEdge> &pending);
+  SignalBit
+  fanout_resolve_sequential_clock_bit(Instance *inst,
+                                      const std::string &clock_pin_name) const;
+  void
+  fanout_process_sequential_instance(Instance *inst,
+                                     const celllib::StandardCell &cell,
+                                     FanoutBitDriverMap &bit_to_driver,
+                                     std::vector<FanoutPendingEdge> &pending);
   void fanout_process_combinational_instance(
       Instance *inst, const celllib::StandardCell &cell,
       FanoutBitDriverMap &bit_to_driver,
@@ -106,14 +104,16 @@ private:
                                    std::vector<FanoutPendingEdge> &pending);
   static bool fanout_pending_has(const std::vector<FanoutPendingEdge> &pending,
                                  std::size_t from_pt, std::size_t to_pt);
-  void fanout_patch_wires_driver_to_loads(
-      const FanoutBitDriverMap &bit_to_driver,
-      std::vector<FanoutPendingEdge> &pending);
-  void fanout_patch_regd_secondary_pass(const FanoutBitDriverMap &bit_to_driver,
-                                        std::vector<FanoutPendingEdge> &pending);
+  void
+  fanout_patch_wires_driver_to_loads(const FanoutBitDriverMap &bit_to_driver,
+                                     std::vector<FanoutPendingEdge> &pending);
+  void
+  fanout_patch_regd_secondary_pass(const FanoutBitDriverMap &bit_to_driver,
+                                   std::vector<FanoutPendingEdge> &pending);
   void fanout_wire_primary_outputs(const FanoutBitDriverMap &bit_to_driver,
                                    std::vector<FanoutPendingEdge> &pending);
-  void fanout_apply_pending_edges(const std::vector<FanoutPendingEdge> &pending);
+  void
+  fanout_apply_pending_edges(const std::vector<FanoutPendingEdge> &pending);
 
   // --- build_gba_graphy（实现见 gba_engine.cpp）---
   void gba_clear_graph_structure();
@@ -158,6 +158,7 @@ public:
   void run_gba_propagate(PointType pt_type);
   void calculate_load_cap();
   void calculate_timing_arcs();
+  void gba_propagate_delay();
   void run_gba_timing_analysis(bool clear_paths_first = true);
   void run_gba_backward_compute_required_and_slack();
 
@@ -193,7 +194,7 @@ public:
   const PathEntry *get_top_k(PathGroup group_type, AnalysisMode mode,
                              std::size_t k);
   const PathEntry *get_last_k(PathGroup group_type, AnalysisMode mode,
-                             std::size_t k);
+                              std::size_t k);
 
   std::vector<PathEntry> get_path_entry(PathGroup group_type,
                                         AnalysisMode mode);

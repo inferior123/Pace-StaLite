@@ -1,14 +1,13 @@
-#include "sta/sta_data_structures.hpp"
 #include "sta/sta_logger.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <iostream>
 #include <limits>
-#include <unordered_set>
 #include <vector>
 
 #include "sta/debug.h"
+#include "sta/sta_worker.hpp"
 
 namespace sta {
 namespace {
@@ -17,13 +16,15 @@ namespace {
 
 /// Fanout counts toward indegree / topo / loop-breaking iff it is enabled and
 /// stays inside the point index range.
-inline bool gba_timing_edge_active(const TimingEdge &e, std::size_t point_count) {
+inline bool gba_timing_edge_active(const TimingEdge &e,
+                                   std::size_t point_count) {
   return !e.loop_disabled && e.target_point < point_count;
 }
 
 /// OpenSTA-style loop breaking + Kahn topo on `points`, result in `out_topo`.
-/// Mutates `TimingEdge::loop_disabled` on back edges. Kept in an inner namespace
-/// so `STAWorker::gba_compute_topo_and_break_cycles` reads as a short pipeline.
+/// Mutates `TimingEdge::loop_disabled` on back edges. Kept in an inner
+/// namespace so `STAWorker::gba_compute_topo_and_break_cycles` reads as a short
+/// pipeline.
 namespace gba_topo {
 
 enum class DfsVertexState : unsigned char { Fresh = 0, OnStack = 1, Done = 2 };
@@ -87,10 +88,11 @@ sorted_roots_with_fanout(const std::vector<TimingPointRef> &points,
   return roots;
 }
 
-static void dfs_disable_back_edges(std::vector<TimingPointRef> &points,
-                                   std::size_t point_count,
-                                   const std::vector<std::size_t> &start_vertices,
-                                   std::vector<DfsVertexState> &state) {
+static void
+dfs_disable_back_edges(std::vector<TimingPointRef> &points,
+                       std::size_t point_count,
+                       const std::vector<std::size_t> &start_vertices,
+                       std::vector<DfsVertexState> &state) {
   for (std::size_t root : start_vertices) {
     if (state[root] != DfsVertexState::Fresh) {
       continue;
@@ -146,49 +148,72 @@ sorted_vertices_with_state(const std::vector<DfsVertexState> &state,
   return out;
 }
 
-/// Kahn topo on the graph induced by active edges. If a residual cycle remains
-/// (DFS back edges need not hit every feedback arc), append remaining vertices
-/// so downstream propagation still visits every point.
-static void kahn_topological_order(const std::vector<TimingPointRef> &points,
-                                   std::size_t point_count,
-                                   std::vector<std::size_t> &out_topo_order) {
-  std::vector<std::size_t> indeg = compute_in_degrees(points, point_count);
-  out_topo_order.clear();
-  out_topo_order.reserve(point_count);
-  std::vector<std::size_t> queue;
-  queue.reserve(point_count);
+/// Run DFS loop-breaking in two phases:
+/// 1) sorted zero-indegree roots with active fanout
+/// 2) any remaining fresh vertex
+static void disable_back_edges_two_phase(std::vector<TimingPointRef> &points,
+                                         std::size_t point_count) {
+  const std::vector<std::size_t> indeg0 = compute_in_degrees(points, point_count);
+  std::vector<DfsVertexState> visit(point_count, DfsVertexState::Fresh);
 
+  dfs_disable_back_edges(
+      points, point_count,
+      sorted_roots_with_fanout(points, point_count, indeg0), visit);
+
+  dfs_disable_back_edges(
+      points, point_count,
+      sorted_vertices_with_state(visit, point_count, DfsVertexState::Fresh),
+      visit);
+}
+
+/// Build layered topology directly from Kahn "waves":
+/// layer0 = all zero-indegree nodes, then repeatedly peel current layer.
+static void build_layered_topology_from_points(
+    const std::vector<TimingPointRef> &points, std::size_t point_count,
+    TopoVisitor &out_topo) {
+  out_topo.clear();
+  if (point_count == 0) {
+    return;
+  }
+
+  std::vector<std::size_t> indeg = compute_in_degrees(points, point_count);
+  TopoVisitor::Layer current_layer;
+  current_layer.reserve(point_count);
   for (std::size_t i = 0; i < point_count; ++i) {
     if (indeg[i] == 0) {
-      queue.push_back(i);
+      current_layer.push_back(i);
     }
   }
 
-  for (std::size_t head = 0; head < queue.size(); ++head) {
-    const std::size_t u = queue[head];
-    out_topo_order.push_back(u);
-    for (const auto &e : points[u].fanouts) {
-      if (gba_timing_edge_active(e, point_count) &&
-          --indeg[e.target_point] == 0) {
-        queue.push_back(e.target_point);
+  std::size_t peeled_node_count = 0;
+  while (!current_layer.empty()) {
+    peeled_node_count += current_layer.size();
+    out_topo.add_layer(current_layer);
+
+    TopoVisitor::Layer next_layer;
+    for (std::size_t u : current_layer) {
+      for (const auto &e : points[u].fanouts) {
+        if (!gba_timing_edge_active(e, point_count)) {
+          continue;
+        }
+        if (--indeg[e.target_point] == 0) {
+          next_layer.push_back(e.target_point);
+        }
       }
     }
+
+    current_layer = std::move(next_layer);
   }
 
-  if (out_topo_order.size() < point_count) {
-    std::unordered_set<std::size_t> leftover;
-    for (std::size_t i = 0; i < point_count; ++i) {
-      if (indeg[i] > 0) {
-        leftover.insert(i);
-      }
-    }
-    LOG_WARN << "[GBA] WARNING: graph still cyclic after DFS loop break; "
-             << leftover.size() << " node(s) not in topo (total="
-             << point_count << ", reached=" << out_topo_order.size() << ")\n";
-    std::cerr << "[GBA] WARNING: forcing remaining nodes into topo_order\n";
-    for (std::size_t i : leftover) {
-      out_topo_order.push_back(i);
-    }
+  const std::size_t topo_node_count = out_topo.node_count();
+  if (topo_node_count != point_count || peeled_node_count != point_count) {
+    LOG_ERROR << "[GBA] ERROR: topology incomplete after DFS cycle break "
+              << "(points=" << point_count
+              << ", topo_nodes=" << topo_node_count
+              << ", peeled_nodes=" << peeled_node_count
+              << ", missing=" << (point_count - topo_node_count)
+              << "), cycle-breaking is likely incorrect.\n";
+    assert(false && "GBA layered topo incomplete after cycle break");
   }
 }
 
@@ -201,49 +226,25 @@ void STAWorker::gba_clear_graph_structure() {
   gba_graphy_.paths.clear();
   gba_graphy_.pt_to_node.clear();
   gba_graphy_.end_node.clear();
-  gba_graphy_.topo_order.clear();
+  gba_graphy_.topo.clear();
 }
 
 void STAWorker::gba_allocate_nodes_for_points() {
   const std::size_t point_count = res.points.size();
-  const double pos_inf = std::numeric_limits<double>::infinity();
-  const double neg_inf = -pos_inf;
-  const double init_delay =
-      (analysis_mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
-  const double init_slew =
-      (analysis_mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
-  const double init_required =
-      (analysis_mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
 
   gba_graphy_.nodes.reserve(point_count);
   for (std::size_t i = 0; i < point_count; ++i) {
     GbaNode node;
-    node.pt_idx = i;
-    node.id = i;
-    node.delay_rise = init_delay;
-    node.delay_fall = init_delay;
-    node.slew_rise = init_slew;
-    node.slew_fall = init_slew;
-    node.required_rise = init_required;
-    node.required_fall = init_required;
-    node.prev_node_rise = std::numeric_limits<std::size_t>::max();
-    node.prev_node_fall = std::numeric_limits<std::size_t>::max();
-    node.prev_path_rise = std::numeric_limits<std::size_t>::max();
-    node.prev_path_fall = std::numeric_limits<std::size_t>::max();
-    node.next_node_rise = std::numeric_limits<std::size_t>::max();
-    node.next_node_fall = std::numeric_limits<std::size_t>::max();
-    node.next_path_rise = std::numeric_limits<std::size_t>::max();
-    node.next_path_fall = std::numeric_limits<std::size_t>::max();
-    node.fanouts.clear();
+    node.init_for_point(i, analysis_mode);
 
     gba_graphy_.pt_to_node[i] = node.id;
     gba_graphy_.nodes.push_back(std::move(node));
   }
 }
 
-std::size_t STAWorker::gba_append_path(std::size_t from_node, std::size_t to_node,
-                                       double incr_ps, double slew_ns,
-                                       TransitionDirection dir,
+std::size_t STAWorker::gba_append_path(std::size_t from_node,
+                                       std::size_t to_node, double incr_ps,
+                                       double slew_ns, TransitionDirection dir,
                                        TransitionDirection input_dir) {
   GbaPath path;
   path.startnode = from_node;
@@ -261,32 +262,14 @@ std::size_t STAWorker::gba_append_path(std::size_t from_node, std::size_t to_nod
 }
 
 void STAWorker::gba_compute_topo_and_break_cycles(std::size_t point_count) {
-  using gba_topo::DfsVertexState;
-  using gba_topo::compute_in_degrees;
-  using gba_topo::dfs_disable_back_edges;
-  using gba_topo::kahn_topological_order;
-  using gba_topo::sorted_roots_with_fanout;
-  using gba_topo::sorted_vertices_with_state;
+  using gba_topo::disable_back_edges_two_phase;
+  using gba_topo::build_layered_topology_from_points;
 
   // OpenSTA-style: DFS from sorted zero-indegree roots, then from any vertex
-  // still unvisited; back edges set TimingEdge::loop_disabled. Kahn topo on
-  // active edges; leftover SCC nodes are appended if the graph stays cyclic.
-
-  const std::vector<std::size_t> indeg0 =
-      compute_in_degrees(res.points, point_count);
-  std::vector<DfsVertexState> visit(point_count, DfsVertexState::Fresh);
-
-  dfs_disable_back_edges(res.points, point_count,
-                         sorted_roots_with_fanout(res.points, point_count,
-                                                  indeg0),
-                         visit);
-
-  dfs_disable_back_edges(
-      res.points, point_count,
-      sorted_vertices_with_state(visit, point_count, DfsVertexState::Fresh),
-      visit);
-
-  kahn_topological_order(res.points, point_count, gba_graphy_.topo_order);
+  // still unvisited; back edges set TimingEdge::loop_disabled. After that we
+  // build layered Kahn topology directly and assert full node coverage.
+  disable_back_edges_two_phase(res.points, point_count);
+  build_layered_topology_from_points(res.points, point_count, gba_graphy_.topo);
 }
 
 void STAWorker::gba_seed_input_clock_nodes() {
@@ -306,11 +289,11 @@ void STAWorker::gba_seed_input_clock_nodes() {
 }
 
 void STAWorker::gba_relax_fanout_segments(std::size_t u_pt, std::size_t v_pt,
-                                         std::size_t u_node_id,
-                                         std::size_t v_node_id, GbaNode &v_node,
-                                         double base_delay_ps,
-                                         double prev_slew_ns,
-                                         TransitionDirection input_dir) {
+                                          std::size_t u_node_id,
+                                          std::size_t v_node_id,
+                                          GbaNode &v_node, double base_delay_ps,
+                                          double prev_slew_ns,
+                                          TransitionDirection input_dir) {
   const bool use_max = (analysis_mode == AnalysisMode::MAX);
 
   auto segs = segment_delays_slews_gba(res, cell_library_, analysis_mode, u_pt,
@@ -326,9 +309,8 @@ void STAWorker::gba_relax_fanout_segments(std::size_t u_pt, std::size_t v_pt,
 
   for (const auto &seg : segs) {
     const double cand_delay = base_delay_ps + seg.delay;
-    const std::size_t path_idx =
-        gba_append_path(u_node_id, v_node_id, seg.delay, seg.slew, seg.dir,
-                        input_dir);
+    const std::size_t path_idx = gba_append_path(
+        u_node_id, v_node_id, seg.delay, seg.slew, seg.dir, input_dir);
 
     if (seg.dir == TransitionDirection::RISING) {
       if ((use_max && seg.slew > v_node.slew_rise) ||
@@ -354,10 +336,10 @@ void STAWorker::gba_forward_propagate_build_paths(std::size_t point_count) {
   const double pos_inf = std::numeric_limits<double>::infinity();
   const double neg_inf = -pos_inf;
 
-  for (std::size_t u_pt : gba_graphy_.topo_order) {
+  gba_graphy_.topo.for_each_forward_node([&](std::size_t u_pt) {
     auto it_u = gba_graphy_.pt_to_node.find(u_pt);
     if (it_u == gba_graphy_.pt_to_node.end()) {
-      continue;
+      return;
     }
     const std::size_t u_node_id = it_u->second;
     GbaNode &u_node = gba_graphy_.nodes[u_node_id];
@@ -371,7 +353,7 @@ void STAWorker::gba_forward_propagate_build_paths(std::size_t point_count) {
                               : (u_node.delay_fall < pos_inf);
 
     if (!has_rise && !has_fall) {
-      continue;
+      return;
     }
 
     if (u_ref.type == OUTPUT || u_ref.type == REGD) {
@@ -404,7 +386,7 @@ void STAWorker::gba_forward_propagate_build_paths(std::size_t point_count) {
                                   TransitionDirection::FALLING);
       }
     }
-  }
+  });
 }
 
 void STAWorker::build_gba_graphy() {
@@ -428,23 +410,8 @@ void STAWorker::build_gba_graphy() {
 
 void STAWorker::reset_gba_nodes_state() {
   AnalysisMode mode = get_analysis_mode();
-  const double pos_inf = std::numeric_limits<double>::infinity();
-  const double neg_inf = -std::numeric_limits<double>::infinity();
-
   for (auto &node : gba_graphy_.nodes) {
-    node.delay_rise = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
-    node.delay_fall = (mode == AnalysisMode::MAX) ? neg_inf : pos_inf;
-    node.required_rise = (mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
-    node.required_fall = (mode == AnalysisMode::MAX) ? pos_inf : neg_inf;
-
-    node.prev_node_rise = std::numeric_limits<std::size_t>::max();
-    node.prev_node_fall = std::numeric_limits<std::size_t>::max();
-    node.prev_path_rise = std::numeric_limits<std::size_t>::max();
-    node.prev_path_fall = std::numeric_limits<std::size_t>::max();
-    node.next_node_rise = std::numeric_limits<std::size_t>::max();
-    node.next_node_fall = std::numeric_limits<std::size_t>::max();
-    node.next_path_rise = std::numeric_limits<std::size_t>::max();
-    node.next_path_fall = std::numeric_limits<std::size_t>::max();
+    node.reset(mode);
   }
 }
 
@@ -460,8 +427,8 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
 
   assert(cell_library_);
 
-  // 1. 直接复用 build_gba_graphy() 中已缓存的拓扑排序
-  const std::vector<std::size_t> &topo = gba_graphy_.topo_order;
+  // 1. 直接复用 build_gba_graphy() 中已缓存的层级拓扑
+  const TopoVisitor &topo = gba_graphy_.topo;
 
   // 2. 初始化起点：根据 pt_type 只选择 CLK_PIN 或 INPUT
   for (std::size_t pt_idx : input_clk_point_ids) {
@@ -480,33 +447,34 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
     node.prev_node_fall = node.id;
   }
 
-  // 3. 沿 topo 序做 DP：仅选择，不计算；使用 build_gba_graphy 中已有的 paths/fanouts
+  // 3. 沿 topo 序做 DP：仅选择，不计算；使用 build_gba_graphy 中已有的
+  // paths/fanouts
   const bool use_max = (analysis_mode == AnalysisMode::MAX);
   const double pos_inf = std::numeric_limits<double>::infinity();
   const double neg_inf = -pos_inf;
 
-  for (std::size_t u_pt : topo) {
+  topo.for_each_forward_node([&](std::size_t u_pt) {
     auto it_u = gba_graphy_.pt_to_node.find(u_pt);
     if (it_u == gba_graphy_.pt_to_node.end())
-      continue;
+      return;
     std::size_t u_node_id = it_u->second;
     GbaNode &u_node = gba_graphy_.nodes[u_node_id];
 
-    const bool has_rise = use_max ? (u_node.delay_rise > neg_inf)
-                                 : (u_node.delay_rise < pos_inf);
-    const bool has_fall = use_max ? (u_node.delay_fall > neg_inf)
-                                 : (u_node.delay_fall < pos_inf);
+    const bool has_rise =
+        use_max ? (u_node.delay_rise > neg_inf) : (u_node.delay_rise < pos_inf);
+    const bool has_fall =
+        use_max ? (u_node.delay_fall > neg_inf) : (u_node.delay_fall < pos_inf);
 
     if (!has_rise && !has_fall)
-      continue;
+      return;
 
-    if constexpr (kDebugGbaPropPath) {  // NOLINT
+    if constexpr (kDebugGbaPropPath) { // NOLINT
       const std::size_t filter = kDebugGbaPropPathFilterPt;
       if (filter == static_cast<std::size_t>(-1) || u_pt == filter) {
         const auto &u_ref = res.points[u_pt];
-        std::cout << "[prop] u_pt=" << u_pt
-                  << " (" << (u_ref.inst ? u_ref.inst->instance_name : "(port)")
-                  << "/" << u_ref.port_name << ")"
+        std::cout << "[prop] u_pt=" << u_pt << " ("
+                  << (u_ref.inst ? u_ref.inst->instance_name : "(port)") << "/"
+                  << u_ref.port_name << ")"
                   << " delay_rise=" << u_node.delay_rise << "ps"
                   << " delay_fall=" << u_node.delay_fall << "ps"
                   << " slew_rise_max=" << u_node.slew_rise << "ns"
@@ -516,7 +484,8 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
       }
     }
 
-    // 遍历 u 的 fanouts（来自 build_gba_graphy），按 path 选择并更新 v 的 delay/prev
+    // 遍历 u 的 fanouts（来自 build_gba_graphy），按 path 选择并更新 v 的
+    // delay/prev
     for (const GbaPath &path : u_node.fanouts) {
       std::size_t v_node_id = path.endnode;
       if (v_node_id >= gba_graphy_.nodes.size())
@@ -532,15 +501,17 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
 
       double cand_delay = base_delay + path.incr;
 
-      if constexpr (kDebugGbaPropPath) {  // NOLINT
+      if constexpr (kDebugGbaPropPath) { // NOLINT
         const std::size_t filter = kDebugGbaPropPathFilterPt;
         if (filter == static_cast<std::size_t>(-1) || u_pt == filter) {
           std::size_t v_pt = v_node.pt_idx;
           const auto &v_ref = res.points[v_pt];
-          const char *idir = path.input_dir == TransitionDirection::RISING ? "R" : "F";
-          const char *odir = path.dir == TransitionDirection::RISING ? "R" : "F";
-          std::cout << "  -> v_pt=" << v_pt
-                    << " (" << (v_ref.inst ? v_ref.inst->instance_name : "(port)")
+          const char *idir =
+              path.input_dir == TransitionDirection::RISING ? "R" : "F";
+          const char *odir =
+              path.dir == TransitionDirection::RISING ? "R" : "F";
+          std::cout << "  -> v_pt=" << v_pt << " ("
+                    << (v_ref.inst ? v_ref.inst->instance_name : "(port)")
                     << "/" << v_ref.port_name << ")"
                     << " [" << idir << "->" << odir << "]"
                     << " incr=" << path.incr << "ps"
@@ -572,7 +543,7 @@ void STAWorker::run_gba_propagate(PointType pt_type) {
         }
       }
     }
-  }
+  });
 }
 
 void STAWorker::compute_setup_hold_gba(TimingPathResult &pr) {
@@ -584,10 +555,9 @@ void STAWorker::compute_setup_hold_gba(TimingPathResult &pr) {
 
   // 逐级用 max/min cap 重算输出 slew，链式传递，不修改 pr.steps 中的值
   for (const auto &s : pr.steps) {
-    cur_slew_ns = recalc_slew_with_max_cap(
-        res, cell_library_, analysis_mode,
-        s.start_point, s.end_point,
-        cur_slew_ns, s.dir);
+    cur_slew_ns = recalc_slew_with_max_cap(res, cell_library_, analysis_mode,
+                                           s.start_point, s.end_point,
+                                           cur_slew_ns, s.dir);
   }
 
   // 用重算后的末步 slew 构造临时路径，仅借用 compute_path_setup_hold 计算约束
@@ -596,10 +566,11 @@ void STAWorker::compute_setup_hold_gba(TimingPathResult &pr) {
   compute_path_setup_hold(tmp);
 
   pr.library_setup_time = tmp.library_setup_time;
-  pr.library_hold_time  = tmp.library_hold_time;
+  pr.library_hold_time = tmp.library_hold_time;
 }
 
-// 从 end_node 回溯构造 TimingPathResult，rise 和 fall 各回溯一条，并计算 setup/hold
+// 从 end_node 回溯构造 TimingPathResult，rise 和 fall 各回溯一条，并计算
+// setup/hold
 void STAWorker::run_gba_timing_analysis(bool clear_paths_first) {
   if (clear_paths_first)
     res.paths.clear();
@@ -647,11 +618,11 @@ void STAWorker::run_gba_timing_analysis(bool clear_paths_first) {
         TimingStep step;
         step.start_point = prev_node.pt_idx;
         step.end_point = cur_node.pt_idx;
-        step.cap_load = (path.dir == TransitionDirection::RISING) ? \
-                  res.points[cur_node.pt_idx].rise_cap : \
-                  res.points[cur_node.pt_idx].fall_cap;
+        step.cap_load = (path.dir == TransitionDirection::RISING)
+                            ? res.points[cur_node.pt_idx].rise_cap
+                            : res.points[cur_node.pt_idx].fall_cap;
         step.incr = path.incr;
-        step.slew = path.slew * 1000.0;  // ns -> ps
+        step.slew = path.slew * 1000.0; // ns -> ps
         step.dir = path.dir;
         steps_rev.push_back(step);
 
@@ -671,7 +642,8 @@ void STAWorker::run_gba_timing_analysis(bool clear_paths_first) {
       }
 
       std::size_t start_pt = steps.front().start_point;
-      PointType start_type = effective_start_type_for_group(res.points[start_pt]);
+      PointType start_type =
+          effective_start_type_for_group(res.points[start_pt]);
       PointType end_type = res.points[end_pt].type;
 
       TimingPathResult pr;
@@ -689,6 +661,8 @@ void STAWorker::run_gba_timing_analysis(bool clear_paths_first) {
   }
 }
 
+void STAWorker::gba_propagate_delay() {}
+
 void run_gba_analysis(STAWorker &worker) {
   LOG_INFO << "Step 1: build_fanouts()";
   worker.build_fanouts();
@@ -699,11 +673,11 @@ void run_gba_analysis(STAWorker &worker) {
 
   worker.reset_gba_nodes_state();
   worker.run_gba_propagate(PointType::CLK_PIN);
-  worker.run_gba_timing_analysis(true);   // clear res.paths first
+  worker.run_gba_timing_analysis(true); // clear res.paths first
 
   worker.reset_gba_nodes_state();
   worker.run_gba_propagate(PointType::INPUT);
-  worker.run_gba_timing_analysis(false);  // append to res.paths
+  worker.run_gba_timing_analysis(false); // append to res.paths
   worker.run_gba_backward_compute_required_and_slack();
 }
 
